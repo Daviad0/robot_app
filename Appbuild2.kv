@@ -1,0 +1,30 @@
+BoxLayoutExample2:
+
+<BoxLayoutExample2>:
+   Button:
+
+      text: "Mexico"
+      on_release: root.btn()
+      size_hint: .5, .5
+      # size: "100dp", "60dp"
+      # width: "100dp"
+      # height: "100dp"
+      # x, center_x, right
+      # y, center_y, top
+      pos_hint: { "center_x": .5 }
+
+<P2>:
+   Label:
+      text: "Bye"
+      color: 0, .75, 1, .95
+      size_hint: 0.6, 0.2
+      pos_hint: {"center_x": 0.2, "top_x": 1}
+
+
+   Button:
+      text: "Here it is"
+      on_release:
+         import webbrowser
+         webbrowser.open('https://www.desmos.com/calculator')
+      size_hint: 0.6, 0.2
+      pos_hint: {"center_x": 0.2, "top_x": 1}
