@@ -5,6 +5,7 @@ from kivy.uix.label import Label
 from kivy.config import Config
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.network.urlrequest import UrlRequest
 
 
 class widget_1(App):
@@ -12,6 +13,7 @@ class widget_1(App):
   
     def build(self):
         # Define a grid layout for this App
+
         self.layout = GridLayout(cols = 1, padding = 10)
   
 
@@ -27,22 +29,38 @@ class widget_1(App):
         
         return self.layout
           # On button press - Create a popup dialog with a label and a close button
+
+    def webReqSuccess(self,req, res):
+        # res = result (content)
+        # req = actual request
+        # print out result of specific request once done
+        print(res)
+    def webReqFail(self,req, res):
+        print("Failed")
+        print(res)
+
     def onButtonPress(self, button):
-        layout2 = BoxLayout(orientation = "vertical")
-        layout = GridLayout(cols = 1, padding = 10)
+        # layout2 = BoxLayout(orientation = "vertical")
+        # layout = GridLayout(cols = 1, padding = 10)
   
-        popupLabel = Label(text = "Click for pop-up")
-        closeButton = Button(text = "Close the pop-up")
-        popup2button = Button(text = "Test")
-        layout.add_widget(popupLabel)
-        layout.add_widget(closeButton)       
-        layout2.add_widget(popup2button)
-        # Instantiate the modal popup and display
-        popup = Popup(title ='Demo Popup',content = layout)     
-        popup2 = Popup(title = 'Test3', content = layout2)
-        popup.open()
-        # Attach close button press with popup.dismiss action
-        closeButton.bind(on_press = popup.dismiss)   
+        # popupLabel = Label(text = "Click for pop-up")
+        # closeButton = Button(text = "Close the pop-up")
+        # popup2button = Button(text = "Test")
+        # layout.add_widget(popupLabel)
+        # layout.add_widget(closeButton)       
+        # layout2.add_widget(popup2button)
+        # # Instantiate the modal popup and display
+        # popup = Popup(title ='Demo Popup',content = layout)     
+        # popup2 = Popup(title = 'Test3', content = layout2)
+        # popup.open()
+        # # Attach close button press with popup.dismiss action
+        # closeButton.bind(on_press = popup.dismiss)   
+        
+        cookies = {'session': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhdmlhZG8iLCJncm91cCI6InRlc3RpbmctZW52IiwiaWQiOiI2MjdiMjM0NDg5ZTE3ODFhNGM1MjQxMzIiLCJpYXQiOjE2NTMwOTc3NjIsImV4cCI6MTY1MzE4NDE2Mn0.BuFPwXiij3E055fgmFCA3Da1-Gl8PDbukcymeJ9R9d0'}
+        headers = {'Content-Type': 'application/json', "group" : "testing-env"}
+        UrlRequest("http://sparkclub.azurewebsites.net/group/items",req_headers=headers, debug=True, on_success = self.webReqSuccess, on_failure = self.webReqFail, on_error=self.webReqFail, timeout=2)
+        
+
 
 # Main Kivy class
 class BoxLayoutApp(App):
