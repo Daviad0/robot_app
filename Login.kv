@@ -1,0 +1,50 @@
+
+
+Login:
+    spacing: '10dp'
+    padding: '20dp'
+    GridLayout:
+        rows: 3
+        cols: 1
+        row_default_height: '48dp'
+        row_force_default: True
+        size_hint_y: None
+        size_hint_x: None
+        width: 800
+        height: self.minimum_height
+        spacing: 40
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        MDTextField:
+            id: username
+            mode: 'rectangle'
+            multiline: False
+            color_mode: 'custom'
+            line_color_focus: root.rgba255to1((19, 3, 252,1))
+            active_line: True
+            hint_text: 'Username'
+            pos_hint: {'center_x': 0.5}
+            font_name: 'Roboto'
+            border: (2,2,2,2)
+            border_color: 0,0,0,1
+            spacing: (20,20,20,20)
+            padding: (20,20,20,20)
+        MDTextField:
+            id: password
+            height: '48dp'
+            mode: 'rectangle'
+            pos_hint: {'center_x': 0.5}
+            multiline: False
+            color_mode: 'custom'
+            line_color_focus: root.rgba255to1((19, 3, 252,1))
+            hint_text: 'Password'
+            password: True
+            font_name: 'Roboto'
+            border: (2,2,2,2)
+            border_color: 0,0,0,1
+            spacing: (20,20,20,20)
+            padding: (20,20,20,20)
+        MDRaisedButton:
+            text: "Login"
+            
+            md_bg_color: root.rgba255to1((19, 3, 252,1))
+
