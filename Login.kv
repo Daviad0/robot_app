@@ -18,7 +18,7 @@ Login:
             id: username
             mode: 'rectangle'
             multiline: False
-            color_mode: 'custom'
+            
             line_color_focus: root.rgba255to1((19, 3, 252,1))
             active_line: True
             hint_text: 'Username'
@@ -28,13 +28,14 @@ Login:
             border_color: 0,0,0,1
             spacing: (20,20,20,20)
             padding: (20,20,20,20)
+            
         MDTextField:
             id: password
             height: '48dp'
             mode: 'rectangle'
             pos_hint: {'center_x': 0.5}
             multiline: False
-            color_mode: 'custom'
+            
             line_color_focus: root.rgba255to1((19, 3, 252,1))
             hint_text: 'Password'
             password: True
@@ -43,8 +44,25 @@ Login:
             border_color: 0,0,0,1
             spacing: (20,20,20,20)
             padding: (20,20,20,20)
-        MDRaisedButton:
-            text: "Login"
             
-            md_bg_color: root.rgba255to1((19, 3, 252,1))
+        FloatLayout:
+            spacing: 20
+            GridLayout:
+                rows: 1
+                cols: 2
+                row_default_height: '48dp'
+                row_force_default: True
+                size_hint_y: None
+                size_hint_x: None
+                width: self.minimum_width
+                height: self.minimum_height
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                spacing: 20
+                MDRaisedButton:
+                    text: "Login"
+                    md_bg_color: root.rgba255to1((19, 3, 252,1))
+                    on_press: root.submitForm()
+                MDRaisedButton:
+                    text: "Forgot Something?"
+                    md_bg_color: root.rgba255to1((100, 100, 100,1))
 
