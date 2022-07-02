@@ -1,8 +1,11 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
+from actions import SparkClub
 
 KVContents = open('Login.kv', encoding='utf8').read()
+
+SCI = SparkClub()
 
 
 class Login(FloatLayout):
@@ -12,13 +15,8 @@ class Login(FloatLayout):
     def submitForm(self):
         print("Submitted form!")
         v = True
-        if(self.ids.username.text == ""):
-            v = False
-            
-            self.ids.username.md_bg_color = self.rgba255to1((50, 0, 0, 1))
-        if(self.ids.password.text == ""):
-            v = False
-            self.ids.password.md_bg_color = self.rgba255to1((50, 0, 0, 1))
+        res = SCI.login(self.ids.username.text, self.ids.password.text)
+        print(res)
         
 
 class LoginPage(MDApp):
