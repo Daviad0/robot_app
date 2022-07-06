@@ -3,92 +3,14 @@
 Login:
     spacing: '10dp'
     padding: '0dp'
-    # GridLayout:
-    #     rows: 2
-    #     padding:'0dp'
-    #     cols: 1
-    #     #rows_minimum: '48dp'
-    #     size_hint_y: None
-    #     pos_hint: {'center_x': .5, 'center_y': .75}
-    #     spacing: 240
-    #     Image:
-    #         source: 'assets/lightning.png'
-    #         size: self.texture_size
-    #         size_hint_y: None
-    #         padding: '60dp'
-    #     FloatLayout:
-    #         size_hint_y: None
-    #         padding: '60dp'
-    #         GridLayout:
-    #             rows: 3
-    #             cols: 1
-    #             row_default_height: '48dp'
-    #             row_force_default: True
-    #             size_hint_y: None
-    #             size_hint_x: None
-    #             width: 800
-    #             height: self.minimum_height
-    #             spacing: 40
-    #             pos_hint: {'center_x': .5, 'center_y': .5}
-    #             MDTextField:
-    #                 id: username
-    #                 mode: 'rectangle'
-    #                 multiline: False
-                    
-    #                 line_color_focus: root.rgba255to1((19, 3, 252,1))
-    #                 active_line: True
-    #                 hint_text: 'Username'
-    #                 pos_hint: {'center_x': 0.5}
-    #                 font_name: 'Roboto'
-    #                 border: (2,2,2,2)
-    #                 border_color: 0,0,0,1
-    #                 spacing: (20,20,20,20)
-    #                 padding: (20,20,20,20)
-                    
-    #             MDTextField:
-    #                 id: password
-    #                 height: '48dp'
-    #                 mode: 'rectangle'
-    #                 pos_hint: {'center_x': 0.5}
-    #                 multiline: False
-                    
-    #                 line_color_focus: root.rgba255to1((19, 3, 252,1))
-    #                 hint_text: 'Password'
-    #                 password: True
-    #                 font_name: 'Roboto'
-    #                 border: (2,2,2,2)
-    #                 border_color: 0,0,0,1
-    #                 spacing: (20,20,20,20)
-    #                 padding: (20,20,20,20)
-                    
-    #             FloatLayout:
-    #                 spacing: 20
-    #                 GridLayout:
-    #                     rows: 1
-    #                     cols: 2
-    #                     row_default_height: '48dp'
-    #                     row_force_default: True
-    #                     size_hint_y: None
-    #                     size_hint_x: None
-    #                     width: self.minimum_width
-    #                     height: self.minimum_height
-    #                     pos_hint: {'center_x': .5, 'center_y': .5}
-    #                     spacing: 20
-    #                     MDRaisedButton:
-    #                         text: "Login"
-    #                         md_bg_color: root.rgba255to1((19, 3, 252,1))
-    #                         on_press: root.submitForm()
-    #                     MDRaisedButton:
-    #                         text: "Forgot Something?"
-    #                         md_bg_color: root.rgba255to1((100, 100, 100,1))
     GridLayout:
+        id: login_page
         rows: 2
         padding:'0dp'
         cols: 1
         #rows_minimum: '48dp'
         size_hint_y: None
         pos_hint: {'center_x': .5, 'center_y': .75}
-        width: '0dp'
         spacing: 240
         Image:
             source: 'assets/lightning.png'
@@ -97,11 +19,11 @@ Login:
             padding: '60dp'
         FloatLayout:
             size_hint_y: None
-            padding: '20dp'
+            padding: '60dp'
             GridLayout:
-                rows: 1
-                cols: 2
-                row_default_height: '48dp'
+                rows: 3
+                cols: 1
+                row_default_height: '36dp'
                 row_force_default: True
                 size_hint_y: None
                 size_hint_x: None
@@ -110,13 +32,164 @@ Login:
                 spacing: 40
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 MDTextField:
-                    id: reset_email
+                    id: username
                     mode: 'rectangle'
                     multiline: False
                     
-                    line_color_focus: root.rgba255to1((19, 3, 252,1))
+                    line_color_focus: root.getColor('primary')
                     active_line: True
-                    hint_text: 'Email'
+                    hint_text: 'Username'
+                    pos_hint: {'center_x': 0.5}
+                    font_name: 'Roboto'
+                    border: (2,2,2,2)
+                    border_color: 0,0,0,1
+                    spacing: (20,20,20,20)
+                    padding: (20,20,20,20)
+                    on_text: root.usernameChange()
+                    
+                MDTextField:
+                    id: password
+                    height: '48dp'
+                    mode: 'rectangle'
+                    pos_hint: {'center_x': 0.5}
+                    multiline: False
+                    disabled: True
+                    opacity: 0.3
+                    color_mode: 'custom'
+                    line_color_focus: root.getColor('primary')
+                    line_color_normal: root.getColor('primary')
+                    line_color_disabled: root.getColor('primary')
+                    active_line: True
+                    hint_text: 'Password'
+                    password: True
+                    font_name: 'Roboto'
+                    border: (2,2,2,2)
+                    border_color: 0,0,0,1
+                    spacing: (20,20,20,20)
+                    padding: (20,20,20,20)
+                    on_text: root.passwordChange()
+                    
+                FloatLayout:
+                    spacing: 20
+                    GridLayout:
+                        rows: 1
+                        cols: 2
+                        row_default_height: '48dp'
+                        row_force_default: True
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        height: self.minimum_height
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        spacing: 20
+                        MDRaisedButton:
+                            text: "Login"
+                            id: login_button
+                            disabled: True
+                            opacity: 0.3
+                            md_bg_color: root.getColor('primary')
+                            disabled_md_bg_color: root.getColor('primary')
+                            disabled_color: root.getColor('white')
+                            color: root.getColor('white')
+                            on_release: root.submitForm()
+                        MDRaisedButton:
+                            text: "Forgot Something?"
+                            md_bg_color: root.getColor('gray')
+                            on_release: root.goToTempLogin()
+    GridLayout:
+        id: temp_page
+        rows: 2
+        padding:'0dp'
+        cols: 1
+        #rows_minimum: '48dp'
+        size_hint_y: None
+        pos_hint: {'center_x': .5, 'center_y': 10}
+        width: '0dp'
+        spacing: 240
+        Image:
+            source: 'assets/lightning.png'
+            size: self.texture_size
+            size_hint_y: None
+            padding: '60dp'
+        
+        FloatLayout:
+            size_hint_y: None
+            padding: '20dp'
+            GridLayout:
+                rows: 3
+                cols: 1
+                row_default_height: '32dp'
+                row_force_default: True
+                size_hint_y: None
+                size_hint_x: None
+                height: self.minimum_height
+                spacing: 40
+                width: 800
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                Label:
+                    text: 'Temporary Login'
+                    font_name: 'Roboto'
+                    font_size: '24dp'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    color: (0,0,0,1)
+                    height: '60dp'
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    row_default_height: '48dp'
+                    row_force_default: True
+                    size_hint_y: None
+                    size_hint_x: None
+                    width: 800
+                    height: self.minimum_height
+                    spacing: 60
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    
+                    MDTextField:
+                        id: temp_email
+                        mode: 'rectangle'
+                        multiline: False
+                        
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Email'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        icon_right: 'email'
+                        icon_right_color: root.getColor('primary')
+                        on_text: root.emailChange()
+
+                    FloatLayout:
+                        size_hint_x: .25
+                        padding: '30dp'
+                        MDRaisedButton:
+                            id: temp_send_code
+                            text: "Send Code"
+                            disabled: True
+                            opacity: 0.3
+                            md_bg_color: root.getColor('primary')
+                            disabled_md_bg_color: root.getColor('primary')
+                            disabled_color: root.getColor('white')
+                            pos_hint: {'center_x': 0.5, 'center_y': .5}
+                            padding: (20,20,20,20)
+                            on_release: root.sendCode()
+                MDTextField:
+                    id: temp_code
+                    mode: 'rectangle'
+                    multiline: False
+                    disabled: True
+                    opacity: 0.3
+                    color_mode: 'custom'
+                    line_color_focus: root.getColor('primary')
+                    line_color_normal: root.getColor('primary')
+                    line_color_disabled: root.getColor('primary')
+                    active_line: True
+                    hint_text: 'Code'
                     pos_hint: {'center_x': 0.5}
                     font_name: 'Roboto'
                     border: (2,2,2,2)
@@ -124,9 +197,5 @@ Login:
                     spacing: (20,20,20,20)
                     padding: (20,20,20,20)
                     
-                MDRaisedButton:
-                    text: "Send Code"
-                    md_bg_color: root.rgba255to1((19, 3, 252,1))
-                    height: '48dp'
-            
+                    
 
