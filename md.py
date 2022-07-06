@@ -4,8 +4,9 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
 from actions import SparkClub
+import kivy.uix.screenmanager as t
 
-KVContents = open('Login.kv', encoding='utf8').read()
+KVContents = open('App.kv', encoding='utf8').read()
 
 SCI = SparkClub()
 
@@ -15,22 +16,31 @@ def rgba255to1(rgba):
 def fadeto(widget, opacity, duration):
     a = Animation(opacity=opacity, duration=duration)
     a.start(widget)
+    
+def changePage(page):
+    MDApp.get_running_app().root.transition = t.RiseInTransition(duration=.3)
+    MDApp.get_running_app().root.current = page
 
 COLORS = {
     "primary": rgba255to1((19, 3, 252,1)),
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
+    "black": rgba255to1((0, 0, 0,1)),
 }
 
 
-class Login(FloatLayout):
+class Login(Screen):
    
     
     def submitForm(self):
         print("Submitted form!")
         v = True
         res = SCI.login(self.ids.username.text, self.ids.password.text)
-        print(res)
+        if(res):
+            changePage("landing")
+        else:
+            self.ids.username.text = ""
+            self.ids.password.text = ""
     def getColor(self, name):
         return COLORS[name.lower()]
     def goToTempLogin(self):
@@ -38,6 +48,7 @@ class Login(FloatLayout):
         self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
         self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
     def usernameChange(self):
+        self.ids.username.icon_right = ""
         if(self.ids.username.text == ""):
             # keep password disabled
             self.ids.password.disabled = True
@@ -49,6 +60,7 @@ class Login(FloatLayout):
             self.ids.password.disabled = False
             fadeto(self.ids.password, 1, 0.25)
     def passwordChange(self):
+        self.ids.password.icon_right = ""
         if(self.ids.username.text == "" or self.ids.password.text == ""):
             # disable login button
             self.ids.login_button.disabled = True
@@ -69,17 +81,38 @@ class Login(FloatLayout):
             return
         self.ids.temp_code.disabled = False
         fadeto(self.ids.temp_code, 1, 0.25)
+        
             
+class Landing(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class Custom(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class Account(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class Splash(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class WindowManager(ScreenManager):
+    
+    def __init__(self, **kwargs):
+        super(WindowManager, self).__init__(**kwargs)
     
 
 class LoginPage(MDApp):
-    def __init__(self):
-        super().__init__()
-        self.screen = Builder.load_string(KVContents)
-        
     def build(self):
         
-        return self.screen
+        return Builder.load_string(KVContents)
     
     
     
