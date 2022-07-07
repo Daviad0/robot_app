@@ -1,10 +1,11 @@
 WindowManager:
+    Splash:
+        id: splashscreen
     Login:
     Landing:
     Custom:
     Account:
-    Splash:
-        id: splashscreen
+    
 
 <Login>:
     name: "login"
@@ -261,6 +262,21 @@ WindowManager:
             pos: self.pos
             size: self.size
     FloatLayout:
-        Label:
-            text: 'Welcome to Lightning4'
-            color: root.getColor('primary')
+        GridLayout:
+            rows: 2
+            cols: 1
+            pos_hint: {'center_x': .5, 'center_y': .0}
+            row_default_height: '20dp'
+            row_force_default: True
+            spacing: '80dp'
+            Image:
+                source: 'assets/lightning.png'
+                size: self.texture_size
+                size_hint_y: None
+            Label:
+                text: '#862'
+                font_size: '80dp'
+                bold: True
+                
+                color: root.getColor('primary')
+                opacity: 0.5

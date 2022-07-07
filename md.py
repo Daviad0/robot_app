@@ -3,8 +3,13 @@ from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
+from kivy.properties import DictProperty
+from kivy.clock import Clock
 from actions import SparkClub
 import kivy.uix.screenmanager as t
+
+# from pushyy import Pushyy
+# from pushyy import RemoteMessage
 
 KVContents = open('App.kv', encoding='utf8').read()
 
@@ -20,6 +25,11 @@ def fadeto(widget, opacity, duration):
 def changePage(page):
     MDApp.get_running_app().root.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.current = page
+
+def authenticate(dt):
+    # look for token here
+    changePage("login")
+    
 
 COLORS = {
     "primary": rgba255to1((19, 3, 252,1)),
@@ -109,7 +119,31 @@ class WindowManager(ScreenManager):
         super(WindowManager, self).__init__(**kwargs)
     
 
+# def my_token(token):
+#     print(token)
+    
+# def foreground_notif(message):
+#     print(message)
+#     MDApp.get_running_app().recent_notif = message.as_dict()
+
+# def click_notif(message):
+#     print(message)
+#     MDApp.get_running_app().recent_notif = message.as_dict()
+    
+
+
 class LoginPage(MDApp):
+    recent_notif = DictProperty(rebind=True)
+    
+    # def get_token(self):
+    #     Pushyy().get_device_token(my_token)
+        
+    def on_start(self):
+        #Pushyy().token_change_listener(my_token)
+        Clock.schedule_once(authenticate, 5)
+        
+        
+        
     def build(self):
         
         return Builder.load_string(KVContents)
