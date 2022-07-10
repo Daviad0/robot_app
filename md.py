@@ -28,7 +28,7 @@ def changePage(page):
 
 def authenticate(dt):
     # look for token here
-    changePage("login")
+    changePage("landing")
     
 
 COLORS = {

@@ -221,10 +221,63 @@ WindowManager:
         Rectangle:
             pos: self.pos
             size: self.size
-    FloatLayout:
-        Label:
-            text: 'Welcome to Lightning'
-            color: root.getColor('primary')
+    
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        StackLayout:
+            size_hint_y: None
+            spacing: '20dp'
+            FloatLayout:
+                padding: '20dp'
+                size_hint_y: None
+                MDCard:
+                    radius: '12dp'
+                    elevation: 2
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: None
+                    width: '400dp'
+                    MDIconButton:
+                        icon: 'magnify'
+            FloatLayout:
+                padding: '20dp'
+                size_hint_y: None
+                MDCard:
+                    radius: '12dp'
+                    elevation: 4
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: None
+                    size_hint_y: None
+                    orientation: 'vertical'
+                    width: '600dp'
+                    height: '160dp'
+                    StackLayout:
+                        spacing: '5dp'
+                        GridLayout:
+                            rows: 1
+                            cols: 2
+                            size_hint_y: None
+                            MDIconButton:
+                                icon: 'magnify'
+                                size_hint_x: None
+                            Label:
+                                text: 'Item'
+                                font_name: 'Roboto'
+                                font_size: '20dp'
+                                pos_hint: {'center_x': 0.5}
+                                size_hint_y: None
+                                color: root.getColor('primary')
+                        Label:
+                            text: 'AKDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD\n KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD\n KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD\n KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
+                            font_name: 'Roboto'
+                            font_size: '16dp'
+                            pos_hint: {'center_x': 0.5}
+                            size_hint_y: None
+                            color: root.getColor('primary')
+                            
+                
+        
+
 
 <Custom>:
     name: "custom"
