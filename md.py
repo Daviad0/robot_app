@@ -7,6 +7,7 @@ from kivy.properties import DictProperty
 from kivy.clock import Clock
 from actions import SparkClub
 import kivy.uix.screenmanager as t
+from kivy.storage.jsonstore import JsonStore
 
 # from pushyy import Pushyy
 # from pushyy import RemoteMessage
@@ -26,16 +27,26 @@ def changePage(page):
     MDApp.get_running_app().root.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.current = page
 
+def getLandingPageItems():
+    i = SCI.get_items()
+    print(i)
+    m = SCI.get_meeting_today()
+    print(m)
+
 def authenticate(dt):
     # look for token here
-    changePage("landing")
+    if(SCI.try_login_with_key()):
+        changePage("landing")
+    else:
+        changePage("login")
     
 
 COLORS = {
     "primary": rgba255to1((19, 3, 252,1)),
+    "secondary": rgba255to1((7, 0, 105,1)),
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
-    "black": rgba255to1((0, 0, 0,1)),
+    "black": rgba255to1((0, 0, 0,1))
 }
 
 
@@ -48,6 +59,7 @@ class Login(Screen):
         res = SCI.login(self.ids.username.text, self.ids.password.text)
         if(res):
             changePage("landing")
+            getLandingPageItems()
         else:
             self.ids.username.text = ""
             self.ids.password.text = ""
@@ -96,6 +108,7 @@ class Login(Screen):
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
+    
     pass
 
 class Custom(Screen):
