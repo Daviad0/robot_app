@@ -2,10 +2,183 @@ WindowManager:
     Splash:
         id: splashscreen
     Login:
+        id: loginpage
     Landing:
+        id: landingpage
     Custom:
     Account:
     
+
+<EmptySpace>:
+    size_hint_y: None
+
+<AttendanceItemEx>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: (signin_content.height)
+
+        StackLayout:
+        
+            id: signin_content
+            height: self.minimum_height
+            size_hint_y: None
+            spacing: '10dp'
+            padding: (10,10,0,10)
+            Label:
+                text: 'Meeting ABCD'
+                font_name: 'Roboto'
+                font_size: '24dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                
+                StackLayout:
+                    orientation: 'tb-lr'
+                    size_hint_x: None
+                    size_hint_y: None
+                    spacing: '40dp'
+                    pos_hint: {'center_x': 0.5, 'center_y': .5}
+                    MDIconButton:
+                        icon: 'alarm-plus'
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        canvas.before:
+                            Color:
+                                rgba: root.getColor('secondary')
+                            Line:
+                                width: 4
+                                circle: (self.x+(self.width)/4+24, self.y + (self.width)/4+24, (self.width-8)/2)
+
+                        
+                        theme_text_color: "Custom"
+                        text_color: root.getColor('secondary')
+                    Label:
+                        id: 'signin_length'
+                        text: '4 hours'
+                        font_name: 'Roboto'
+                        font_size: '20dp'
+                        size_hint_y: None
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        color: root.getColor('secondary')
+            FloatLayout:
+                size_hint_y: None
+                
+                StackLayout:
+                    orientation: 'tb-lr'
+                    size_hint_x: None
+                    size_hint_y: None
+                    spacing: '40dp'
+                    pos_hint: {'center_x': 0.5, 'center_y': .5}
+                    MDIconButton:
+                        id: 'signin_subgroup_icon'
+                        icon: 'check'
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        canvas.before:
+                            Color:
+                                rgba: root.getColor('success')
+                            Line:
+                                width: 4
+                                circle: (self.x+(self.width)/4+24, self.y + (self.width)/4+24, (self.width-8)/2)
+
+                        
+                        theme_text_color: "Custom"
+                        text_color: root.getColor('success')
+                    Label:
+                        id: 'signin_subgroup'
+                        text: 'Your subgroup is meeting!'
+                        font_name: 'Roboto'
+                        font_size: '20dp'
+                        size_hint_y: None
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        color: root.getColor('success')     
+                    
+            
+                
+            FloatLayout:
+                size_hint_y: None
+
+                MDFillRoundFlatButton:
+                    padding: '16dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Check In to the Meeting'
+
+<LandingItem>:
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: (landingitem_content.height)
+
+        StackLayout:
+        
+            id: landingitem_content
+            height: self.minimum_height
+            size_hint_y: None
+            spacing: '10dp'
+            padding: (20,20,20,20)
+            GridLayout:
+                rows: 1
+                cols: 2
+                size_hint_y: None
+                MDIconButton:
+                    icon: 'magnify'
+                    id: icon
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    text_color: root.getColor('secondary')
+                Label:
+                    text: 'Item'
+                    id: title
+                    font_name: 'Roboto'
+                    font_size: '20dp'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    color: root.getColor('secondary')
+                    bold: True
+            Label:
+                text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
+                font_name: 'Roboto'
+                id: description
+                font_size: '16dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1]
+                color: root.getColor('secondary')
+                halign: 'center'
+                
+                
+            FloatLayout:
+                id: buttonct
+                size_hint_y: None
+
+                MDFillRoundFlatButton:
+                    id: button
+                    padding: '16dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Open Link'
+
 
 <Login>:
     name: "login"
@@ -225,129 +398,15 @@ WindowManager:
     ScrollView:
         do_scroll_x: False
         do_scroll_y: True
-        StackLayout:
+        GridLayout:
             size_hint_y: None
-            spacing: '160dp'
-            FloatLayout:
-                padding: '40dp'
-                size_hint_y: None
-                MDCard:
-                    radius: '12dp'
-                    elevation: 4
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-                    size_hint_x: None
-                    size_hint_y: None
-                    orientation: 'vertical'
-                    width: '600dp'
-                    height: (landingitem_content_1.height)
-
-                    StackLayout:
-                    
-                        id: landingitem_content_1
-                        height: self.minimum_height
-                        size_hint_y: None
-                        spacing: '10dp'
-                        padding: (10,10,0,10)
-                        GridLayout:
-                            rows: 1
-                            cols: 2
-                            size_hint_y: None
-                            MDIconButton:
-                                icon: 'magnify'
-                                size_hint_x: None
-                            Label:
-                                text: 'Item'
-                                font_name: 'Roboto'
-                                font_size: '20dp'
-                                pos_hint: {'center_x': 0.5}
-                                size_hint_y: None
-                                color: root.getColor('secondary')
-                                bold: True
-                        StackLayout:
-                            size_hint_y: None
-                            padding: '0dp'
-                            Label:
-                                text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
-                                font_name: 'Roboto'
-                                font_size: '16dp'
-                                pos_hint: {'center_x': 0.5}
-                                size_hint_y: None
-                                color: root.getColor('secondary')
-                            
-                        FloatLayout:
-                            size_hint_y: None
-
-                            MDFillRoundFlatButton:
-                                padding: '16dp'
-                                pos_hint: {'center_x': .5, 'center_y': .5}
-                                md_bg_color: root.getColor('primary')
-                                text: 'Open Link'
-            FloatLayout:
-                padding: '40dp'
-                size_hint_y: None
-                MDCard:
-                    radius: '12dp'
-                    elevation: 4
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-                    size_hint_x: None
-                    size_hint_y: None
-                    orientation: 'vertical'
-                    width: '600dp'
-                    height: (signin_content.height)
-
-                    StackLayout:
-                    
-                        id: signin_content
-                        height: self.minimum_height
-                        size_hint_y: None
-                        spacing: '10dp'
-                        padding: (10,10,0,10)
-                        Label:
-                            text: 'Meeting ABCD'
-                            font_name: 'Roboto'
-                            font_size: '24dp'
-                            pos_hint: {'center_x': 0.5}
-                            size_hint_y: None
-                            color: root.getColor('secondary')
-                            bold: True
-                        FloatLayout:
-                            size_hint_y: None
-                            Label:
-                                size_hint_x: None
-                                canvas.before:
-                                    Color:
-                                        rgba: root.getColor('primary')
-                                    Ellipse:
-                                        pos: (self.x+5, self.y+5)
-                                        size: (self.width-10, self.height-10)
-                                        angle_start: 0
-                                        angle_end: 360
-
-                                text: '4'
-                                pos_hint: {'center_x': .5, 'center_y': .5}
-                                font_name: 'Roboto'
-                                font_size: '20dp'
-                            
-
-                        StackLayout:
-                            size_hint_y: None
-                            padding: '0dp'
-                            Label:
-                                text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
-                                font_name: 'Roboto'
-                                font_size: '16dp'
-                                pos_hint: {'center_x': 0.5}
-                                size_hint_y: None
-                                color: root.getColor('secondary')
-                            
-                        FloatLayout:
-                            size_hint_y: None
-
-                            MDFillRoundFlatButton:
-                                padding: '16dp'
-                                pos_hint: {'center_x': .5, 'center_y': .5}
-                                md_bg_color: root.getColor('primary')
-                                text: 'Open Link'
+            spacing: '4dp'
+            height: self.minimum_height
+            rows: 1
+            cols: 1
+            id: all_items
+            
+            
             
 
                             

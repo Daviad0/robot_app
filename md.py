@@ -4,10 +4,12 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
 from kivy.properties import DictProperty
+import json
 from kivy.clock import Clock
 from actions import SparkClub
 import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
+import webbrowser
 
 # from pushyy import Pushyy
 # from pushyy import RemoteMessage
@@ -26,12 +28,15 @@ def fadeto(widget, opacity, duration):
 def changePage(page):
     MDApp.get_running_app().root.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.current = page
+    if(page == "landing"):
+        Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
+        
 
 def getLandingPageItems():
     i = SCI.get_items()
-    print(i)
     m = SCI.get_meeting_today()
-    print(m)
+    return (i, m)
+ 
 
 def authenticate(dt):
     # look for token here
@@ -46,9 +51,30 @@ COLORS = {
     "secondary": rgba255to1((7, 0, 105,1)),
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
-    "black": rgba255to1((0, 0, 0,1))
+    "black": rgba255to1((0, 0, 0,1)),
+    "success": rgba255to1((0, 255, 0,1))
 }
 
+
+class EmptySpace(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+class AttendanceItemEx(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class LandingItem(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    
+    pass
+
+
+def openLink(link):
+    webbrowser.open(link)
+    print("A")
 
 class Login(Screen):
    
@@ -109,6 +135,40 @@ class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
     
+    def addItems(self, dt):
+        
+        r = getLandingPageItems()
+        
+        self.ids.all_items.rows = 5
+        self.ids.all_items.add_widget(AttendanceItemEx())
+        for i in range(4):
+            self.ids.all_items.add_widget(EmptySpace())
+        
+        for lpi in r[0]:
+            self.ids.all_items.rows += 4
+            
+            
+            nW = LandingItem()
+            
+            nW.ids.title.text = lpi["title"]
+            nW.ids.icon.icon = lpi["icon"]
+            nW.ids.description.text = lpi["contents"]
+            if(not lpi["result"]["to"] == "link"):
+                nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
+            else:
+                print("A")
+                nW.ids.buttonct.bind(on_release=lambda x: openLink(lpi["result"]["to"]))
+                
+            if(lpi["contents"] == ""):
+                nW.ids.landingitem_content.remove_widget(nW.ids.description)
+            
+            self.ids.all_items.add_widget(nW)
+            for i in range(3):
+                self.ids.all_items.add_widget(EmptySpace())
+                
+                
+        
+        
     pass
 
 class Custom(Screen):
