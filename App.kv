@@ -12,6 +12,30 @@ WindowManager:
 <EmptySpace>:
     size_hint_y: None
 
+<AttendanceItem>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '20dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '400dp'
+
+        Label:
+            text: "You're all signed in for today!"
+            id: title
+            font_name: 'Roboto'
+            font_size: '20dp'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            color: root.getColor('secondary')
+            bold: True
+            
+
+
 <AttendanceItemEx>:
     padding: '40dp'
     size_hint_y: None
@@ -34,6 +58,7 @@ WindowManager:
             padding: (10,10,0,10)
             Label:
                 text: 'Meeting ABCD'
+                id: title
                 font_name: 'Roboto'
                 font_size: '24dp'
                 pos_hint: {'center_x': 0.5}
@@ -64,7 +89,7 @@ WindowManager:
                         theme_text_color: "Custom"
                         text_color: root.getColor('secondary')
                     Label:
-                        id: 'signin_length'
+                        id: length
                         text: '4 hours'
                         font_name: 'Roboto'
                         font_size: '20dp'
@@ -97,7 +122,7 @@ WindowManager:
                         theme_text_color: "Custom"
                         text_color: root.getColor('success')
                     Label:
-                        id: 'signin_subgroup'
+                        id: subgroup
                         text: 'Your subgroup is meeting!'
                         font_name: 'Roboto'
                         font_size: '20dp'
@@ -116,6 +141,7 @@ WindowManager:
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Check In to the Meeting'
+                    on_press: root.checkInToMeeting()
 
 <LandingItem>:
     size_hint_y: None
@@ -178,6 +204,7 @@ WindowManager:
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Open Link'
+                    on_press: root.openLink()
 
 
 <Login>:
@@ -398,6 +425,7 @@ WindowManager:
     ScrollView:
         do_scroll_x: False
         do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
         GridLayout:
             size_hint_y: None
             spacing: '4dp'

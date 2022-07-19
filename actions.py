@@ -65,8 +65,15 @@ class SparkClub():
         if(res["status"] == 200 and data["successful"] and "today" in data):
             return data["today"]
         else:
-            return {}
-    
+            return None
+    def sign_in_meeting(self):
+        if not self.account["loggedIn"]:
+            return False
+        
+        res = self._sendAPIRequest("POST", "/group/today")
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
         
         
     

@@ -63,18 +63,28 @@ class EmptySpace(FloatLayout):
 class AttendanceItemEx(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
+    def checkInToMeeting(self):
+        successful = SCI.sign_in_meeting()
+        print(successful)
+        if(successful):
+            Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
+    pass
+
+class AttendanceItem(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
     pass
 
 class LandingItem(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
-    
+    def openLink(self):
+        webbrowser.open("https://sparkclub.io/")
+        print("A")
     pass
 
 
-def openLink(link):
-    webbrowser.open(link)
-    print("A")
+
 
 class Login(Screen):
    
@@ -134,15 +144,34 @@ class Login(Screen):
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
-    
+    def removeAllElements(self):
+        rows = [i for i in self.ids.all_items.children]
+        for r in rows:
+            self.ids.all_items.remove_widget(r)
+                
     def addItems(self, dt):
-        
+        self.removeAllElements()
         r = getLandingPageItems()
         
         self.ids.all_items.rows = 5
-        self.ids.all_items.add_widget(AttendanceItemEx())
-        for i in range(4):
-            self.ids.all_items.add_widget(EmptySpace())
+        
+        if(not r[1] == None):
+            if(r[1]["logged"]):
+                
+                
+                
+                self.ids.all_items.add_widget(AttendanceItem())
+                self.ids.all_items.add_widget(EmptySpace())
+            else:
+                
+                aW = AttendanceItemEx()
+                aW.ids.title.text = r[1]["title"]
+                aW.ids.length.text = str(r[1]["length"]) + " hours"
+                #aW.ids.subgroup.text = r[1]["subgroup"]
+                
+                self.ids.all_items.add_widget(aW)
+                for i in range(4):
+                    self.ids.all_items.add_widget(EmptySpace())
         
         for lpi in r[0]:
             self.ids.all_items.rows += 4
@@ -155,9 +184,7 @@ class Landing(Screen):
             nW.ids.description.text = lpi["contents"]
             if(not lpi["result"]["to"] == "link"):
                 nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
-            else:
-                print("A")
-                nW.ids.buttonct.bind(on_release=lambda x: openLink(lpi["result"]["to"]))
+                
                 
             if(lpi["contents"] == ""):
                 nW.ids.landingitem_content.remove_widget(nW.ids.description)
