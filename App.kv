@@ -7,6 +7,8 @@ WindowManager:
         id: landingpage
     Custom:
     Account:
+    Actions:
+        id: actionspage
     
 
 <EmptySpace>:
@@ -34,7 +36,25 @@ WindowManager:
             color: root.getColor('secondary')
             bold: True
             
-
+<Action>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: '200dp'
+        md_bg_color: root.getColor('light')
+        Label:
+            id: title
+            text: 'Hiya'
+            color: root.getColor('white')
+            font_size: '60dp'
+            bold: True
 
 <AttendanceItemEx>:
     padding: '40dp'
@@ -206,7 +226,26 @@ WindowManager:
                     text: 'Open Link'
                     on_press: root.openLink()
 
+<Actions>:
+    name: "actions"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        GridLayout:
+            size_hint_y: None
+            spacing: '4dp'
+            height: self.minimum_height
+            rows: 1
+            cols: 1
+            id: all_items
 <Login>:
     name: "login"
     canvas:
@@ -433,7 +472,13 @@ WindowManager:
             rows: 1
             cols: 1
             id: all_items
-            
+    Label:
+        id: protons_label
+        text: '1000'
+        size_hint_y: None
+        size_hint_x: None
+        color: root.getColor('secondary')
+        pos_hint: {'center_x': 0.05, 'center_y': .04}
             
             
 

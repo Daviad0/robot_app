@@ -56,6 +56,17 @@ class SparkClub():
             return data["items"]
         else:
             return []
+        
+    def get_protons(self):
+        if not self.account["loggedIn"]:
+            return None
+        
+        res = self._sendAPIRequest("GET", "/group/protons")
+        if(res["status"] == 200):
+            return res["data"]
+        else:
+            return None
+        
     def get_meeting_today(self):
         if not self.account["loggedIn"]:
             return {}

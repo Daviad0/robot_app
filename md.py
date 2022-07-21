@@ -30,18 +30,22 @@ def changePage(page):
     MDApp.get_running_app().root.current = page
     if(page == "landing"):
         Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
+    elif(page == "actions"):
+        Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, .5)
         
 
 def getLandingPageItems():
     i = SCI.get_items()
     m = SCI.get_meeting_today()
-    return (i, m)
+    p = SCI.get_protons()
+    return (i, m, p)
  
 
 def authenticate(dt):
     # look for token here
     if(SCI.try_login_with_key()):
-        changePage("landing")
+        #changePage("landing")
+        changePage("actions")
     else:
         changePage("login")
     
@@ -49,6 +53,7 @@ def authenticate(dt):
 COLORS = {
     "primary": rgba255to1((19, 3, 252,1)),
     "secondary": rgba255to1((7, 0, 105,1)),
+    "light": rgba255to1((130, 207, 255,1)),
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
     "black": rgba255to1((0, 0, 0,1)),
@@ -60,6 +65,12 @@ class EmptySpace(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
     pass
+
+class Action(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
 class AttendanceItemEx(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -140,6 +151,24 @@ class Login(Screen):
         self.ids.temp_code.disabled = False
         fadeto(self.ids.temp_code, 1, 0.25)
         
+class Actions(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def removeAllElements(self):
+        rows = [i for i in self.ids.all_items.children]
+        for r in rows:
+            self.ids.all_items.remove_widget(r)
+                
+    def addItems(self, dt):
+        self.removeAllElements()
+        self.ids.all_items.rows = 2
+        self.ids.all_items.add_widget(Action())
+        self.ids.all_items.add_widget(EmptySpace())
+                
+                
+        
+        
+    pass
             
 class Landing(Screen):
     def getColor(self, name):
@@ -154,6 +183,12 @@ class Landing(Screen):
         r = getLandingPageItems()
         
         self.ids.all_items.rows = 5
+        
+        
+        if(not r[2] == None):
+            self.ids.protons_label.text = str(r[2]["total"])
+        else:
+            self.remove_widget(self.ids.protons_label)
         
         if(not r[1] == None):
             if(r[1]["logged"]):
