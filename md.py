@@ -45,7 +45,7 @@ def authenticate(dt):
     # look for token here
     if(SCI.try_login_with_key()):
         #changePage("landing")
-        changePage("actions")
+        changePage("account")
     else:
         changePage("login")
     

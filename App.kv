@@ -7,6 +7,7 @@ WindowManager:
         id: landingpage
     Custom:
     Account:
+        id: accountpage
     Actions:
         id: actionspage
     
@@ -47,14 +48,28 @@ WindowManager:
         size_hint_y: None
         orientation: 'vertical'
         width: '600dp'
-        height: '200dp'
+        height: '160dp'
+        padding: '32dp'
         md_bg_color: root.getColor('light')
-        Label:
-            id: title
-            text: 'Hiya'
-            color: root.getColor('white')
-            font_size: '60dp'
-            bold: True
+        StackLayout:
+            height: self.minimum_height
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                id: title
+                text: 'Add Landing Item'
+                color: root.getColor('white')
+                font_size: '40dp'
+                bold: True
+                size_hint_y: None
+            Label:
+                id: title
+                text: 'Leads can add landing page items whenever!'
+                color: root.getColor('white')
+                font_size: '20dp'
+                size_hint_y: None
+
+
+
 
 <AttendanceItemEx>:
     padding: '40dp'
@@ -508,10 +523,18 @@ WindowManager:
         Rectangle:
             pos: self.pos
             size: self.size
-    FloatLayout:
-        Label:
-            text: 'Welcome to Lightning3'
-            color: root.getColor('primary')
+    StackLayout:
+        size_hint_y: None
+        height: self.minimum_height
+        FloatLayout:
+            size_hint_y: None
+            Label:
+                size_hint_y: None
+
+                text: 'You'
+                color: root.getColor('primary')
+                bold: True
+
 
 
 <Splash>:
