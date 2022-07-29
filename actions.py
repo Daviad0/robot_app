@@ -35,7 +35,6 @@ class SparkClub():
             "group": "testing-env" # change to the lightning robotics group name later
         })
         data = res["data"]
-        
         if(res["status"] == 200 and data["successful"]):
             self.account["loggedIn"] = True
             self.account["token"] = data["token"]
