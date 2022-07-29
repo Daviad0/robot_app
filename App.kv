@@ -1,0 +1,566 @@
+WindowManager:
+    Splash:
+        id: splashscreen
+    Login:
+        id: loginpage
+    Landing:
+        id: landingpage
+    Custom:
+    Account:
+        id: accountpage
+    Actions:
+        id: actionspage
+    
+
+<EmptySpace>:
+    size_hint_y: None
+
+<AttendanceItem>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '20dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '400dp'
+
+        Label:
+            text: "You're all signed in for today!"
+            id: title
+            font_name: 'Roboto'
+            font_size: '20dp'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            color: root.getColor('secondary')
+            bold: True
+            
+<Action>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: '160dp'
+        padding: '32dp'
+        md_bg_color: root.getColor('light')
+        StackLayout:
+            height: self.minimum_height
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                id: title
+                text: 'Add Landing Item'
+                color: root.getColor('white')
+                font_size: '40dp'
+                bold: True
+                size_hint_y: None
+            Label:
+                id: title
+                text: 'Leads can add landing page items whenever!'
+                color: root.getColor('white')
+                font_size: '20dp'
+                size_hint_y: None
+
+
+
+
+<AttendanceItemEx>:
+    padding: '40dp'
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: (signin_content.height)
+
+        StackLayout:
+        
+            id: signin_content
+            height: self.minimum_height
+            size_hint_y: None
+            spacing: '10dp'
+            padding: (10,10,0,10)
+            Label:
+                text: 'Meeting ABCD'
+                id: title
+                font_name: 'Roboto'
+                font_size: '24dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                
+                StackLayout:
+                    orientation: 'tb-lr'
+                    size_hint_x: None
+                    size_hint_y: None
+                    spacing: '40dp'
+                    pos_hint: {'center_x': 0.5, 'center_y': .5}
+                    MDIconButton:
+                        icon: 'alarm-plus'
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        canvas.before:
+                            Color:
+                                rgba: root.getColor('secondary')
+                            Line:
+                                width: 4
+                                circle: (self.x+(self.width)/4+24, self.y + (self.width)/4+24, (self.width-8)/2)
+
+                        
+                        theme_text_color: "Custom"
+                        text_color: root.getColor('secondary')
+                    Label:
+                        id: length
+                        text: '4 hours'
+                        font_name: 'Roboto'
+                        font_size: '20dp'
+                        size_hint_y: None
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        color: root.getColor('secondary')
+            FloatLayout:
+                size_hint_y: None
+                
+                StackLayout:
+                    orientation: 'tb-lr'
+                    size_hint_x: None
+                    size_hint_y: None
+                    spacing: '40dp'
+                    pos_hint: {'center_x': 0.5, 'center_y': .5}
+                    MDIconButton:
+                        id: 'signin_subgroup_icon'
+                        icon: 'check'
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        canvas.before:
+                            Color:
+                                rgba: root.getColor('success')
+                            Line:
+                                width: 4
+                                circle: (self.x+(self.width)/4+24, self.y + (self.width)/4+24, (self.width-8)/2)
+
+                        
+                        theme_text_color: "Custom"
+                        text_color: root.getColor('success')
+                    Label:
+                        id: subgroup
+                        text: 'Your subgroup is meeting!'
+                        font_name: 'Roboto'
+                        font_size: '20dp'
+                        size_hint_y: None
+                        size_hint_x: None
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        color: root.getColor('success')     
+                    
+            
+                
+            FloatLayout:
+                size_hint_y: None
+
+                MDFillRoundFlatButton:
+                    padding: '16dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Check In to the Meeting'
+                    on_press: root.checkInToMeeting()
+
+<LandingItem>:
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        height: (landingitem_content.height)
+
+        StackLayout:
+        
+            id: landingitem_content
+            height: self.minimum_height
+            size_hint_y: None
+            spacing: '10dp'
+            padding: (20,20,20,20)
+            GridLayout:
+                rows: 1
+                cols: 2
+                size_hint_y: None
+                MDIconButton:
+                    icon: 'magnify'
+                    id: icon
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    text_color: root.getColor('secondary')
+                Label:
+                    text: 'Item'
+                    id: title
+                    font_name: 'Roboto'
+                    font_size: '20dp'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    color: root.getColor('secondary')
+                    bold: True
+            Label:
+                text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
+                font_name: 'Roboto'
+                id: description
+                font_size: '16dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1]
+                color: root.getColor('secondary')
+                halign: 'center'
+                
+                
+            FloatLayout:
+                id: buttonct
+                size_hint_y: None
+
+                MDFillRoundFlatButton:
+                    id: button
+                    padding: '16dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Open Link'
+                    on_press: root.openLink()
+
+<Actions>:
+    name: "actions"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        GridLayout:
+            size_hint_y: None
+            spacing: '4dp'
+            height: self.minimum_height
+            rows: 1
+            cols: 1
+            id: all_items
+<Login>:
+    name: "login"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        spacing: '10dp'
+        padding: '0dp'
+        GridLayout:
+            id: login_page
+            rows: 2
+            padding:'0dp'
+            cols: 1
+            #rows_minimum: '48dp'
+            size_hint_y: None
+            pos_hint: {'center_x': .5, 'center_y': .75}
+            spacing: 240
+            Image:
+                source: 'assets/lightning.png'
+                size: self.texture_size
+                size_hint_y: None
+                padding: '60dp'
+            FloatLayout:
+                size_hint_y: None
+                padding: '60dp'
+                GridLayout:
+                    rows: 3
+                    cols: 1
+                    row_default_height: '36dp'
+                    row_force_default: True
+                    size_hint_y: None
+                    size_hint_x: None
+                    width: 800
+                    height: self.minimum_height
+                    spacing: 40
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    MDTextField:
+                        id: username
+                        mode: 'rectangle'
+                        multiline: False
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Username'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.usernameChange()
+                        
+                    MDTextField:
+                        id: password
+                        height: '48dp'
+                        mode: 'rectangle'
+                        pos_hint: {'center_x': 0.5}
+                        multiline: False
+                        disabled: True
+                        opacity: 0.3
+                        color_mode: 'custom'
+                        line_color_focus: root.getColor('primary')
+                        line_color_normal: root.getColor('primary')
+                        line_color_disabled: root.getColor('primary')
+                        icon_right_color: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Password'
+                        password: True
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.passwordChange()
+                        
+                    FloatLayout:
+                        spacing: '20dp'
+                        GridLayout:
+                            rows: 1
+                            cols: 2
+                            row_default_height: '48dp'
+                            row_force_default: True
+                            size_hint_y: None
+                            size_hint_x: None
+                            width: self.minimum_width
+                            height: self.minimum_height
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            spacing: 20
+                            MDRaisedButton:
+                                text: "Login"
+                                id: login_button
+                                disabled: True
+                                opacity: 0.3
+                                md_bg_color: root.getColor('primary')
+                                disabled_md_bg_color: root.getColor('primary')
+                                disabled_color: root.getColor('white')
+                                color: root.getColor('white')
+                                on_release: root.submitForm()
+                            MDRaisedButton:
+                                text: "Forgot Something?"
+                                md_bg_color: root.getColor('gray')
+                                on_release: root.goToTempLogin()
+        GridLayout:
+            id: temp_page
+            rows: 2
+            padding:'0dp'
+            cols: 1
+            #rows_minimum: '48dp'
+            size_hint_y: None
+            pos_hint: {'center_x': .5, 'center_y': 10}
+            width: '0dp'
+            spacing: 240
+            Image:
+                source: 'assets/lightning.png'
+                size: self.texture_size
+                size_hint_y: None
+                padding: '60dp'
+            
+            FloatLayout:
+                size_hint_y: None
+                padding: '20dp'
+                GridLayout:
+                    rows: 3
+                    cols: 1
+                    row_default_height: '32dp'
+                    row_force_default: True
+                    size_hint_y: None
+                    size_hint_x: None
+                    height: self.minimum_height
+                    spacing: '40dp'
+                    width: 800
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    Label:
+                        text: 'Temporary Login'
+                        font_name: 'Roboto'
+                        font_size: '24dp'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_y: None
+                        color: root.getColor('primary')
+                        height: '60dp'
+                    GridLayout:
+                        rows: 1
+                        cols: 2
+                        row_default_height: '48dp'
+                        row_force_default: True
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: 800
+                        height: self.minimum_height
+                        spacing: 60
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        
+                        MDTextField:
+                            id: temp_email
+                            mode: 'rectangle'
+                            multiline: False
+                            
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'Email'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            spacing: (20,20,20,20)
+                            padding: (20,20,20,20)
+                            icon_right: 'email'
+                            icon_right_color: root.getColor('primary')
+                            on_text: root.emailChange()
+
+                        FloatLayout:
+                            size_hint_x: .25
+                            padding: '30dp'
+                            MDRaisedButton:
+                                id: temp_send_code
+                                text: "Send Code"
+                                disabled: True
+                                opacity: 0.3
+                                md_bg_color: root.getColor('primary')
+                                disabled_md_bg_color: root.getColor('primary')
+                                disabled_color: root.getColor('white')
+                                pos_hint: {'center_x': 0.5, 'center_y': .5}
+                                padding: (20,20,20,20)
+                                on_release: root.sendCode()
+                    MDTextField:
+                        id: temp_code
+                        mode: 'rectangle'
+                        multiline: False
+                        disabled: True
+                        opacity: 0.3
+                        color_mode: 'custom'
+                        line_color_focus: root.getColor('primary')
+                        line_color_normal: root.getColor('primary')
+                        line_color_disabled: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Code'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        
+<Landing>:
+    name: "landing"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        GridLayout:
+            size_hint_y: None
+            spacing: '4dp'
+            height: self.minimum_height
+            rows: 1
+            cols: 1
+            id: all_items
+    Label:
+        id: protons_label
+        text: '1000'
+        size_hint_y: None
+        size_hint_x: None
+        color: root.getColor('secondary')
+        pos_hint: {'center_x': 0.05, 'center_y': .04}
+            
+            
+
+                            
+                
+        
+
+
+<Custom>:
+    name: "custom"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        Label:
+            text: 'Welcome to Lightning2'
+            color: root.getColor('primary')
+
+<Account>:
+    name: "account"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    StackLayout:
+        size_hint_y: None
+        height: self.minimum_height
+        FloatLayout:
+            size_hint_y: None
+            Label:
+                size_hint_y: None
+
+                text: 'You'
+                color: root.getColor('primary')
+                bold: True
+
+
+
+<Splash>:
+    name: "splash"
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        GridLayout:
+            rows: 2
+            cols: 1
+            pos_hint: {'center_x': .5, 'center_y': .0}
+            row_default_height: '20dp'
+            row_force_default: True
+            spacing: '80dp'
+            Image:
+                source: 'assets/lightning.png'
+                size: self.texture_size
+                size_hint_y: None
+            Label:
+                text: '#862'
+                font_size: '80dp'
+                bold: True
+                
+                color: root.getColor('primary')
+                opacity: 0.5

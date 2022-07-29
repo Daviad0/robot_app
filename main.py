@@ -44,7 +44,12 @@ class P2(BoxLayout):
 class P3(BoxLayout):
     pass
 
+class LoginPage(BoxLayout):
+    pass
 
+
+class Login(App):
+    pass
 
 class AppBuild(App):
     pass
@@ -79,9 +84,8 @@ def show_popup3():
     popupWindow3.open()
 
 
-AppBuild().run()
-AppBuild2().run()
-AppBuild3().run()
+Login().run()
+
 
 
 
