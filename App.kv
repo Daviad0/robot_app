@@ -530,17 +530,49 @@ WindowManager:
         Rectangle:
             pos: self.pos
             size: self.size
-    StackLayout:
-        size_hint_y: None
-        height: self.minimum_height
-        FloatLayout:
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        StackLayout:
             size_hint_y: None
+            spacing: '4dp'
+            height: self.minimum_height
             Label:
                 size_hint_y: None
 
-                text: 'You'
+                text: 'Hey There,'
+                color: root.getColor('secondary')
+                font_size: '24dp'
+                
+            Label:
+                size_hint_y: None
+
+                text: 'Daviado'
                 color: root.getColor('primary')
                 bold: True
+                font_size: '40dp'
+            FloatLayout:
+                size_hint_y: None
+                height: role_card.height + 60
+                MDCard:
+                    id: role_card
+                    radius: '20dp'
+                    elevation: 4
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_y: None
+                    size_hint_x: None
+                    orientation: 'vertical'
+                    md_bg_color: root.getColor('gray')
+                    width: (len(account_role.text)*40) + 40
+                    height: '48dp'
+                    Label:
+                        id: account_role
+                        text: 'STUDENT'
+                        bold: True
+                        font_size: '20dp'
+                        
+            
 
 
 
