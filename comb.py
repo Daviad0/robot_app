@@ -1,5 +1,11 @@
-from kivymd.app import MDApp
 from kivy.lang import Builder
+from kivy.properties import StringProperty, ListProperty
+
+from kivymd.app import MDApp
+from kivymd.theming import ThemableBehavior
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.toolbar import MDToolbar
+from kivymd.uix.list import OneLineIconListItem, MDList
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
@@ -11,10 +17,27 @@ import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
 import webbrowser
 
-# from pushyy import Pushyy
-# from pushyy import RemoteMessage
+class ContentNavigationDrawer(MDBoxLayout):
+    pass
 
-KVContents = open('App.kv', encoding='utf8').read()
+
+class ItemDrawer(OneLineIconListItem):
+    icon = StringProperty()
+    text_color = ListProperty((0, 0, 0, 1))
+
+
+class DrawerList(ThemableBehavior, MDList):
+    def set_color_item(self, instance_item):
+        """Called when tap on a menu item."""
+
+        # Set the color of the icon and text for the menu item.
+        for item in self.children:
+            if item.text_color == self.theme_cls.primary_color:
+                item.text_color = self.theme_cls.text_color
+                break
+        instance_item.text_color = self.theme_cls.primary_color
+        
+KVContents = open('comb.kv', encoding='utf8').read()
 
 SCI = SparkClub()
 
@@ -26,8 +49,8 @@ def fadeto(widget, opacity, duration):
     a.start(widget)
     
 def changePage(page):
-    MDApp.get_running_app().root.transition = t.RiseInTransition(duration=.3)
-    MDApp.get_running_app().root.current = page
+    MDApp.get_running_app().root.ids.window_manager.transition = t.RiseInTransition(duration=.3)
+    MDApp.get_running_app().root.ids.window_manager.current = page
     if(page == "landing"):
         Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
     elif(page == "actions"):
@@ -169,7 +192,12 @@ class Actions(Screen):
         
         
     pass
-            
+
+
+class MainScreen(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -183,12 +211,7 @@ class Landing(Screen):
         r = getLandingPageItems()
         
         self.ids.all_items.rows = 5
-        
-        
-        if(not r[2] == None):
-            self.ids.protons_label.text = str(r[2]["total"])
-        else:
-            self.remove_widget(self.ids.protons_label)
+    
         
         if(not r[1] == None):
             if(r[1]["logged"]):
@@ -233,6 +256,9 @@ class Landing(Screen):
         
     pass
 
+class NavDrawer(MDToolbar):
+    pass
+
 class Custom(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -252,41 +278,30 @@ class WindowManager(ScreenManager):
     
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
-    
-
-# def my_token(token):
-#     print(token)
-    
-# def foreground_notif(message):
-#     print(message)
-#     MDApp.get_running_app().recent_notif = message.as_dict()
-
-# def click_notif(message):
-#     print(message)
-#     MDApp.get_running_app().recent_notif = message.as_dict()
-    
 
 
-class LoginPage(MDApp):
-    recent_notif = DictProperty(rebind=True)
+class Main(MDApp):
+    def getColor(self, name):
+        return COLORS[name.lower()]
     
-    # def get_token(self):
-    #     Pushyy().get_device_token(my_token)
-        
-    def on_start(self):
-        #Pushyy().token_change_listener(my_token)
-        Clock.schedule_once(authenticate, 5)
-        
-        
-        
     def build(self):
-        
         return Builder.load_string(KVContents)
-    
-    
-    
-    
-    
 
-LoginPage().run()
+    def on_start(self):
+        icons_item = {
+            "folder": "Sign out",
+            "account-multiple": "Communication",
+            "star": "Starred",
+            "history": "Announcements",
+            "checkbox-marked": "Pictures",
+            "file": "Safety Handbook",
+        }
+        for icon_name in icons_item.keys():
+            self.root.ids.content_drawer.ids.md_list.add_widget(
+                ItemDrawer(icon=icon_name, text=icons_item[icon_name])
+            )
         
+        Clock.schedule_once(authenticate, 5)
+
+
+Main().run()

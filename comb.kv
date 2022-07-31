@@ -1,15 +1,89 @@
-WindowManager:
-    Splash:
-        id: splashscreen
-    Login:
-        id: loginpage
-    Landing:
-        id: landingpage
-    Custom:
-    Account:
-        id: accountpage
-    Actions:
-        id: actionspage
+<ItemDrawer>:
+    theme_text_color: "Custom"
+    on_release: self.parent.set_color_item(self)
+
+    IconLeftWidget:
+        id: icon
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: root.text_color
+
+
+<ContentNavigationDrawer>:
+    orientation: "vertical"
+    padding: "8dp"
+    spacing: "8dp"
+
+    AnchorLayout:
+        anchor_x: "left"
+        size_hint_y: None
+        height: avatar.height
+
+        Image:
+            id: avatar
+            size_hint: None, None
+            size: "50dp", "50dp"
+            source: "My project-1.png"
+
+    MDLabel:
+        text: "test_1"
+        font_style: "Button"
+        adaptive_height: True
+
+    MDLabel:
+        text: "test1@gmail.com"
+        font_style: "Caption"
+        adaptive_height: True
+
+    ScrollView:
+
+        DrawerList:
+            id: md_list
+
+
+
+MainScreen:
+
+    MDNavigationLayout:
+
+        ScreenManager:
+
+            MDScreen:
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+
+                    MDToolbar:
+                        title: "Navigation Drawer"
+                        elevation: 10
+                        left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
+                        right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
+                        md_bg_color: root.getColor('primary')
+
+
+                    WindowManager:
+                        id: window_manager
+                        Splash:
+                            id: splashscreen
+                        Login:
+                            id: loginpage
+                        Landing:
+                            id: landingpage
+                        Custom:
+                        Account:
+                            id: accountpage
+                        Actions:
+                            id: actionspage
+
+
+        MDNavigationDrawer:
+            id: nav_drawer
+
+            ContentNavigationDrawer:
+                id: content_drawer
+
+
+
     
 
 <EmptySpace>:
@@ -487,38 +561,7 @@ WindowManager:
             rows: 1
             cols: 1
             id: all_items
-    Label:
-        id: protons_label
-        text: '1000'
-        size_hint_y: None
-        size_hint_x: None
-        color: root.getColor('secondary')
-        pos_hint: {'center_x': 0.05, 'center_y': .04}
-<<<<<<< Updated upstream
-=======
-    FloatLayout:
-        size_hint_y: None
-        color: root.getColor('secondary')
-        pos_hint: {'center_x': 0.9, 'center_y': .1}
-        StackLayout:
-            size_hint_y: None
-            size_hint_x: None
-            spacing: '4dp'
-            orientation: 'tb-lr'
-            pos_hint: {'center_x': 0.5}
-            MDIconButton:
-                md_bg_color: root.getColor('secondary')
-                theme_text_color: 'Custom'
-                text_color: root.getColor('white')
-                icon: "language-python"
                 
-            MDIconButton:
-                md_bg_color: root.getColor('secondary')
-                theme_text_color: 'Custom'
-                text_color: root.getColor('white')
-                icon: "language-python"
-                
->>>>>>> Stashed changes
             
             
 
@@ -548,17 +591,49 @@ WindowManager:
         Rectangle:
             pos: self.pos
             size: self.size
-    StackLayout:
-        size_hint_y: None
-        height: self.minimum_height
-        FloatLayout:
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        StackLayout:
             size_hint_y: None
+            spacing: '4dp'
+            height: self.minimum_height
             Label:
                 size_hint_y: None
 
-                text: 'You'
+                text: 'Hey There,'
+                color: root.getColor('secondary')
+                font_size: '24dp'
+                
+            Label:
+                size_hint_y: None
+
+                text: 'Daviado'
                 color: root.getColor('primary')
                 bold: True
+                font_size: '40dp'
+            FloatLayout:
+                size_hint_y: None
+                height: role_card.height + 60
+                MDCard:
+                    id: role_card
+                    radius: '20dp'
+                    elevation: 4
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_y: None
+                    size_hint_x: None
+                    orientation: 'vertical'
+                    md_bg_color: root.getColor('gray')
+                    width: (len(account_role.text)*40) + 40
+                    height: '48dp'
+                    Label:
+                        id: account_role
+                        text: 'STUDENT'
+                        bold: True
+                        font_size: '20dp'
+                        
+            
 
 
 

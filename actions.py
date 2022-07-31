@@ -49,7 +49,7 @@ class SparkClub():
     def get_items(self):
         if not self.account["loggedIn"]:
             return []
-        res = self._sendAPIRequest("GET", "/group/items")
+        res = self._sendAPIRequest("GET", "/group/items", headers={"subgroup": "H"})
         data = res["data"]
         if(res["status"] == 200 and data["successful"]):
             return data["items"]
@@ -87,12 +87,12 @@ class SparkClub():
         
         
     
-    def _sendAPIRequest(self, method, endpoint, data=None):
+    def _sendAPIRequest(self, method, endpoint, data=None, headers=None):
         cookies = {}
         if(self.account["loggedIn"]):
             cookies["session"] = self.account["token"]
             print(self.account["token"])
-        res = requests.request(method, "http://localhost:8080" + endpoint, data=data, cookies=cookies)
+        res = requests.request(method, "http://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
         data = res.json()
         return {"status": res.status_code, "data": data}
         
