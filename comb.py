@@ -70,6 +70,8 @@ def changePage(page):
         MDApp.get_running_app().root.ids.content_drawer.trigger_login()
     elif(page == "actions"):
         Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, 0)
+    elif(page == "subgroup"):
+        MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}  
         
 
 def getLandingPageItems():
@@ -81,19 +83,21 @@ def getLandingPageItems():
     return (i, m, p)
  
  
+initialPage = "subgroup"
+
 def handleLogin(token, data={}):
     if(token):
         if(SCI.try_login_with_key()):
             #changePage("landing")
-            Clock.schedule_once(lambda x: changePage("landing"), 0)
+            Clock.schedule_once(lambda x: changePage(initialPage), 0)
             
             
         else:
-            changePage("login")
+            Clock.schedule_once(lambda x: changePage("login"), 0)
     else:
         res = SCI.login(data["username"], data["password"])
         if(res):
-            Clock.schedule_once(lambda x: changePage("landing"), 0)
+            Clock.schedule_once(lambda x: changePage(initialPage), 0)
             
             
             # add a bad response here?
@@ -108,7 +112,8 @@ COLORS = {
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
     "black": rgba255to1((0, 0, 0,1)),
-    "success": rgba255to1((0, 255, 0,1))
+    "success": rgba255to1((0, 255, 0,1)),
+    "red": rgba255to1((255, 0, 0,1))
 }
 
 

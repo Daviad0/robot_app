@@ -59,6 +59,7 @@ MainScreen:
 
 
                     WindowManager:
+                        padding: ("0dp", "40dp", "0dp", "0dp")
                         id: window_manager
                         Splash:
                             id: splashscreen
@@ -149,7 +150,64 @@ MainScreen:
 
 
 <Subgroup>:
+    name: "subgroup"
     padding: '40dp'
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        StackLayout:
+            padding: ("0dp", "80dp", "0dp", "0dp")
+            Label:
+                text: "Subgroup Name"
+                id: subgroup_name
+                font_name: 'Roboto'
+                font_size: '36dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                MDRaisedButton:
+                    text: "SUB"
+                    id: tag
+                    disabled: True
+                    md_bg_color: root.getColor('primary')
+                    color: root.getColor('light')
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                text: "You are in this subgroup!"
+                id: subgroup_name
+                font_name: 'Roboto'
+                font_size: '16dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+            FloatLayout:
+                size_hint_y: None
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    row_default_height: '48dp'
+                    row_force_default: True
+                    size_hint_y: None
+                    size_hint_x: None
+                    width: self.minimum_width
+                    height: self.minimum_height
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: 20
+                    MDRaisedButton:
+                        text: "Join"
+                        id: login_button
+                        md_bg_color: root.getColor('primary')
+                        color: root.getColor('white')
+                    MDRaisedButton:
+                        text: "Leave"
+                        md_bg_color: root.getColor('red')
+                        color: root.getColor('white')
+
 
 <Action>:
     padding: '40dp'
