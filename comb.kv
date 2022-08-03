@@ -23,17 +23,21 @@
             id: avatar
             size_hint: None, None
             size: "50dp", "50dp"
-            source: "My project-1.png"
+            source: "assets/applogo.png"
 
     MDLabel:
         text: "test_1"
         font_style: "Button"
         adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: root.getColor("secondary")
 
     MDLabel:
         text: "test1@gmail.com"
         font_style: "Caption"
         adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: root.getColor("secondary")
 
     ScrollView:
 
