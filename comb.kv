@@ -11,7 +11,7 @@
 
 <ContentNavigationDrawer>:
     orientation: "vertical"
-    padding: "8dp"
+    padding: ("20dp", "8dp", "8dp", "8dp")
     spacing: "8dp"
 
     AnchorLayout:
@@ -27,11 +27,13 @@
 
     MDLabel:
         text: "test_1"
+        id: username
         font_style: "Button"
         adaptive_height: True
 
     MDLabel:
         text: "test1@gmail.com"
+        id: email
         font_style: "Caption"
         adaptive_height: True
 
@@ -50,15 +52,10 @@ MainScreen:
 
             MDScreen:
 
-                MDBoxLayout:
-                    orientation: 'vertical'
+                FloatLayout:
+                    
 
-                    MDToolbar:
-                        title: "Navigation Drawer"
-                        elevation: 10
-                        left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
-                        right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
-                        md_bg_color: root.getColor('primary')
+                    
 
 
                     WindowManager:
@@ -74,6 +71,20 @@ MainScreen:
                             id: accountpage
                         Actions:
                             id: actionspage
+                        Subgroup:
+                            id: subgrouppage
+                    StackLayout:
+                        id: nav_bar
+                        pos_hint: {'center_x': 0.5, 'center_y': 10}
+                        MDToolbar:
+                            title: "Navigation Drawer"
+                            elevation: 10
+                            left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
+                            right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
+                            md_bg_color: root.getColor('primary')
+                    MessageBox:
+                        id: message_box
+                        pos_hint: {'center_x': .5, 'center_y': 10}
 
 
         MDNavigationDrawer:
@@ -81,10 +92,35 @@ MainScreen:
 
             ContentNavigationDrawer:
                 id: content_drawer
+        
 
 
 
     
+<MessageBox>:
+    canvas:
+        Color:
+            rgba: (0,0,0, .4)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    MDCard:
+        radius: "10dp"
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        width: "300dp"
+        Label:
+            text: "Please Wait..."
+            id: message
+            font_name: 'Roboto'
+            font_size: '20dp'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            color: root.getColor('secondary')
+            bold: True
+
 
 <EmptySpace>:
     size_hint_y: None
@@ -110,7 +146,11 @@ MainScreen:
             size_hint_y: None
             color: root.getColor('secondary')
             bold: True
-            
+
+
+<Subgroup>:
+    padding: '40dp'
+
 <Action>:
     padding: '40dp'
     size_hint_y: None
@@ -370,7 +410,7 @@ MainScreen:
                     row_force_default: True
                     size_hint_y: None
                     size_hint_x: None
-                    width: 800
+                    width: 600
                     height: self.minimum_height
                     spacing: 40
                     pos_hint: {'center_x': .5, 'center_y': .5}
