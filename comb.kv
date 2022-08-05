@@ -20,22 +20,27 @@
         height: avatar.height
 
         Image:
+            padding: ('8dp', '0dp', '0dp', '0dp')
             id: avatar
             size_hint: None, None
             size: "50dp", "50dp"
-            source: "My project-1.png"
+            source: "assets/applogosingle.png"
 
     MDLabel:
         text: "test_1"
         id: username
         font_style: "Button"
         adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: root.getColor("secondary")
 
     MDLabel:
         text: "test1@gmail.com"
         id: email
         font_style: "Caption"
         adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: root.getColor("secondary")
 
     ScrollView:
 

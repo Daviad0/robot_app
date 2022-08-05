@@ -22,6 +22,8 @@ class ContentNavigationDrawer(MDBoxLayout):
     def trigger_login(self):
         self.ids.username.text = SCI.account["username"]
         self.ids.email.text = SCI.account["email"]
+    def getColor(self, name):
+        return COLORS[name.lower()]
     pass
 
 
@@ -275,6 +277,7 @@ class Landing(Screen):
             
             nW.ids.title.text = lpi["title"]
             nW.ids.icon.icon = lpi["icon"]
+            
             nW.ids.description.text = lpi["contents"]
             if(not lpi["result"]["to"] == "link"):
                 nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
@@ -333,6 +336,7 @@ class Main(MDApp):
         return COLORS[name.lower()]
     
     def build(self):
+        self.icon = "assets/applogo.png"
         return Builder.load_string(KVContents)
 
     def on_start(self):
