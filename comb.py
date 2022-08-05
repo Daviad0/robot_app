@@ -1,10 +1,13 @@
 from kivy.lang import Builder
 from kivy.properties import StringProperty, ListProperty
+# import kivy label
+from kivy.uix.label import Label
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.toolbar import MDToolbar
+
 from kivymd.uix.list import OneLineIconListItem, MDList
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -85,7 +88,7 @@ def getLandingPageItems():
     return (i, m, p)
  
  
-initialPage = "subgroup"
+initialPage = "landing"
 
 def handleLogin(token, data={}):
     if(token):
@@ -157,6 +160,11 @@ class LandingItem(FloatLayout):
     def openLink(self):
         webbrowser.open("https://sparkclub.io/")
         print("A")
+    pass
+
+class SubgroupItem(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
     pass
 
 
@@ -289,6 +297,17 @@ class Landing(Screen):
             self.ids.all_items.add_widget(nW)
             for i in range(3):
                 self.ids.all_items.add_widget(EmptySpace())
+        nS = SubgroupItem()
+        
+        self.ids.all_items.rows += 3
+        
+        l = Label(text = "My Subgroups", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
+        
+        nS.ids.subgroup_name.text = "Electrical"
+        self.ids.all_items.add_widget(l)
+        self.ids.all_items.add_widget(nS)
+        self.ids.all_items.add_widget(EmptySpace())
+        
     
     def addItems(self):
         
@@ -341,12 +360,11 @@ class Main(MDApp):
 
     def on_start(self):
         icons_item = {
-            "folder": "Sign out",
-            "account-multiple": "Communication",
-            "star": "Starred",
-            "history": "Announcements",
-            "checkbox-marked": "Pictures",
-            "file": "Safety Handbook",
+            "exit-to-app": "Sign out",
+            "view-list": "Landing Page",
+            "checkbox-marked-circle-outline": "Attendance",
+            "list-status": "Actions",
+            "account-circle": "My Account"
         }
         for icon_name in icons_item.keys():
             self.root.ids.content_drawer.ids.md_list.add_widget(

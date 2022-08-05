@@ -82,7 +82,7 @@ MainScreen:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
                         MDToolbar:
-                            title: "Navigation Drawer"
+                            title: "Landing Page"
                             elevation: 10
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                             right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
@@ -177,8 +177,9 @@ MainScreen:
                 MDRaisedButton:
                     text: "SUB"
                     id: tag
-                    disabled: True
-                    md_bg_color: root.getColor('primary')
+                    theme_text_color: "Custom"
+                    
+                    md_bg_color: root.getColor('secondary')
                     color: root.getColor('light')
                     pos_hint: {'center_x': .5, 'center_y': .5}
             Label:
@@ -209,8 +210,25 @@ MainScreen:
                         color: root.getColor('white')
                     MDRaisedButton:
                         text: "Leave"
+                        id: leave_button
                         md_bg_color: root.getColor('red')
                         color: root.getColor('white')
+            Label:
+                text: "Upcoming Meetings"
+                font_name: 'Roboto'
+                font_size: '24dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            Label:
+                text: "Statistics"
+                font_name: 'Roboto'
+                font_size: '24dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
 
 
 <Action>:
@@ -353,6 +371,43 @@ MainScreen:
                     md_bg_color: root.getColor('primary')
                     text: 'Check In to the Meeting'
                     on_press: root.checkInToMeeting()
+
+
+<SubgroupItem>:
+    size_hint_y: None
+    MDCard:
+        radius: '12dp'
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '600dp'
+        GridLayout:
+            rows: 1
+            cols: 2
+            size_hint_y: None
+            padding: ('20dp', '0dp', '20dp', '0dp')
+            Label:
+                text: 'Subgroup Name'
+                id: subgroup_name
+                font_name: 'Roboto'
+                font_size: '20dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                size_hint_x: None
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                MDFillRoundFlatButton:
+                    id: go_to
+                    padding: '16dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Visit Page'
+                
 
 <LandingItem>:
     size_hint_y: None
