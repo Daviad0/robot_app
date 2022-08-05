@@ -16,6 +16,7 @@ from actions import SparkClub
 import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
 import webbrowser
+import threading
 
 class ContentNavigationDrawer(MDBoxLayout):
     def trigger_login(self):
@@ -53,29 +54,57 @@ def fadeto(widget, opacity, duration):
     a = Animation(opacity=opacity, duration=duration)
     a.start(widget)
     
+
+def toggle_message_box(show):
+    MDApp.get_running_app().root.ids.message_box.pos_hint = {'center_x': 0.5, 'center_y': 0.5 if show else 10}
+
+
 def changePage(page):
     MDApp.get_running_app().root.ids.window_manager.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.ids.window_manager.current = page
     if(page == "landing"):
-        Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
+        x = threading.Thread(target = MDApp.get_running_app().root.ids.landingpage.addItems, args = (), daemon=True)
+        x.start()
+        
+        MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        #Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, 0)
+        
+        MDApp.get_running_app().root.ids.content_drawer.trigger_login()
     elif(page == "actions"):
-        Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, .5)
+        Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, 0)
+    elif(page == "subgroup"):
+        MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}  
         
 
 def getLandingPageItems():
+    Clock.schedule_once(lambda x : toggle_message_box(True), 0)
     i = SCI.get_items()
     m = SCI.get_meeting_today()
     p = SCI.get_protons()
+    Clock.schedule_once(lambda x : toggle_message_box(False), 0)
     return (i, m, p)
  
+ 
+initialPage = "subgroup"
 
-def authenticate(dt):
-    # look for token here
-    if(SCI.try_login_with_key()):
-        #changePage("landing")
-        changePage("landing")
+def handleLogin(token, data={}):
+    if(token):
+        if(SCI.try_login_with_key()):
+            #changePage("landing")
+            Clock.schedule_once(lambda x: changePage(initialPage), 0)
+            
+            
+        else:
+            Clock.schedule_once(lambda x: changePage("login"), 0)
     else:
-        changePage("login")
+        res = SCI.login(data["username"], data["password"])
+        if(res):
+            Clock.schedule_once(lambda x: changePage(initialPage), 0)
+            
+            
+            # add a bad response here?
+        
+    
     
 
 COLORS = {
@@ -85,7 +114,8 @@ COLORS = {
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
     "black": rgba255to1((0, 0, 0,1)),
-    "success": rgba255to1((0, 255, 0,1))
+    "success": rgba255to1((0, 255, 0,1)),
+    "red": rgba255to1((255, 0, 0,1))
 }
 
 
@@ -106,10 +136,17 @@ class AttendanceItemEx(FloatLayout):
         successful = SCI.sign_in_meeting()
         print(successful)
         if(successful):
-            Clock.schedule_once(MDApp.get_running_app().root.ids.landingpage.addItems, .5)
+            x = threading.Thread(target = MDApp.get_running_app().root.ids.landingpage.addItems, args = (), daemon=True)
+            x.start()
+        
     pass
 
 class AttendanceItem(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class MessageBox(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
     pass
@@ -130,14 +167,10 @@ class Login(Screen):
     
     def submitForm(self):
         print("Submitted form!")
-        v = True
-        res = SCI.login(self.ids.username.text, self.ids.password.text)
-        if(res):
-            changePage("landing")
-            getLandingPageItems()
-        else:
-            self.ids.username.text = ""
-            self.ids.password.text = ""
+        x = threading.Thread(target = handleLogin, args = (False,{"username": self.ids.username.text, "password" : self.ids.password.text},), daemon=True)
+        x.start()
+        
+        
     def getColor(self, name):
         return COLORS[name.lower()]
     def goToTempLogin(self):
@@ -210,13 +243,13 @@ class Landing(Screen):
         rows = [i for i in self.ids.all_items.children]
         for r in rows:
             self.ids.all_items.remove_widget(r)
-                
-    def addItems(self, dt):
-        self.removeAllElements()
-        r = getLandingPageItems()
-        
-        self.ids.all_items.rows = 5
     
+    
+    def showItems(self, r):
+        self.removeAllElements()
+        self.ids.all_items.rows = 9
+        self.ids.all_items.add_widget(EmptySpace())
+        self.ids.all_items.add_widget(EmptySpace())
         
         if(not r[1] == None):
             if(r[1]["logged"]):
@@ -256,6 +289,13 @@ class Landing(Screen):
             self.ids.all_items.add_widget(nW)
             for i in range(3):
                 self.ids.all_items.add_widget(EmptySpace())
+    
+    def addItems(self):
+        
+        r = getLandingPageItems()
+        Clock.schedule_once(lambda x: self.showItems(r), 0)
+        
+        
                 
                 
         
@@ -276,6 +316,11 @@ class Account(Screen):
     pass
 
 class Splash(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class Subgroup(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
     pass
@@ -308,7 +353,8 @@ class Main(MDApp):
                 ItemDrawer(icon=icon_name, text=icons_item[icon_name])
             )
         
-        Clock.schedule_once(authenticate, 5)
+        x = threading.Thread(target = handleLogin, args = (True,), daemon=True)
+        x.start()
 
 
 Main().run()
