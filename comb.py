@@ -30,9 +30,19 @@ class ContentNavigationDrawer(MDBoxLayout):
     pass
 
 
+icons_item = {
+            "exit-to-app": ["Sign out", "login"],
+            "view-list": ["Landing Page", "landing"],
+            "checkbox-marked-circle-outline": ["Attendance", "subgroup"],
+            "list-status": ["Actions"],
+            "account-circle": ["My Account"]
+        }
 class ItemDrawer(OneLineIconListItem):
     icon = StringProperty()
     text_color = ListProperty((0, 0, 0, 1))
+    def clickItem(self):
+        MDApp.get_running_app().root.ids.nav_bar_title.title = icons_item[self.icon][0]
+        changePage(icons_item[self.icon][1])
 
 
 class DrawerList(ThemableBehavior, MDList):
@@ -77,6 +87,10 @@ def changePage(page):
         Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, 0)
     elif(page == "subgroup"):
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}  
+    elif(page == "login"):
+        MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        SCI.logout()
+    MDApp.get_running_app().root.ids.nav_drawer.set_state("closed")
         
 
 def getLandingPageItems():
@@ -255,17 +269,20 @@ class Landing(Screen):
     
     def showItems(self, r):
         self.removeAllElements()
-        self.ids.all_items.rows = 9
+        #self.ids.all_items.rows = 9
         self.ids.all_items.add_widget(EmptySpace())
         self.ids.all_items.add_widget(EmptySpace())
         
         if(not r[1] == None):
+            l = Label(text = "Current Meeting", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
+        
+            self.ids.all_items.add_widget(l)
             if(r[1]["logged"]):
                 
                 
                 
                 self.ids.all_items.add_widget(AttendanceItem())
-                self.ids.all_items.add_widget(EmptySpace())
+                #self.ids.all_items.add_widget(EmptySpace())
             else:
                 
                 aW = AttendanceItemEx()
@@ -274,11 +291,14 @@ class Landing(Screen):
                 #aW.ids.subgroup.text = r[1]["subgroup"]
                 
                 self.ids.all_items.add_widget(aW)
-                for i in range(4):
-                    self.ids.all_items.add_widget(EmptySpace())
+                # for i in range(4):
+                #     self.ids.all_items.add_widget(EmptySpace())
         
+        l = Label(text = "Active Items", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
+        
+        self.ids.all_items.add_widget(l)
         for lpi in r[0]:
-            self.ids.all_items.rows += 4
+            #self.ids.all_items.rows += 4
             
             
             nW = LandingItem()
@@ -295,11 +315,12 @@ class Landing(Screen):
                 nW.ids.landingitem_content.remove_widget(nW.ids.description)
             
             self.ids.all_items.add_widget(nW)
-            for i in range(3):
-                self.ids.all_items.add_widget(EmptySpace())
+            # for i in range(3):
+            #     self.ids.all_items.add_widget(EmptySpace())
         nS = SubgroupItem()
-        
-        self.ids.all_items.rows += 3
+        self.ids.all_items.add_widget(EmptySpace())
+        self.ids.all_items.add_widget(EmptySpace())
+        #self.ids.all_items.rows += 3
         
         l = Label(text = "My Subgroups", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
         
@@ -359,16 +380,10 @@ class Main(MDApp):
         return Builder.load_string(KVContents)
 
     def on_start(self):
-        icons_item = {
-            "exit-to-app": "Sign out",
-            "view-list": "Landing Page",
-            "checkbox-marked-circle-outline": "Attendance",
-            "list-status": "Actions",
-            "account-circle": "My Account"
-        }
+        
         for icon_name in icons_item.keys():
             self.root.ids.content_drawer.ids.md_list.add_widget(
-                ItemDrawer(icon=icon_name, text=icons_item[icon_name])
+                ItemDrawer(icon=icon_name, text=icons_item[icon_name][0])
             )
         
         x = threading.Thread(target = handleLogin, args = (True,), daemon=True)

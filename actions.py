@@ -27,7 +27,15 @@ class SparkClub():
                 else:
                     return True
         return False
-    
+    def logout(self):
+        self.account = {
+            "loggedIn": False,
+            "token": "",
+            "permissions": [],
+            "username": "",
+            "email": ""
+        }
+        self.storage.put("prev", account=self.account)
     def login(self, username, password):
         res = self._sendAPIRequest("POST", "/acc/login", {
             "username": username,

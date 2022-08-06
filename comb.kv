@@ -1,6 +1,6 @@
 <ItemDrawer>:
     theme_text_color: "Custom"
-    on_release: self.parent.set_color_item(self)
+    on_release: root.clickItem()
 
     IconLeftWidget:
         id: icon
@@ -83,6 +83,7 @@ MainScreen:
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
                         MDToolbar:
                             title: "Landing Page"
+                            id: nav_bar_title
                             elevation: 10
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                             right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
@@ -154,6 +155,12 @@ MainScreen:
 
 
 <Subgroup>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     name: "subgroup"
     padding: '40dp'
     ScrollView:
@@ -411,6 +418,7 @@ MainScreen:
 
 <LandingItem>:
     size_hint_y: None
+    height: card.height
     MDCard:
         radius: '12dp'
         elevation: 4
@@ -420,6 +428,7 @@ MainScreen:
         orientation: 'vertical'
         width: '600dp'
         height: (landingitem_content.height)
+        id: card
 
         StackLayout:
         
@@ -711,13 +720,11 @@ MainScreen:
         do_scroll_x: False
         do_scroll_y: True
         pos_hint: {'center_x': .5, 'center_y': .5}
-        GridLayout:
+        StackLayout:
             size_hint_y: None
-            spacing: '4dp'
-            height: self.minimum_height
-            rows: 1
-            cols: 1
+            spacing: '12dp'
             id: all_items
+            height: self.minimum_height
                 
             
             
