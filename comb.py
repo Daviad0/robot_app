@@ -1,3 +1,4 @@
+from re import I
 from kivy.lang import Builder
 from kivy.properties import StringProperty, ListProperty
 # import kivy label
@@ -131,7 +132,7 @@ COLORS = {
     "white": rgba255to1((255, 255, 255,1)),
     "gray" : rgba255to1((100, 100, 100,1)),
     "black": rgba255to1((0, 0, 0,1)),
-    "success": rgba255to1((0, 255, 0,1)),
+    "success": rgba255to1((0, 200, 0,1)),
     "red": rgba255to1((255, 0, 0,1))
 }
 
@@ -280,19 +281,46 @@ class Landing(Screen):
             if(r[1]["logged"]):
                 
                 
+                aI = AttendanceItem()
                 
-                self.ids.all_items.add_widget(AttendanceItem())
-                #self.ids.all_items.add_widget(EmptySpace())
+                aI.ids.meeting.text = r[1]["title"] + " at 12:00 PM (" + str(r[1]["length"]) +  "h)"
+                
+                self.ids.all_items.add_widget(aI)
+                self.ids.all_items.add_widget(EmptySpace())
             else:
-                
+                print(r[1])
                 aW = AttendanceItemEx()
                 aW.ids.title.text = r[1]["title"]
                 aW.ids.length.text = str(r[1]["length"]) + " hours"
+                
+                attending = False
+                sg = []
+                for i in r[1]["subgroups"]:
+                    if i in SCI.account["subgroups"]:
+                        attending = True
+                        sg.append(i)
+                            
+                    
+                if(attending):
+                    aW.ids.subgroup.text = ("Lots of subgroups are meeting!" if len(sg) > 1 else "Your subgroup is meeting")
+                    aW.ids.signin_subgroup_icon.icon = "check"
+                    aW.ids.signin_subgroup_icon.text_color = self.getColor("success")
+                    aW.ids.subgroup.color = self.getColor("success")
+                else:
+                    aW.ids.subgroup.text = "Your subgroup isn't meeting"
+                    aW.ids.signin_subgroup_icon.icon = "help"
+                    aW.ids.signin_subgroup_icon.text_color = self.getColor("red")
+                    aW.ids.subgroup.color = self.getColor("red")
+                    
+                    
+                    
+                
                 #aW.ids.subgroup.text = r[1]["subgroup"]
                 
                 self.ids.all_items.add_widget(aW)
                 # for i in range(4):
                 #     self.ids.all_items.add_widget(EmptySpace())
+                self.ids.all_items.add_widget(EmptySpace())
         
         l = Label(text = "Active Items", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
         
@@ -318,7 +346,7 @@ class Landing(Screen):
             # for i in range(3):
             #     self.ids.all_items.add_widget(EmptySpace())
         nS = SubgroupItem()
-        self.ids.all_items.add_widget(EmptySpace())
+        
         self.ids.all_items.add_widget(EmptySpace())
         #self.ids.all_items.rows += 3
         

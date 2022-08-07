@@ -134,24 +134,42 @@ MainScreen:
 <AttendanceItem>:
     padding: '40dp'
     size_hint_y: None
+    height: card.height
     MDCard:
         radius: '20dp'
-        elevation: 4
+        elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
         width: '400dp'
-
-        Label:
-            text: "You're all signed in for today!"
-            id: title
-            font_name: 'Roboto'
-            font_size: '20dp'
-            pos_hint: {'center_x': 0.5}
+        id: card
+        height: card_content.height
+        StackLayout:
+            id: card_content
+            height: self.minimum_height
             size_hint_y: None
-            color: root.getColor('secondary')
-            bold: True
+            padding: '10dp'
+            spacing: '4dp'
+            Label:
+                text: "You're Signed In!"
+                id: title
+                font_name: 'Roboto'
+                font_size: '20dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            Label:
+                text: "Team Meeting at 12:00 PM (4h)"
+                id: meeting
+                font_name: 'Roboto'
+                font_size: '12dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                italic: True
+
 
 
 <Subgroup>:
@@ -275,14 +293,16 @@ MainScreen:
 <AttendanceItemEx>:
     padding: '40dp'
     size_hint_y: None
+    height: card.height
     MDCard:
-        radius: '12dp'
-        elevation: 4
+        radius: '16dp'
+        elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
         width: '600dp'
+        id: card
         height: (signin_content.height)
 
         StackLayout:
@@ -306,9 +326,10 @@ MainScreen:
                 
                 StackLayout:
                     orientation: 'tb-lr'
-                    size_hint_x: None
+                    
                     size_hint_y: None
                     spacing: '40dp'
+                    padding: ('80dp', '0dp', '80dp', '0dp')
                     pos_hint: {'center_x': 0.5, 'center_y': .5}
                     MDIconButton:
                         icon: 'alarm-plus'
@@ -329,8 +350,6 @@ MainScreen:
                         text: '4 hours'
                         font_name: 'Roboto'
                         font_size: '20dp'
-                        size_hint_y: None
-                        size_hint_x: None
                         pos_hint: {'center_x': .5, 'center_y': .5}
                         color: root.getColor('secondary')
             FloatLayout:
@@ -338,14 +357,13 @@ MainScreen:
                 
                 StackLayout:
                     orientation: 'tb-lr'
-                    size_hint_x: None
                     size_hint_y: None
                     spacing: '40dp'
+                    padding: ('80dp', '0dp', '80dp', '0dp')
                     pos_hint: {'center_x': 0.5, 'center_y': .5}
                     MDIconButton:
-                        id: 'signin_subgroup_icon'
+                        id: signin_subgroup_icon
                         icon: 'check'
-                        size_hint_x: None
                         pos_hint: {'center_x': .5, 'center_y': .5}
                         canvas.before:
                             Color:
@@ -363,7 +381,6 @@ MainScreen:
                         font_name: 'Roboto'
                         font_size: '20dp'
                         size_hint_y: None
-                        size_hint_x: None
                         pos_hint: {'center_x': .5, 'center_y': .5}
                         color: root.getColor('success')     
                     
@@ -384,7 +401,7 @@ MainScreen:
     size_hint_y: None
     MDCard:
         radius: '12dp'
-        elevation: 4
+        elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
@@ -421,7 +438,7 @@ MainScreen:
     height: card.height
     MDCard:
         radius: '12dp'
-        elevation: 4
+        elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
