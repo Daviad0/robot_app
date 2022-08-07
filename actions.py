@@ -59,6 +59,24 @@ class SparkClub():
             return True
         else:
             return False
+    def get_subgroup(self, subgroup):
+        if not self.account["loggedIn"]:
+            return []
+        res = self._sendAPIRequest("GET", "/group/subgroup?name=" + subgroup)
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return (data["subgroup"], data['admin'])
+        else:
+            return []
+    def get_meetings(self):
+        if not self.account["loggedIn"]:
+            return []
+        res = self._sendAPIRequest("GET", "/group/meetings")
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return data["items"]
+        else:
+            return []
     def get_items(self):
         if not self.account["loggedIn"]:
             return []

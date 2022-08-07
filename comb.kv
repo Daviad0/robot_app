@@ -187,6 +187,8 @@ MainScreen:
         pos_hint: {'center_x': .5, 'center_y': .5}
         StackLayout:
             padding: ("0dp", "80dp", "0dp", "0dp")
+            size_hint_y: None
+            height: self.minimum_height
             Label:
                 text: "Subgroup Name"
                 id: subgroup_name
@@ -209,7 +211,7 @@ MainScreen:
                     pos_hint: {'center_x': .5, 'center_y': .5}
             Label:
                 text: "You are in this subgroup!"
-                id: subgroup_name
+                id: subgroup_membership
                 font_name: 'Roboto'
                 font_size: '16dp'
                 pos_hint: {'center_x': 0.5}
@@ -217,6 +219,7 @@ MainScreen:
                 color: root.getColor('secondary')
             FloatLayout:
                 size_hint_y: None
+                padding: '20dp'
                 GridLayout:
                     rows: 1
                     cols: 2
@@ -230,14 +233,10 @@ MainScreen:
                     spacing: 20
                     MDRaisedButton:
                         text: "Join"
-                        id: login_button
+                        id: action_button
                         md_bg_color: root.getColor('primary')
                         color: root.getColor('white')
-                    MDRaisedButton:
-                        text: "Leave"
-                        id: leave_button
-                        md_bg_color: root.getColor('red')
-                        color: root.getColor('white')
+                    
             Label:
                 text: "Upcoming Meetings"
                 font_name: 'Roboto'
@@ -246,6 +245,20 @@ MainScreen:
                 size_hint_y: None
                 color: root.getColor('secondary')
                 bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: meetings.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
+                    size_hint_x: None
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                    orientation: 'lr-tb'
+                    id: meetings
+                    height: self.minimum_height
+                    width: '410dp'
+                
             Label:
                 text: "Statistics"
                 font_name: 'Roboto'
@@ -396,6 +409,47 @@ MainScreen:
                     text: 'Check In to the Meeting'
                     on_press: root.checkInToMeeting()
 
+<MeetingItem>:
+    size_hint_y: None
+    size_hint_x: None
+    height: card.height
+    width: card.width
+    MDCard:
+        radius: '12dp'
+        elevation: '6dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '200dp'
+        id: card
+        height: card_content.height
+        StackLayout:
+            id: card_content
+            height: self.minimum_height
+            size_hint_y: None
+            padding: '10dp'
+            spacing: '0dp'
+            Label:
+                text: '4/20/22'
+                id: date
+                font_name: 'Roboto'
+                font_size: '20dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            Label:
+                text: 'Team Meeting'
+                id: title
+                font_name: 'Roboto'
+                font_size: '12dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                italic: True
+                
+            
 
 <SubgroupItem>:
     size_hint_y: None
@@ -425,12 +479,14 @@ MainScreen:
                 size_hint_y: None
                 size_hint_x: None
                 pos_hint: {'center_x': .5, 'center_y': .5}
+                padding: '16dp'
                 MDFillRoundFlatButton:
                     id: go_to
                     padding: '16dp'
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Visit Page'
+                    on_release: root.toSubgroup()
                 
 
 <LandingItem>:
