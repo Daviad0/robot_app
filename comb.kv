@@ -189,6 +189,7 @@ MainScreen:
             padding: ("0dp", "80dp", "0dp", "0dp")
             size_hint_y: None
             height: self.minimum_height
+            spacing: '16dp'
             Label:
                 text: "Subgroup Name"
                 id: subgroup_name
@@ -831,11 +832,16 @@ MainScreen:
     ScrollView:
         do_scroll_x: False
         do_scroll_y: True
+        
         pos_hint: {'center_x': .5, 'center_y': .5}
         StackLayout:
             size_hint_y: None
             spacing: '4dp'
             height: self.minimum_height
+            EmptySpace:
+                id: initial_space
+            EmptySpace:
+                id: initial_space
             Label:
                 size_hint_y: None
 
@@ -845,7 +851,7 @@ MainScreen:
                 
             Label:
                 size_hint_y: None
-
+                id: username
                 text: 'Daviado'
                 color: root.getColor('primary')
                 bold: True

@@ -12,7 +12,8 @@ class SparkClub():
             "permissions": [],
             "username": "",
             "email": "",
-            "subgroups": []
+            "subgroups": [],
+            "role": ""
         }
         
     def try_login_with_key(self):
@@ -27,6 +28,7 @@ class SparkClub():
                     return False
                 else:
                     self.account["subgroups"] = data["user"]["access"]["groups"]
+                    self.account["role"] = data["user"]["access"]["role"]
                     self.account["permissions"] = data["user"]["access"]["permissions"]
                     return True
         return False
@@ -37,7 +39,8 @@ class SparkClub():
             "permissions": [],
             "username": "",
             "email": "", 
-            "subgroups": []
+            "subgroups": [],
+            "role": ""
         }
         self.storage.put("prev", account=self.account)
     def login(self, username, password):
@@ -54,6 +57,7 @@ class SparkClub():
             self.account["username"] = data["user"]["username"]
             self.account["email"] = data["user"]["email"]
             self.account["subgroups"] = data["user"]["access"]["groups"]
+            self.account["role"] = data["user"]["access"]["role"]
             self.storage.put("prev", account=self.account)
             print("Logged in!")
             return True
