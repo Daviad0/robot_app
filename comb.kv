@@ -170,6 +170,30 @@ MainScreen:
                 color: root.getColor('secondary')
                 italic: True
 
+<MemberItem>:
+    padding: '40dp'
+    size_hint_y: None
+    size_hint_x: None
+    height: card.height
+    width: card.width
+    MDCard:
+        radius: '20dp'
+        elevation: '6dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        orientation: 'vertical'
+        width: '160dp'
+        id: card
+        Label:
+            text: "Daviado"
+            id: username
+            font_name: 'Roboto'
+            font_size: '16dp'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            color: root.getColor('secondary')
+            bold: True
 
 
 <Subgroup>:
@@ -232,12 +256,33 @@ MainScreen:
                     height: self.minimum_height
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: 20
-                    MDRaisedButton:
+                    MDFillRoundFlatButton:
                         text: "Join"
                         id: action_button
                         md_bg_color: root.getColor('primary')
                         color: root.getColor('white')
+
+            Label:
+                text: "Subgroup Items"
+                font_name: 'Roboto'
+                font_size: '24dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: groupitems.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
                     
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                
+                    id: groupitems
+                    height: self.minimum_height
+                        
             Label:
                 text: "Upcoming Meetings"
                 font_name: 'Roboto'
@@ -261,13 +306,26 @@ MainScreen:
                     width: '410dp'
                 
             Label:
-                text: "Statistics"
+                text: "Members"
                 font_name: 'Roboto'
                 font_size: '24dp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
                 bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: members.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
+                    size_hint_x: None
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                    orientation: 'lr-tb'
+                    id: members
+                    height: self.minimum_height
+                    width: '500dp'
 
 
 <Action>:
@@ -461,7 +519,7 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
-        width: '600dp'
+        width: '500dp'
         GridLayout:
             rows: 1
             cols: 2
@@ -500,7 +558,7 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
-        width: '600dp'
+        width: '500dp'
         height: (landingitem_content.height)
         id: card
 
@@ -666,7 +724,7 @@ MainScreen:
                             height: self.minimum_height
                             pos_hint: {'center_x': .5, 'center_y': .5}
                             spacing: 20
-                            MDRaisedButton:
+                            MDFillRoundFlatButton:
                                 text: "Login"
                                 id: login_button
                                 disabled: True
@@ -676,7 +734,7 @@ MainScreen:
                                 disabled_color: root.getColor('white')
                                 color: root.getColor('white')
                                 on_release: root.submitForm()
-                            MDRaisedButton:
+                            MDFillRoundFlatButton:
                                 text: "Forgot Something?"
                                 md_bg_color: root.getColor('gray')
                                 on_release: root.goToTempLogin()
@@ -708,7 +766,7 @@ MainScreen:
                     size_hint_x: None
                     height: self.minimum_height
                     spacing: '40dp'
-                    width: 800
+                    width: 600
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     Label:
                         text: 'Temporary Login'
@@ -725,7 +783,7 @@ MainScreen:
                         row_force_default: True
                         size_hint_y: None
                         size_hint_x: None
-                        width: 800
+                        width: 600
                         height: self.minimum_height
                         spacing: 60
                         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -751,7 +809,7 @@ MainScreen:
                         FloatLayout:
                             size_hint_x: .25
                             padding: '30dp'
-                            MDRaisedButton:
+                            MDFillRoundFlatButton:
                                 id: temp_send_code
                                 text: "Send Code"
                                 disabled: True
