@@ -1,4 +1,4 @@
-from re import I
+
 from kivy.lang import Builder
 from datetime import datetime
 from kivy.properties import StringProperty, ListProperty
@@ -402,8 +402,6 @@ class Landing(Screen):
         
     pass
 
-class NavDrawer(MDToolbar):
-    pass
 
 class Custom(Screen):
     def getColor(self, name):
@@ -468,9 +466,9 @@ class Subgroup(Screen):
                     mI.ids.date.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
                     self.ids.meetings.add_widget(mI)
                     show -= 1
-        if(show >= 10):
-            l = Label(text="No upcoming meetings scheduled", italic=True, font_size="12dp", font_name="Roboto", color=self.getColor("secondary"))
-            self.ids.meetings.add_widget(l)
+        # if(show >= 10):
+        #     l = Label(text="No upcoming meetings scheduled", italic=True, font_size="12dp", font_name="Roboto", color=self.getColor("secondary"))
+        #     self.ids.meetings.add_widget(l)
         for u in users:
             if(sg["name"] in u["access"]["groups"]):
                 mI = MemberItem()
@@ -479,6 +477,7 @@ class Subgroup(Screen):
                 else:
                     mI.ids.username.text = u["username"]
                 self.ids.members.add_widget(mI)
+        print(items)
         for i in items:
             lI = LandingItem()
             lI.ids.title.text = i["title"]

@@ -568,7 +568,7 @@ MainScreen:
             height: self.minimum_height
             size_hint_y: None
             spacing: '10dp'
-            padding: (20,20,20,20)
+            padding: (40,20,40,20)
             GridLayout:
                 rows: 1
                 cols: 2
@@ -959,9 +959,8 @@ MainScreen:
                 size: self.texture_size
                 size_hint_y: None
             Label:
-                text: '#862'
-                font_size: '80dp'
+                text: 'SparkClub'
+                font_size: '40dp'
                 bold: True
                 
-                color: root.getColor('primary')
-                opacity: 0.5
+                color: root.getColor('secondary')
