@@ -538,7 +538,7 @@ class Subgroup(Screen):
             self.ids.action_button.md_bg_color = self.getColor("primary")
         pass
         
-        show = 10
+        show = 10 if not self.admin else 20
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         now = datetime.now()
         
@@ -561,12 +561,13 @@ class Subgroup(Screen):
                 self.ids.members.add_widget(mI)
         print(items)
         for m in meetings:
-            if(show > 0 and sg["name"] in m["subgroups"]):
+            if(show > 0 and (sg["name"] in m["subgroups"] or self.admin)):
                 dout = datetime.strptime(m["datetime"], f)
                 if(dout > now):
                     mI = MeetingItem()
                     mI.ids.card.identifier = m["_id"]
                     mI.ids.card.link = "meeting"
+                    mI.ids.card.opacity = 1 if (sg["name"] in m["subgroups"]) else 0.5
                     mI.ids.card.bind(on_touch_down=self.triggerOverlay)
                     mI.ids.title.text = m["title"]
                     
@@ -647,23 +648,32 @@ class Subgroup(Screen):
     def showMeetingOverlay(self, *args):
         card = args[0]
         buttons = []
-        if(self.admin):
-            buttons.append({"name" : "We Aren't Attending", "color" : "red"})
+        f = "%Y-%m-%dT%H:%M:%S.%fZ"
+        
         print(self.meetings)
         m = next(x for x in self.meetings if x["_id"] == card.identifier)
+        dout = datetime.strptime(m["datetime"], f)
         self.selectedMeeting = m
+        if(self.admin):
+            if not self.subgroup['name'] in self.selectedMeeting['subgroups']:
+                buttons.append({"name" : "We Are Attending", "color": "primary"})
+            else:
+                buttons.append({"name" : "We Aren't Attending", "color" : "red"})
         
-        MDApp.get_running_app().root.ids.action_box.addData(m['title'], "@ " + str(m["datetime"]) + "\n" + m["description"] + "\n" + str(len(m["subgroups"])) + " subgroups attending", buttons, self.handleMeetingOverlay)
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'], "on " + str(dout.month) + "/" + str(dout.day) + "/" + str(dout.year) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM") + "\n\n" + m["description"] + "\n\n" + str(len(m["subgroups"])) + " subgroups attending", buttons, self.handleMeetingOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
     def handleMeetingOverlay(self, buttonId):
         if(buttonId == 0):
             pass
-            x = threading.Thread(target = self.removeAttendance, args = (), daemon=True)
+            action = "remove"
+            if not self.subgroup['name'] in self.selectedMeeting['subgroups']:
+                action = "add"
+            x = threading.Thread(target = self.changeAttendance, args = (action,), daemon=True)
             x.start()
             
-    def removeAttendance(self):
+    def changeAttendance(self, action):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
-        SCI.remove_subgroup_attendance(self.subgroup, self.admin, self.selectedMeeting)
+        SCI.change_subgroup_attendance(self.subgroup, self.admin, self.selectedMeeting, action)
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("subgroup"), 0)
     def removeMember(self, memberId):

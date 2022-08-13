@@ -126,13 +126,13 @@ class SparkClub():
         else:
             return None
     
-    def remove_subgroup_attendance(self, subgroup, admin, meeting):
+    def change_subgroup_attendance(self, subgroup, admin, meeting, action):
         if not self.account["loggedIn"]:
             return None
         if not admin:
             return None
         
-        res = self._sendAPIRequest("POST", "/group/subgroup/schedule", data={"meetingId": meeting['_id'], "group": subgroup["name"], "action": "remove"})
+        res = self._sendAPIRequest("POST", "/group/subgroup/schedule", data={"meetingId": meeting['_id'], "group": subgroup["name"], "action": action})
         if(res["status"] == 200):
             return res["data"]
         else:
