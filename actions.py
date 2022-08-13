@@ -1,3 +1,4 @@
+import re
 from kivy.network.urlrequest import UrlRequest
 from kivy.storage.jsonstore import JsonStore
 import requests
@@ -13,7 +14,8 @@ class SparkClub():
             "username": "",
             "email": "",
             "subgroups": [],
-            "role": ""
+            "role": "",
+            "id": ""
         }
         
     def try_login_with_key(self):
@@ -40,7 +42,8 @@ class SparkClub():
             "username": "",
             "email": "", 
             "subgroups": [],
-            "role": ""
+            "role": "",
+            "id": ""
         }
         self.storage.put("prev", account=self.account)
     def login(self, username, password):
@@ -58,6 +61,7 @@ class SparkClub():
             self.account["email"] = data["user"]["email"]
             self.account["subgroups"] = data["user"]["access"]["groups"]
             self.account["role"] = data["user"]["access"]["role"]
+            self.account["id"] = data["user"]["id"]
             self.storage.put("prev", account=self.account)
             print("Logged in!")
             return True
@@ -105,6 +109,30 @@ class SparkClub():
             return None
         
         res = self._sendAPIRequest("GET", "/group/protons")
+        if(res["status"] == 200):
+            return res["data"]
+        else:
+            return None
+    
+    def remove_subgroup_member(self, subgroup, admin, member):
+        if not self.account["loggedIn"]:
+            return None
+        if not admin and not self.account["id"] == member:
+            return None
+        
+        res = self._sendAPIRequest("POST", "/group/subgroup/remove", data={"uid": member, "group": subgroup["name"]})
+        if(res["status"] == 200):
+            return res["data"]
+        else:
+            return None
+    
+    def remove_subgroup_attendance(self, subgroup, admin, meeting):
+        if not self.account["loggedIn"]:
+            return None
+        if not admin:
+            return None
+        
+        res = self._sendAPIRequest("POST", "/group/subgroup/schedule", data={"meetingId": meeting['_id'], "group": subgroup["name"], "action": "remove"})
         if(res["status"] == 200):
             return res["data"]
         else:

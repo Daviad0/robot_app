@@ -88,8 +88,12 @@ MainScreen:
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                             right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
                             md_bg_color: root.getColor('primary')
+                            color: root.getColor('secondary')
                     MessageBox:
                         id: message_box
+                        pos_hint: {'center_x': .5, 'center_y': 10}
+                    ActionBox:
+                        id: action_box
                         pos_hint: {'center_x': .5, 'center_y': 10}
 
 
@@ -117,15 +121,108 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         width: "300dp"
-        Label:
-            text: "Please Wait..."
-            id: message
-            font_name: 'Roboto'
-            font_size: '20dp'
-            pos_hint: {'center_x': 0.5}
+        height: message_box_layout.height
+        StackLayout:
             size_hint_y: None
-            color: root.getColor('secondary')
-            bold: True
+            height: self.minimum_height
+            id: message_box_layout
+            padding: "10dp"
+            spacing: '0dp'
+            Label:
+                text: "Please Wait..."
+                id: message
+                font_name: 'Roboto'
+                font_size: '20dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            Label:
+                text: "Contacting Server..."
+                id: submessage
+                font_name: 'Roboto'
+                font_size: '14dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+<ActionBox>:
+    canvas:
+        Color:
+            rgba: (0,0,0, .4)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    MDCard:
+        radius: "10dp"
+        elevation: 4
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: None
+        size_hint_y: None
+        width: "400dp"
+        height: action_box_layout.height
+        StackLayout:
+            id: action_box_layout
+            size_hint_y: None
+            height: self.minimum_height
+            padding: '20dp'
+            Label:
+                text: "Do This Action?"
+                id: title
+                font_name: 'Roboto'
+                font_size: '20dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('primary')
+                bold: True
+            Label:
+                text: "Here are some details about the action you are about to do!"
+                id: contents
+                font_name: 'Roboto'
+                font_size: '14dp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                text_size: self.width, None
+                height: self.texture_size[1]
+                halign: 'center'
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ('20dp', '20dp', '20dp', '0dp')
+                spacing: '0dp'
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: buttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "5dp"
+                        padding: "5dp"
+                
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: defaultbuttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "5dp"
+                        padding: "5dp"
+                        IDButton:
+                            on_release: root.performAction((self))
+                            buttonid: -1
+                            text: "Cancel"
+                            id: action_button
+                            md_bg_color: root.getColor('gray')
+                            color: root.getColor('white')
+            
 
 
 <EmptySpace>:
@@ -176,7 +273,7 @@ MainScreen:
     size_hint_x: None
     height: card.height
     width: card.width
-    MDCard:
+    ClickableMDCard:
         radius: '20dp'
         elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -185,6 +282,7 @@ MainScreen:
         orientation: 'vertical'
         width: '160dp'
         id: card
+        username: "Daviado"
         Label:
             text: "Daviado"
             id: username
@@ -259,6 +357,7 @@ MainScreen:
                     MDFillRoundFlatButton:
                         text: "Join"
                         id: action_button
+                        on_release: root.showLeaveOverlay()
                         md_bg_color: root.getColor('primary')
                         color: root.getColor('white')
 
@@ -473,7 +572,7 @@ MainScreen:
     size_hint_x: None
     height: card.height
     width: card.width
-    MDCard:
+    ClickableMDCard:
         radius: '12dp'
         elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -551,7 +650,7 @@ MainScreen:
 <LandingItem>:
     size_hint_y: None
     height: card.height
-    MDCard:
+    ClickableMDCard:
         radius: '12dp'
         elevation: '6dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -727,8 +826,6 @@ MainScreen:
                             MDFillRoundFlatButton:
                                 text: "Login"
                                 id: login_button
-                                disabled: True
-                                opacity: 0.3
                                 md_bg_color: root.getColor('primary')
                                 disabled_md_bg_color: root.getColor('primary')
                                 disabled_color: root.getColor('white')

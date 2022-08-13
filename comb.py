@@ -1,7 +1,8 @@
 
+from os import umask
 from kivy.lang import Builder
 from datetime import datetime
-from kivy.properties import StringProperty, ListProperty
+from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty, BooleanProperty
 # import kivy label
 from kivy.uix.label import Label
 
@@ -9,13 +10,19 @@ from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.toolbar import MDToolbar
+# import MDCard
+from kivymd.uix.card import MDCard
 
 from kivymd.uix.list import OneLineIconListItem, MDList
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
 from kivy.properties import DictProperty
-import json
+
+# import MDFillRoundFlatButton from kivymd
+from kivymd.uix.button import MDFillRoundFlatButton
+
+
 from kivy.clock import Clock
 from actions import SparkClub
 import kivy.uix.screenmanager as t
@@ -36,14 +43,22 @@ icons_item = {
             "exit-to-app": ["Sign out", "login"],
             "view-list": ["Landing Page", "landing"],
             "checkbox-marked-circle-outline": ["Attendance", "landing"],
-            "list-status": ["Actions", "landing"],
+            "list-status": ["Actions", "actions"],
             "account-circle": ["My Account", "account"]
         }
 class ItemDrawer(OneLineIconListItem):
     icon = StringProperty()
     text_color = ListProperty((0, 0, 0, 1))
     def clickItem(self):
-        changePage(icons_item[self.icon][1])
+        if(icons_item[self.icon][1] == "login"):
+            MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "You will have to re-enter your username and password to access the app again!", [{"name": "Sign Out", "color": "red"}], self.signOut)
+            MDApp.get_running_app().root.ids.action_box.show()
+        else: 
+            changePage(icons_item[self.icon][1])
+        MDApp.get_running_app().root.ids.nav_drawer.set_state("closed")
+    def signOut(self, buttonId):
+        changePage("login")
+        
 
 
 class DrawerList(ThemableBehavior, MDList):
@@ -62,6 +77,8 @@ KVContents = open('comb.kv', encoding='utf8').read()
 SCI = SparkClub()
 
 def rgba255to1(rgba):
+    if(len(rgba) == 3):
+        return (rgba[0]/255, rgba[1]/255, rgba[2]/255, 1)
     return (rgba[0]/255, rgba[1]/255, rgba[2]/255, rgba[3])
 
 def fadeto(widget, opacity, duration):
@@ -87,6 +104,7 @@ def changePage(page):
         MDApp.get_running_app().root.ids.content_drawer.trigger_login()
         
     elif(page == "actions"):
+        MDApp.get_running_app().root.ids.nav_bar_title.title = "Actions"
         Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, 0)
     elif(page == "subgroup"):
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}  
@@ -103,7 +121,7 @@ def changePage(page):
         MDApp.get_running_app().root.ids.nav_bar_title.title = "My Account"
         MDApp.get_running_app().root.ids.accountpage.setup()
     
-    MDApp.get_running_app().root.ids.nav_drawer.set_state("closed")
+    
         
 
 def getLandingPageItems():
@@ -145,9 +163,15 @@ COLORS = {
     "gray" : rgba255to1((100, 100, 100,1)),
     "black": rgba255to1((0, 0, 0,1)),
     "success": rgba255to1((0, 200, 0,1)),
-    "red": rgba255to1((255, 0, 0,1))
+    "red": rgba255to1((255, 0, 0,1)),
+    "green": rgba255to1((0, 255, 0,1)),
+    "blue": rgba255to1((0, 0, 255,1))
 }
 
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 class EmptySpace(FloatLayout):
     def getColor(self, name):
@@ -181,6 +205,41 @@ class MessageBox(FloatLayout):
         return COLORS[name.lower()]
     pass
 
+class IDButton(MDFillRoundFlatButton):
+    buttonid = NumericProperty(0)
+
+class ActionBox(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def show(self):
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+    def hide(self):
+        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+    def addData(self, title, contents, buttons, callback=None):
+        # Each callback should have an argument for the buttonid
+        self.ids.title.text = title
+        self.ids.contents.text = contents
+        
+        self.ids.buttons.clear_widgets()
+        self.callback = callback
+        n = 0
+        for b in buttons:
+            name = b["name"]
+            color = b["color"]
+            self.ids.buttons.add_widget(IDButton(text=name, md_bg_color=self.getColor(color), color=self.getColor('white'), on_release=self.performAction, buttonid=n))
+            n+=1
+    def performAction(self, *args):
+        buttonId = args[0].buttonid
+        print("Action Performed: " + str(buttonId))
+        if(buttonId == -1):
+            self.hide()
+        else:
+            self.callback(buttonId)
+            self.hide()
+            
+    
+    pass
+
 class MeetingItem(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -192,10 +251,12 @@ class MemberItem(FloatLayout):
     pass
 
 class LandingItem(FloatLayout):
+    weblink = StringProperty("")
     def getColor(self, name):
         return COLORS[name.lower()]
     def openLink(self):
-        webbrowser.open("https://sparkclub.io/")
+        print(self.weblink)
+        webbrowser.open(self.weblink)
         print("A")
     pass
 
@@ -359,13 +420,28 @@ class Landing(Screen):
             
             nW = LandingItem()
             
+            
             nW.ids.title.text = lpi["title"]
             nW.ids.icon.icon = lpi["icon"]
             
             nW.ids.description.text = lpi["contents"]
             if(not lpi["result"]["to"] == "link"):
                 nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
+            else:
+                nW.weblink = lpi["result"]["data"]
                 
+            if("color" in lpi):
+                try:
+                    if("#" in lpi["color"]):
+                        nW.ids.button.mg_bg_color = rgba255to1(hex_to_rgb(lpi["color"]))
+                        nW.ids.icon.text_color = rgba255to1(hex_to_rgb(lpi["color"]))
+                        print(rgba255to1(hex_to_rgb(lpi["color"])))
+                    else:
+                        nW.ids.button.mg_bg_color = self.getColor(lpi["color"])
+                        nW.ids.icon.text_color = self.getColor(lpi["color"])
+                    
+                except:
+                    pass
                 
             if(lpi["contents"] == ""):
                 nW.ids.landingitem_content.remove_widget(nW.ids.description)
@@ -420,8 +496,15 @@ class Splash(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
     pass
+class ClickableMDCard(MDCard):
+    identifier = StringProperty()
+    link = StringProperty()
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
 
 class Subgroup(Screen):
+    
     def getColor(self, name):
         return COLORS[name.lower()]
     def subgroupInfo(self):
@@ -434,9 +517,13 @@ class Subgroup(Screen):
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
     def setup(self, sgD, meetings, users, items):
         sg = sgD[0]
+        
         self.ids.tag.text = ("• " if (sgD[1]) else "" ) + sg["tag"]
         self.ids.subgroup_name.text = sg["name"]
-        
+        self.admin = sgD[1]
+        self.users = users
+        self.subgroup = sg
+        self.meetings = meetings
         inGroup = (sg["name"] in SCI.account["subgroups"])
         if(inGroup):
             self.ids.subgroup_membership.text = "You are a leader of this subgroup" if sgD[1] else "You are a member of this subgroup"
@@ -455,34 +542,53 @@ class Subgroup(Screen):
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         now = datetime.now()
         
-        for m in meetings:
-            if(show > 0 and sg["name"] in m["subgroups"]):
-                dout = datetime.strptime(m["datetime"], f)
-                if(dout > now):
-                    mI = MeetingItem()
-                    
-                    mI.ids.title.text = m["title"]
-                    
-                    mI.ids.date.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
-                    self.ids.meetings.add_widget(mI)
-                    show -= 1
+        self.ids.members.clear_widgets()
+        self.ids.meetings.clear_widgets()
+        self.ids.groupitems.clear_widgets()
         # if(show >= 10):
         #     l = Label(text="No upcoming meetings scheduled", italic=True, font_size="12dp", font_name="Roboto", color=self.getColor("secondary"))
         #     self.ids.meetings.add_widget(l)
         for u in users:
             if(sg["name"] in u["access"]["groups"]):
                 mI = MemberItem()
+                mI.ids.card.identifier = u["id"]
+                mI.ids.card.link = "member"
+                mI.ids.card.bind(on_touch_down=self.triggerOverlay)
                 if(u["id"] in sg["managers"]):
                     mI.ids.username.text = "• " + u["username"]
                 else:
                     mI.ids.username.text = u["username"]
                 self.ids.members.add_widget(mI)
         print(items)
+        for m in meetings:
+            if(show > 0 and sg["name"] in m["subgroups"]):
+                dout = datetime.strptime(m["datetime"], f)
+                if(dout > now):
+                    mI = MeetingItem()
+                    mI.ids.card.identifier = m["_id"]
+                    mI.ids.card.link = "meeting"
+                    mI.ids.card.bind(on_touch_down=self.triggerOverlay)
+                    mI.ids.title.text = m["title"]
+                    
+                    mI.ids.date.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
+                    self.ids.meetings.add_widget(mI)
+                    show -= 1
         for i in items:
             lI = LandingItem()
             lI.ids.title.text = i["title"]
             lI.ids.icon.icon = i["icon"]
             lI.ids.description.text = i["contents"]
+            if("color" in i):
+                try:
+                    if("#" in i["color"]):
+                        lI.ids.button.mg_bg_color = rgba255to1(hex_to_rgb(i["color"]))
+                        lI.ids.icon.text_color = rgba255to1(hex_to_rgb(i["color"]))
+                        print(rgba255to1(hex_to_rgb(i["color"])))
+                    else:
+                        lI.ids.button.mg_bg_color = self.getColor(i["color"])
+                        lI.ids.icon.text_color = self.getColor(i["color"])
+                except:
+                    pass
             if(not i["result"]["to"] == "link"):
                 lI.ids.landingitem_content.remove_widget(lI.ids.buttonct)
                 
@@ -490,8 +596,82 @@ class Subgroup(Screen):
             if(i["contents"] == ""):
                 lI.ids.landingitem_content.remove_widget(lI.ids.description)
             self.ids.groupitems.add_widget(lI)
+    def triggerOverlay(self, *args):
+        card = args[0]
+        touch = args[1]
+        if(not card.collide_point(touch.x, touch.y)):
+            return
+        
+        if(not type(card) is ClickableMDCard):
+            return
+        
+        link = card.link
+        
+        if(link == "member"):
+            self.showMemberOverlay(card)
+        elif(link == "meeting"):
+            self.showMeetingOverlay(card)
+    def showMemberOverlay(self, *args):
+        
+        card = args[0]
+        
+        buttons = [{"name" : "Account", "color": "primary"}]
+        
+        u = next(x for x in self.users if x["id"] == card.identifier)
+        self.member = u
+        if(self.admin and not u["id"] in self.subgroup["managers"]):
+            buttons.append({"name" : "Kick", "color": "red"})
+        
+        username = ("• " if u["id"] in self.subgroup['managers'] else "") + u["username"]
+        
+        MDApp.get_running_app().root.ids.action_box.addData(username, u["fullname"] + "\nThis user is in " + str(len(u['access']['groups'])) + " subgroups\nThey have 400 protons", buttons, self.handleMemberOverlay)
+        MDApp.get_running_app().root.ids.action_box.show()
+    def handleMemberOverlay(self, buttonId):
+        print(buttonId)
+        if(buttonId == 0):
+            changePage("account")
+            # TODO, show account page of actual user selected
+        elif(buttonId == 1):
+            x = threading.Thread(target = self.removeMember, args = (self.member["id"],), daemon=True)
+            x.start()
+            pass
+    def showLeaveOverlay(self):
+        MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "You won't be able to join back unless the subgroup is public, or a Subgroup Leader invites you back!", [{"name" : "Leave", "color": "red"}], self.handleLeaveOverlay)
+        MDApp.get_running_app().root.ids.action_box.show()
+    def handleLeaveOverlay(self, buttonId):
+        if(buttonId == 0):
+            pass
+            x = threading.Thread(target = self.removeMember, args = (SCI.account["id"],), daemon=True)
+            x.start()
+            print("Leave subgroup here")
+    def showMeetingOverlay(self, *args):
+        card = args[0]
+        buttons = []
+        if(self.admin):
+            buttons.append({"name" : "We Aren't Attending", "color" : "red"})
+        print(self.meetings)
+        m = next(x for x in self.meetings if x["_id"] == card.identifier)
+        self.selectedMeeting = m
+        
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'], "@ " + str(m["datetime"]) + "\n" + m["description"] + "\n" + str(len(m["subgroups"])) + " subgroups attending", buttons, self.handleMeetingOverlay)
+        MDApp.get_running_app().root.ids.action_box.show()
+    def handleMeetingOverlay(self, buttonId):
+        if(buttonId == 0):
+            pass
+            x = threading.Thread(target = self.removeAttendance, args = (), daemon=True)
+            x.start()
             
-            
+    def removeAttendance(self):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.remove_subgroup_attendance(self.subgroup, self.admin, self.selectedMeeting)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("subgroup"), 0)
+    def removeMember(self, memberId):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.remove_subgroup_member(self.subgroup, self.admin, memberId)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("subgroup"), 0)
+        
     pass
 
 class WindowManager(ScreenManager):
