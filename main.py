@@ -18,6 +18,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.animation import Animation
 from kivy.properties import DictProperty
+from kivy.core.window import Window
 
 # import MDFillRoundFlatButton from kivymd
 from kivymd.uix.button import MDFillRoundFlatButton
@@ -29,6 +30,8 @@ import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
 import webbrowser
 import threading
+
+window_size = [600,600]
 
 class ContentNavigationDrawer(MDBoxLayout):
     def trigger_login(self):
@@ -696,6 +699,7 @@ class Main(MDApp):
     
     def build(self):
         SCI.initialize()
+        
         self.icon = "assets/applogo.png"
         
         print("Hello World")
@@ -711,5 +715,5 @@ class Main(MDApp):
         x = threading.Thread(target = handleLogin, args = (True,), daemon=True)
         x.start()
 
-
+Window.fullscreen = 'auto'
 Main().run()

@@ -84,7 +84,7 @@ MainScreen:
                         MDToolbar:
                             title: "Landing Page"
                             id: nav_bar_title
-                            elevation: 10
+                            elevation: '4dp'
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                             right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
                             md_bg_color: root.getColor('primary')
@@ -116,7 +116,7 @@ MainScreen:
             pos: self.pos
     MDCard:
         radius: "10dp"
-        elevation: 4
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
@@ -154,11 +154,11 @@ MainScreen:
             pos: self.pos
     MDCard:
         radius: "10dp"
-        elevation: 4
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .8
         size_hint_y: None
-        width: "400dp"
+        
         height: action_box_layout.height
         StackLayout:
             id: action_box_layout
@@ -234,12 +234,11 @@ MainScreen:
     height: card.height
     MDCard:
         radius: '20dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
-        width: '400dp'
         id: card
         height: card_content.height
         StackLayout:
@@ -252,7 +251,7 @@ MainScreen:
                 text: "You're Signed In!"
                 id: title
                 font_name: 'Roboto'
-                font_size: '20dp'
+                font_size: '16sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -261,7 +260,7 @@ MainScreen:
                 text: "Team Meeting at 12:00 PM (4h)"
                 id: meeting
                 font_name: 'Roboto'
-                font_size: '12dp'
+                font_size: '12sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -275,7 +274,7 @@ MainScreen:
     width: card.width
     ClickableMDCard:
         radius: '20dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
@@ -316,7 +315,7 @@ MainScreen:
                 text: "Subgroup Name"
                 id: subgroup_name
                 font_name: 'Roboto'
-                font_size: '36dp'
+                font_size: '32sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -336,7 +335,7 @@ MainScreen:
                 text: "You are in this subgroup!"
                 id: subgroup_membership
                 font_name: 'Roboto'
-                font_size: '16dp'
+                font_size: '12sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -364,7 +363,7 @@ MainScreen:
             Label:
                 text: "Subgroup Items"
                 font_name: 'Roboto'
-                font_size: '24dp'
+                font_size: '20sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -385,7 +384,7 @@ MainScreen:
             Label:
                 text: "Upcoming Meetings"
                 font_name: 'Roboto'
-                font_size: '24dp'
+                font_size: '20sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -396,18 +395,17 @@ MainScreen:
                 padding: '20dp'
                 StackLayout:
                     size_hint_y: None
-                    size_hint_x: None
+                    size_hint_x: .8
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: '10dp'
                     orientation: 'lr-tb'
                     id: meetings
                     height: self.minimum_height
-                    width: '410dp'
                 
             Label:
                 text: "Members"
                 font_name: 'Roboto'
-                font_size: '24dp'
+                font_size: '20sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -418,13 +416,12 @@ MainScreen:
                 padding: '20dp'
                 StackLayout:
                     size_hint_y: None
-                    size_hint_x: None
+                    size_hint_x: .8
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: '10dp'
                     orientation: 'lr-tb'
                     id: members
                     height: self.minimum_height
-                    width: '500dp'
 
 
 <Action>:
@@ -432,7 +429,7 @@ MainScreen:
     size_hint_y: None
     MDCard:
         radius: '12dp'
-        elevation: 4
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
@@ -467,12 +464,11 @@ MainScreen:
     height: card.height
     MDCard:
         radius: '16dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
-        width: '600dp'
         id: card
         height: (signin_content.height)
 
@@ -574,7 +570,7 @@ MainScreen:
     width: card.width
     ClickableMDCard:
         radius: '12dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: None
         size_hint_y: None
@@ -611,24 +607,29 @@ MainScreen:
 
 <SubgroupItem>:
     size_hint_y: None
+    height: card.height
     MDCard:
         radius: '12dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .6
         size_hint_y: None
+        id: card
+        height: content.height
         orientation: 'vertical'
-        width: '500dp'
         GridLayout:
             rows: 1
             cols: 2
             size_hint_y: None
-            padding: ('20dp', '0dp', '20dp', '0dp')
+            size_hint_x: .9
+            height: self.minimum_height
+            id: content
+            padding: ('20dp', '10dp', '20dp', '10dp')
             Label:
                 text: 'Subgroup Name'
                 id: subgroup_name
                 font_name: 'Roboto'
-                font_size: '20dp'
+                font_size: '16sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -652,12 +653,12 @@ MainScreen:
     height: card.height
     ClickableMDCard:
         radius: '12dp'
-        elevation: '6dp'
+        elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .6
         size_hint_y: None
         orientation: 'vertical'
-        width: '500dp'
+        
         height: (landingitem_content.height)
         id: card
 
@@ -667,7 +668,7 @@ MainScreen:
             height: self.minimum_height
             size_hint_y: None
             spacing: '10dp'
-            padding: (40,20,40,20)
+            padding: ('20dp','20dp','20dp','20dp')
             GridLayout:
                 rows: 1
                 cols: 2
@@ -682,7 +683,7 @@ MainScreen:
                     text: 'Item'
                     id: title
                     font_name: 'Roboto'
-                    font_size: '20dp'
+                    font_size: '16sp'
                     pos_hint: {'center_x': 0.5}
                     size_hint_y: None
                     color: root.getColor('secondary')
@@ -691,7 +692,7 @@ MainScreen:
                 text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
                 font_name: 'Roboto'
                 id: description
-                font_size: '16dp'
+                font_size: '12sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 text_size: self.width, None
