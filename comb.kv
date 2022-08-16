@@ -96,6 +96,9 @@ MainScreen:
                     ActionBox:
                         id: action_box
                         pos_hint: {'center_x': .5, 'center_y': 10}
+                    InputBox:
+                        id: input_box
+                        pos_hint: {'center_x': .5, 'center_y': 10}
 
 
         MDNavigationDrawer:
@@ -221,8 +224,90 @@ MainScreen:
                             text: "Cancel"
                             id: action_button
                             font_size: '12sp'
-                            padding: "12dp"
+                            padding: '12sp'
                             md_bg_color: root.getColor('gray')
+                            color: root.getColor('white')
+
+<InputBox>:
+    canvas:
+        Color:
+            rgba: (0,0,0, .4)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    MDCard:
+        radius: "10dp"
+        elevation: '4dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        
+        height: action_box_layout.height
+        StackLayout:
+            id: action_box_layout
+            size_hint_y: None
+            height: self.minimum_height
+            padding: '20dp'
+            Label:
+                text: "Create Something"
+                id: title
+                font_name: 'Roboto'
+                font_size: '16sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('primary')
+                bold: True
+            Label:
+                text: "Here are some details about the action you are about to do!"
+                id: contents
+                font_name: 'Roboto'
+                font_size: '12sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                text_size: self.width, None
+                height: self.texture_size[1]
+                halign: 'center'
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ('20dp', '20dp', '20dp', '0dp')
+                spacing: '4dp'
+                StackLayout:
+                    id: inputs
+                    size_hint_y: None
+                    height: self.minimum_height
+                    
+                
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: defaultbuttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "5dp"
+                        padding: "5dp"
+                        IDButton:
+                            on_release: root.performAction((self))
+                            buttonid: -1
+                            text: "Cancel"
+                            id: action_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('gray')
+                            color: root.getColor('white')
+                        IDButton:
+                            on_release: root.performAction((self))
+                            buttonid: 1
+                            text: "Submit"
+                            id: action_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('primary')
                             color: root.getColor('white')
             
 
@@ -370,6 +455,18 @@ MainScreen:
                 size_hint_y: None
                 color: root.getColor('secondary')
                 bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: new_item.height
+                IDButton:
+                    text: "Add New Item"
+                    id: new_item
+                    md_bg_color:root.getColor("primary")
+                    color:root.getColor('white')
+                    font_size:"12sp"
+                    padding:"12dp"
+                    pos_hint:{"center_x":.5, "center_y":.5}
+                    on_release:root.showNewItem()
             FloatLayout:
                 size_hint_y: None
                 height: groupitems.height
@@ -578,7 +675,7 @@ MainScreen:
         size_hint_y: None
         orientation: 'vertical'
         id: card
-        width: '200dp'
+        width: '300dp'
         height: card_content.height
         StackLayout:
             id: card_content
@@ -781,7 +878,7 @@ MainScreen:
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     MDTextField:
                         id: username
-                        mode: 'rectangle'
+
                         multiline: False
                         icon_right_color: root.getColor('primary')
                         line_color_focus: root.getColor('primary')
@@ -797,20 +894,13 @@ MainScreen:
                         
                     MDTextField:
                         id: password
-                        height: '48dp'
-                        mode: 'rectangle'
-                        pos_hint: {'center_x': 0.5}
+                        password: True
                         multiline: False
-                        disabled: True
-                        opacity: 0.3
-                        color_mode: 'custom'
-                        line_color_focus: root.getColor('primary')
-                        line_color_normal: root.getColor('primary')
-                        line_color_disabled: root.getColor('primary')
                         icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
                         active_line: True
                         hint_text: 'Password'
-                        password: True
+                        pos_hint: {'center_x': 0.5}
                         font_name: 'Roboto'
                         border: (2,2,2,2)
                         border_color: 0,0,0,1
@@ -870,7 +960,7 @@ MainScreen:
                     size_hint_y: None
                     size_hint_x: None
                     height: self.minimum_height
-                    spacing: '40dp'
+                    spacing: '20dp'
                     width: 600
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     Label:
@@ -895,7 +985,6 @@ MainScreen:
                         
                         MDTextField:
                             id: temp_email
-                            mode: 'rectangle'
                             multiline: False
                             
                             line_color_focus: root.getColor('primary')
@@ -927,7 +1016,6 @@ MainScreen:
                                 on_release: root.sendCode()
                     MDTextField:
                         id: temp_code
-                        mode: 'rectangle'
                         multiline: False
                         disabled: True
                         opacity: 0.3

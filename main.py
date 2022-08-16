@@ -5,7 +5,7 @@ from datetime import datetime
 from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty, BooleanProperty
 # import kivy label
 from kivy.uix.label import Label
-
+from kivymd.uix.textfield import MDTextField
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -254,6 +254,55 @@ class ActionBox(FloatLayout):
     
     pass
 
+class IDInput(MDTextField):
+    inputid = NumericProperty(0)
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+class InputBox(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def show(self):
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        #vibrate(0.4)
+        if(platform == "android" or platform == "ios"):
+            vibrator.vibrate(0.1)
+    def hide(self):
+        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+    def addData(self, title, contents, inputs, callback=None):
+        # Each callback should have an argument for the buttonid
+        self.ids.title.text = title
+        self.ids.contents.text = contents
+        
+        self.ids.inputs.clear_widgets()
+        self.callback = callback
+        self.data = []
+        n = 0
+        for b in inputs:
+            hint = b["hint"]
+            multiline = b["multiline"]
+            protected = b["protected"]
+            id = "form" + str(n)
+            i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'), active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
+            i.bind(text=self.changeText)
+            self.ids.inputs.add_widget(i)
+            n+=1
+            self.data.append("")
+    def changeText(self, *args):
+        inputId = args[0].inputid
+        print("changed text: " + str(inputId))
+        self.data[inputId] = args[0].text
+    def performAction(self, *args):
+        buttonId = args[0].buttonid
+        if(buttonId == -1):
+            self.hide()
+        else:
+            self.callback(self.data)
+            self.hide()
+            
+    
+    pass
+
 class MeetingItem(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -369,13 +418,32 @@ class Landing(Screen):
         rows = [i for i in self.ids.all_items.children]
         for r in rows:
             self.ids.all_items.remove_widget(r)
-    
-    
+    def showNewItem(self,d):
+        MDApp.get_running_app().root.ids.input_box.addData("New Landing Item", "Create a new landing item to be visible to all members of the team!", [
+            {"hint":"Title","multiline":False,"protected":False},
+            {"hint":"Contents","multiline":True,"protected":False},
+            {"hint":"Link To (optional)","multiline":False,"protected":False},
+        ], self.handleNewItem)
+        MDApp.get_running_app().root.ids.input_box.show()
+    def handleNewItem(self, data):
+        print(data)
+        x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
+        x.start()
+    def createItem(self, data):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.create_new_item(data[0], data[1], data[2])
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("landing"), 0)
     def showItems(self, r):
         self.removeAllElements()
         #self.ids.all_items.rows = 9
         self.ids.all_items.add_widget(EmptySpace())
         self.ids.all_items.add_widget(EmptySpace())
+        
+        
+        admin = True
+        
+        
         
         if(not r[1] == None):
             l = Label(text = "Current Meeting", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
@@ -425,9 +493,15 @@ class Landing(Screen):
                 #     self.ids.all_items.add_widget(EmptySpace())
                 self.ids.all_items.add_widget(EmptySpace())
         
+        
         l = Label(text = "Active Items", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
         
         self.ids.all_items.add_widget(l)
+        if(admin):
+            fL = FloatLayout(size_hint_y= None)
+            b = IDButton(text="Add New Item", md_bg_color=self.getColor("primary"), color=self.getColor('white'), font_size="12sp", padding="12dp", pos_hint={"center_x":.5, "center_y":.5}, on_release=self.showNewItem)
+            fL.add_widget(b)
+            self.ids.all_items.add_widget(fL)
         for lpi in r[0]:
             #self.ids.all_items.rows += 4
             
@@ -518,7 +592,22 @@ class ClickableMDCard(MDCard):
     pass
 
 class Subgroup(Screen):
-    
+    def showNewItem(self):
+        MDApp.get_running_app().root.ids.input_box.addData("New Subgroup Item", "Create a item that will only be visible to the " + self.subgroup["name"] + " subgroup", [
+            {"hint":"Title","multiline":False,"protected":False},
+            {"hint":"Contents","multiline":True,"protected":False},
+            {"hint":"Link To (optional)","multiline":False,"protected":False},
+        ], self.handleNewItem)
+        MDApp.get_running_app().root.ids.input_box.show()
+    def handleNewItem(self, data):
+        print(data)
+        x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
+        x.start()
+    def createItem(self, data):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.create_new_item(data[0], data[1], data[2], self.subgroup["tag"])
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("subgroup"), 0)
     def getColor(self, name):
         return COLORS[name.lower()]
     def subgroupInfo(self):
@@ -606,6 +695,9 @@ class Subgroup(Screen):
                     pass
             if(not i["result"]["to"] == "link"):
                 lI.ids.landingitem_content.remove_widget(lI.ids.buttonct)
+            else:
+                lI.weblink = i["result"]["data"]
+                
                 
                 
             if(i["contents"] == ""):

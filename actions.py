@@ -145,7 +145,27 @@ class SparkClub():
             return res["data"]
         else:
             return None
+    def create_new_item(self, title, contents, linkto, subgroup=None):
+        if not self.account["loggedIn"]:
+            return False
         
+        action = "link" if linkto else "static"
+        res = {
+            "to": action,
+            "data": linkto
+        }
+        
+        icon = "star"
+        show = 1
+        subgroups = [] if subgroup == None else [subgroup]
+        
+        
+        res = self._sendAPIRequest("POST", "/group/item", data={"title": title, "contents": contents, "resultdata": [action, linkto], "icon": icon, "show": show, "subgroups": subgroups, "action": "create"})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def get_meeting_today(self):
         if not self.account["loggedIn"]:
             return {}
