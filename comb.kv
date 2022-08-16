@@ -85,6 +85,7 @@ MainScreen:
                             title: "Landing Page"
                             id: nav_bar_title
                             elevation: '4dp'
+                            font_size: '16sp'
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                             right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
                             md_bg_color: root.getColor('primary')
@@ -118,9 +119,8 @@ MainScreen:
         radius: "10dp"
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .6
         size_hint_y: None
-        width: "300dp"
         height: message_box_layout.height
         StackLayout:
             size_hint_y: None
@@ -132,7 +132,7 @@ MainScreen:
                 text: "Please Wait..."
                 id: message
                 font_name: 'Roboto'
-                font_size: '20dp'
+                font_size: '16sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -141,7 +141,7 @@ MainScreen:
                 text: "Contacting Server..."
                 id: submessage
                 font_name: 'Roboto'
-                font_size: '14dp'
+                font_size: '12sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -169,7 +169,7 @@ MainScreen:
                 text: "Do This Action?"
                 id: title
                 font_name: 'Roboto'
-                font_size: '20dp'
+                font_size: '16sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('primary')
@@ -178,7 +178,7 @@ MainScreen:
                 text: "Here are some details about the action you are about to do!"
                 id: contents
                 font_name: 'Roboto'
-                font_size: '14dp'
+                font_size: '12sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
@@ -189,7 +189,7 @@ MainScreen:
                 size_hint_y: None
                 height: self.minimum_height
                 padding: ('20dp', '20dp', '20dp', '0dp')
-                spacing: '0dp'
+                spacing: '4dp'
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -220,6 +220,8 @@ MainScreen:
                             buttonid: -1
                             text: "Cancel"
                             id: action_button
+                            font_size: '12sp'
+                            padding: "12dp"
                             md_bg_color: root.getColor('gray')
                             color: root.getColor('white')
             
@@ -279,14 +281,14 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
-        width: '160dp'
         id: card
+        width: '160dp'
         username: "Daviado"
         Label:
             text: "Daviado"
             id: username
             font_name: 'Roboto'
-            font_size: '16dp'
+            font_size: '12dp'
             pos_hint: {'center_x': 0.5}
             size_hint_y: None
             color: root.getColor('secondary')
@@ -575,8 +577,8 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
-        width: '200dp'
         id: card
+        width: '200dp'
         height: card_content.height
         StackLayout:
             id: card_content
@@ -612,7 +614,7 @@ MainScreen:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .6
+        size_hint_x: .8
         size_hint_y: None
         id: card
         height: content.height
@@ -629,10 +631,10 @@ MainScreen:
                 text: 'Subgroup Name'
                 id: subgroup_name
                 font_name: 'Roboto'
-                font_size: '16sp'
-                pos_hint: {'center_x': 0.5}
+                font_size: '12sp'
                 size_hint_y: None
                 color: root.getColor('secondary')
+                halign: 'left'
                 bold: True
             FloatLayout:
                 size_hint_y: None
@@ -641,7 +643,8 @@ MainScreen:
                 padding: '16dp'
                 MDFillRoundFlatButton:
                     id: go_to
-                    padding: '16dp'
+                    padding: '8dp'
+                    font_size: '8sp'
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Visit Page'
@@ -655,7 +658,7 @@ MainScreen:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .6
+        size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
         
@@ -667,17 +670,19 @@ MainScreen:
             id: landingitem_content
             height: self.minimum_height
             size_hint_y: None
-            spacing: '10dp'
+            spacing: '16dp'
             padding: ('20dp','20dp','20dp','20dp')
             GridLayout:
                 rows: 1
                 cols: 2
                 size_hint_y: None
+                id: item_header
                 MDIconButton:
                     icon: 'magnify'
                     id: icon
                     size_hint_x: None
                     theme_text_color: "Custom"
+                    font_size: '16sp'
                     text_color: root.getColor('secondary')
                 Label:
                     text: 'Item'
@@ -685,14 +690,15 @@ MainScreen:
                     font_name: 'Roboto'
                     font_size: '16sp'
                     pos_hint: {'center_x': 0.5}
-                    size_hint_y: None
                     color: root.getColor('secondary')
+                    
                     bold: True
+                    valign: 'middle'
             Label:
                 text: 'KDJASDJJKASDJKAKJSDJKASKJDJKASDJKAKJSDJKASDJK JASJDJASD'
                 font_name: 'Roboto'
                 id: description
-                font_size: '12sp'
+                font_size: '10sp'
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 text_size: self.width, None
@@ -707,7 +713,8 @@ MainScreen:
 
                 MDFillRoundFlatButton:
                     id: button
-                    padding: '16dp'
+                    padding: '12dp'
+                    font_size: '12sp'
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Open Link'
@@ -752,7 +759,7 @@ MainScreen:
             #rows_minimum: '48dp'
             size_hint_y: None
             pos_hint: {'center_x': .5, 'center_y': .75}
-            spacing: 240
+            spacing: 260
             Image:
                 source: 'assets/lightning.png'
                 size: self.texture_size

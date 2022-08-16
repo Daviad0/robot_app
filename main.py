@@ -22,14 +22,22 @@ from kivy.core.window import Window
 
 # import MDFillRoundFlatButton from kivymd
 from kivymd.uix.button import MDFillRoundFlatButton
+#from kivy.utils import platform
 
-
+import kivy
 from kivy.clock import Clock
 from actions import SparkClub
 import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
 import webbrowser
 import threading
+from kivy.utils import platform
+
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', '0')
+Config.set("graphics", "resizable", 0)
+
+from plyer import vibrator
 
 window_size = [600,600]
 
@@ -216,6 +224,9 @@ class ActionBox(FloatLayout):
         return COLORS[name.lower()]
     def show(self):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        #vibrate(0.4)
+        if(platform == "android" or platform == "ios"):
+            vibrator.vibrate(0.2)
     def hide(self):
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def addData(self, title, contents, buttons, callback=None):
@@ -229,7 +240,7 @@ class ActionBox(FloatLayout):
         for b in buttons:
             name = b["name"]
             color = b["color"]
-            self.ids.buttons.add_widget(IDButton(text=name, md_bg_color=self.getColor(color), color=self.getColor('white'), on_release=self.performAction, buttonid=n))
+            self.ids.buttons.add_widget(IDButton(text=name, md_bg_color=self.getColor(color), color=self.getColor('white'), on_release=self.performAction, buttonid=n, font_size="12sp", padding="12dp"))
             n+=1
     def performAction(self, *args):
         buttonId = args[0].buttonid
@@ -715,5 +726,5 @@ class Main(MDApp):
         x = threading.Thread(target = handleLogin, args = (True,), daemon=True)
         x.start()
 
-Window.fullscreen = 'auto'
+Window.fullscreen = False
 Main().run()
