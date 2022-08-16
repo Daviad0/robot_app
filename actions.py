@@ -1,12 +1,16 @@
 import re
 from kivy.network.urlrequest import UrlRequest
 from kivy.storage.jsonstore import JsonStore
+from kivymd.app import MDApp
 import requests
+import os
+
+path = ""
 
 class SparkClub():
     def __init__(self):
-        self.storage = JsonStore("account.json")
-        print(self.storage.exists("account"))
+	
+        
         self.account = {
             "loggedIn": False,
             "token": "",
@@ -17,7 +21,11 @@ class SparkClub():
             "role": "",
             "id": ""
         }
-        
+    def initialize(self):
+        global path
+        path = os.path.join(MDApp.get_running_app().user_data_dir, "account.json")
+        self.storage = JsonStore(path)
+        print(self.storage.exists("account"))
     def try_login_with_key(self):
         if(self.storage.exists("prev")):
             self.account = self.storage.get("prev")["account"]
