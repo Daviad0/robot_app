@@ -46,12 +46,20 @@ KV = '''
                 on_press:
                     root.nav_drawer.set_state("close")
                     root.screen_manager.current = "scr 2"
+
+            OneLineListItem:
+                text: "My Account"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "scr 4"
             
             OneLineListItem:
                 text: "Log Out"
                 on_press:
                     root.nav_drawer.set_state("close")
                     root.screen_manager.current = "scr 3"
+            
+            
 
 
 Screen:
@@ -82,7 +90,21 @@ Screen:
                 MDLabel:
                     text: "Attendance File"
                     halign: "center"
-            
+
+            Screen:
+                name: "scr 4"
+
+                MDLabel:
+                    
+                    halign: "center"
+                MDRoundFlatIconButton:
+                    icon: "account-cancel"
+                    text: "Reset Password"
+                    width: dp(250)
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    on_release:
+                        import webbrowser
+                        webbrowser.open('http://www.google.com')
             Screen:
                 name: "scr 3"
 
