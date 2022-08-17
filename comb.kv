@@ -13,33 +13,39 @@
     orientation: "vertical"
     padding: ("20dp", "8dp", "8dp", "8dp")
     spacing: "8dp"
-
-    AnchorLayout:
-        anchor_x: "left"
+    StackLayout:
         size_hint_y: None
-        height: avatar.height
+        padding: ("20dp", "8dp", "8dp", "0dp")
+        height: self.minimum_height
+        AnchorLayout:
+            anchor_x: "left"
+            size_hint_y: None
+            height: avatar.height
 
-        Image:
-            id: avatar
-            size_hint: None, None
-            size: "50dp", "50dp"
-            source: "assets/applogosingle.png"
+            Image:
+                id: avatar
+                size_hint: None, None
+                size: "40dp", "40dp"
+                source: "assets/sparkclub.png"
+        StackLayout:
+            size_hint_y: None
+            padding: ("0dp", "8dp", "0dp", "8dp")
+            height: self.minimum_height
+            MDLabel:
+                text: "test_1"
+                id: username
+                font_style: "Button"
+                adaptive_height: True
+                theme_text_color: "Custom"
+                text_color: root.getColor("primary")
 
-    MDLabel:
-        text: "test_1"
-        id: username
-        font_style: "Button"
-        adaptive_height: True
-        theme_text_color: "Custom"
-        text_color: root.getColor("secondary")
-
-    MDLabel:
-        text: "test1@gmail.com"
-        id: email
-        font_style: "Caption"
-        adaptive_height: True
-        theme_text_color: "Custom"
-        text_color: root.getColor("secondary")
+            MDLabel:
+                text: "test1@gmail.com"
+                id: email
+                font_style: "Caption"
+                adaptive_height: True
+                theme_text_color: "Custom"
+                text_color: root.getColor("secondary")
 
     ScrollView:
 
@@ -333,7 +339,7 @@ MainScreen:
             height: self.minimum_height
             size_hint_y: None
             padding: '10dp'
-            spacing: '4dp'
+            spacing: '0dp'
             Label:
                 text: "You're Signed In!"
                 id: title
@@ -720,7 +726,7 @@ MainScreen:
             rows: 1
             cols: 2
             size_hint_y: None
-            size_hint_x: .9
+            size_hint_x: .95
             height: self.minimum_height
             id: content
             padding: ('20dp', '10dp', '20dp', '10dp')
