@@ -34,6 +34,7 @@ import threading
 from kivy.utils import platform
 
 from kivy.config import Config
+from settings import AppSettings
 Config.set('graphics', 'fullscreen', '0')
 Config.set("graphics", "resizable", 0)
 
@@ -49,6 +50,7 @@ class ContentNavigationDrawer(MDBoxLayout):
         return COLORS[name.lower()]
     pass
 
+inPopup = False
 
 icons_item = {
             "exit-to-app": ["Sign out", "login"],
@@ -86,6 +88,7 @@ class DrawerList(ThemableBehavior, MDList):
 KVContents = open('comb.kv', encoding='utf8').read()
 
 SCI = SparkClub()
+SETTINGS = AppSettings()
 
 def rgba255to1(rgba):
     if(len(rgba) == 3):
@@ -166,18 +169,7 @@ def handleLogin(token, data={}):
     
     
 
-COLORS = {
-    "primary": rgba255to1((19, 3, 252,1)),
-    "secondary": rgba255to1((7, 0, 105,1)),
-    "light": rgba255to1((130, 207, 255,1)),
-    "white": rgba255to1((255, 255, 255,1)),
-    "gray" : rgba255to1((100, 100, 100,1)),
-    "black": rgba255to1((0, 0, 0,1)),
-    "success": rgba255to1((0, 200, 0,1)),
-    "red": rgba255to1((255, 0, 0,1)),
-    "green": rgba255to1((0, 255, 0,1)),
-    "blue": rgba255to1((0, 0, 255,1))
-}
+COLORS = {}
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
@@ -223,13 +215,28 @@ class ActionBox(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
     def show(self):
+        
+        self.opacity = 0
+        
+        global inPopup
+        if(inPopup):
+            return
+        inPopup = True
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        fadeto(self, 1, .2)
         #vibrate(0.4)
         if(platform == "android" or platform == "ios"):
             vibrator.vibrate(0.2)
+    def actualHide(self):
+        global inPopup
+        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        
     def hide(self):
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        
     def addData(self, title, contents, buttons, callback=None):
+        if(inPopup):
+            return
         # Each callback should have an argument for the buttonid
         self.ids.title.text = title
         self.ids.contents.text = contents
@@ -243,6 +250,7 @@ class ActionBox(FloatLayout):
             self.ids.buttons.add_widget(IDButton(text=name, md_bg_color=self.getColor(color), color=self.getColor('white'), on_release=self.performAction, buttonid=n, font_size="12sp", padding="12dp"))
             n+=1
     def performAction(self, *args):
+        global inPopup
         buttonId = args[0].buttonid
         print("Action Performed: " + str(buttonId))
         if(buttonId == -1):
@@ -250,7 +258,8 @@ class ActionBox(FloatLayout):
         else:
             self.callback(buttonId)
             self.hide()
-            
+        inPopup = False
+        
     
     pass
 
@@ -263,13 +272,27 @@ class InputBox(FloatLayout):
     def getColor(self, name):
         return COLORS[name.lower()]
     def show(self):
+        global inPopup
+        if(inPopup):
+            return
+        self.opacity = 0
+        inPopup = True
+        
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        fadeto(self, 1, .2)
         #vibrate(0.4)
         if(platform == "android" or platform == "ios"):
             vibrator.vibrate(0.1)
+    def actualHide(self):
+        global inPopup
+        
+        inPopup = False
     def hide(self):
+        
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def addData(self, title, contents, inputs, callback=None):
+        if(inPopup):
+            return
         # Each callback should have an argument for the buttonid
         self.ids.title.text = title
         self.ids.contents.text = contents
@@ -283,8 +306,9 @@ class InputBox(FloatLayout):
             multiline = b["multiline"]
             protected = b["protected"]
             id = "form" + str(n)
-            i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'), active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
+            i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
             i.bind(text=self.changeText)
+            i.line_color_focus = self.getColor('primary')
             self.ids.inputs.add_widget(i)
             n+=1
             self.data.append("")
@@ -293,12 +317,14 @@ class InputBox(FloatLayout):
         print("changed text: " + str(inputId))
         self.data[inputId] = args[0].text
     def performAction(self, *args):
+        global inPopup
         buttonId = args[0].buttonid
         if(buttonId == -1):
             self.hide()
         else:
             self.callback(self.data)
             self.hide()
+        inPopup = False
             
     
     pass
@@ -315,12 +341,27 @@ class MemberItem(FloatLayout):
 
 class LandingItem(FloatLayout):
     weblink = StringProperty("")
+    moduleitemid = StringProperty("")
     def getColor(self, name):
         return COLORS[name.lower()]
     def openLink(self):
         print(self.weblink)
         webbrowser.open(self.weblink)
         print("A")
+        
+    def handleConfirmation(self, buttonId):
+        if(buttonId == 0):
+            x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
+            x.start()
+    def deleteItem(self):
+        MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "This will delete the Landing Item for EVERYONE, not just you seeing it!", [{"name" : "Delete", "color": "red"}], self.handleConfirmation)
+        MDApp.get_running_app().root.ids.action_box.show()
+    def bgDeleteItem(self, id):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.remove_item(id)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("landing"), 0)
+        
     pass
 
 subgroup = ""
@@ -513,11 +554,22 @@ class Landing(Screen):
             nW.ids.icon.icon = lpi["icon"]
             
             nW.ids.description.text = lpi["contents"]
+            buttonsGone = 0
+
             if(not lpi["result"]["to"] == "link"):
-                nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
+                nW.ids.buttonspan.remove_widget(nW.ids.button)
+                buttonsGone += 1
             else:
                 nW.weblink = lpi["result"]["data"]
+            
+            if(not admin):
+                nW.ids.buttonspan.remove_widget(nW.ids.deletebutton)
+                buttonsGone += 1
+            else:
+                nW.moduleitemid = lpi["_id"]
                 
+            if(buttonsGone == 2):
+                nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
             if("color" in lpi):
                 try:
                     if("#" in lpi["color"]):
@@ -578,6 +630,36 @@ class Account(Screen):
     def setup(self):
         self.ids.username.text = SCI.account["username"]
         self.ids.account_role.text = SCI.account["role"].upper()
+    def showResetPassword(self,d):
+        MDApp.get_running_app().root.ids.input_box.addData("Reset Your Password", "You will need your old password to change your password to a new one. Please note that this will not sign out your other accounts!", [
+            {"hint":"Current Password","multiline":False,"protected":True},
+            {"hint":"New Password","multiline":False,"protected":True},
+            {"hint":"Confirm New Password","multiline":False,"protected":True},
+        ], self.handleResetPassword)
+        MDApp.get_running_app().root.ids.input_box.show()
+    def handleResetPassword(self, data):
+        print(data)
+        x = threading.Thread(target = self.resetPassword, args = (data,), daemon=True)
+        x.start()
+    def showError(self, title, error):
+        MDApp.get_running_app().root.ids.action_box.addData(title, error, [])
+        MDApp.get_running_app().root.ids.action_box.show()
+    def resetPassword(self, data):
+        
+        if(not data[1] == data[2]):
+            # show error   
+            Clock.schedule_once(lambda x: self.showError("New Password Mismatch", "The new password you entered doesn't match the confirmation password."))
+            return
+        
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        result = SCI.reset_password(data[0], data[1])
+        
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        if(not result):
+            # show error
+            Clock.schedule_once(lambda x: self.showError("Incorrect Password", "You can't change your password to something new if you don't know your previous one!"))
+            return
+        
     pass
 
 class Splash(Screen):
@@ -693,10 +775,22 @@ class Subgroup(Screen):
                         lI.ids.icon.text_color = self.getColor(i["color"])
                 except:
                     pass
+            buttonsGone = 0
+
             if(not i["result"]["to"] == "link"):
-                lI.ids.landingitem_content.remove_widget(lI.ids.buttonct)
+                lI.ids.buttonspan.remove_widget(lI.ids.button)
+                buttonsGone += 1
             else:
                 lI.weblink = i["result"]["data"]
+            
+            if(not self.admin):
+                lI.ids.buttonspan.remove_widget(lI.ids.deletebutton)
+                buttonsGone += 1
+            else:
+                lI.moduleitemid = i["_id"]
+                
+            if(buttonsGone == 2):
+                lI.ids.landingitem_content.remove_widget(lI.ids.buttonct)
                 
                 
                 
@@ -801,8 +895,48 @@ class Main(MDApp):
         return COLORS[name.lower()]
     
     def build(self):
+        global COLORS
         SCI.initialize()
+        SETTINGS.initialize()
         
+        # if(SETTINGS.settings["color_scheme"] == "light"):
+        #     COLORS = {
+        #         "primary": rgba255to1((19, 3, 252,1)),
+        #         "secondary": rgba255to1((7, 0, 105,1)),
+        #         "light": rgba255to1((130, 207, 255,1)),
+        #         "white": rgba255to1((255, 255, 255,1)),
+        #         "gray" : rgba255to1((100, 100, 100,1)),
+        #         "black": rgba255to1((0, 0, 0,1)),
+        #         "success": rgba255to1((0, 200, 0,1)),
+        #         "red": rgba255to1((255, 0, 0,1)),
+        #         "green": rgba255to1((0, 255, 0,1)),
+        #         "blue": rgba255to1((0, 0, 255,1))
+        #     }
+        # elif(SETTINGS.settings["color_scheme"] == "dark"):
+        #     COLORS = {
+        #         "primary": rgba255to1((19, 3, 252,1)),
+        #         "secondary": rgba255to1((7, 0, 105,1)),
+        #         "light": rgba255to1((130, 207, 255,1)),
+        #         "white": rgba255to1((50, 50, 50,1)),
+        #         "gray" : rgba255to1((150, 150, 150,1)),
+        #         "black": rgba255to1((255, 255, 255,1)),
+        #         "success": rgba255to1((0, 200, 0,1)),
+        #         "red": rgba255to1((255, 0, 0,1)),
+        #         "green": rgba255to1((0, 255, 0,1)),
+        #         "blue": rgba255to1((80, 80, 255,1))
+        #     }
+        COLORS = {
+            "primary": rgba255to1((19, 3, 252,1)),
+            "secondary": rgba255to1((7, 0, 105,1)),
+            "light": rgba255to1((130, 207, 255,1)),
+            "white": rgba255to1((255, 255, 255,1)),
+            "gray" : rgba255to1((100, 100, 100,1)),
+            "black": rgba255to1((0, 0, 0,1)),
+            "success": rgba255to1((0, 200, 0,1)),
+            "red": rgba255to1((255, 0, 0,1)),
+            "green": rgba255to1((0, 255, 0,1)),
+            "blue": rgba255to1((0, 0, 255,1))
+        }
         self.icon = "assets/applogo.png"
         
         print("Hello World")

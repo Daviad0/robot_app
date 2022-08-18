@@ -6,6 +6,7 @@ import requests
 import os
 
 path = ""
+group = "testing-env"
 
 class SparkClub():
     def __init__(self):
@@ -58,7 +59,7 @@ class SparkClub():
         res = self._sendAPIRequest("POST", "/acc/login", {
             "username": username,
             "password": password,
-            "group": "testing-env" # change to the lightning robotics group name later
+            "group": group # change to the lightning robotics group name later
         })
         data = res["data"]
         if(res["status"] == 200 and data["successful"]):
@@ -133,6 +134,16 @@ class SparkClub():
             return res["data"]
         else:
             return None
+    def remove_item(self, id):
+        if not self.account["loggedIn"]:
+            return False
+
+        res = self._sendAPIRequest("POST", "/group/item", data={"_id": id, "action": "delete"})
+        
+        if(res["status"] == 200):
+            return True
+        else:
+            return False
     
     def change_subgroup_attendance(self, subgroup, admin, meeting, action):
         if not self.account["loggedIn"]:
@@ -185,7 +196,15 @@ class SparkClub():
         if(res["status"] == 200 and data["successful"]):
             return True
         
-        
+    def reset_password(self, current, new):
+        if not self.account["loggedIn"]:
+            return False
+        res = self._sendAPIRequest("POST", "/acc/reset", data={"oldPw": current, "newPw": new, "id": self.account["id"]})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     
     def _sendAPIRequest(self, method, endpoint, data=None, headers=None):
         cookies = {}

@@ -130,6 +130,7 @@ MainScreen:
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: .6
         size_hint_y: None
+        md_bg_color: root.getColor('white')
         height: message_box_layout.height
         StackLayout:
             size_hint_y: None
@@ -167,8 +168,9 @@ MainScreen:
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: .8
         size_hint_y: None
-        
+        md_bg_color: root.getColor('white')
         height: action_box_layout.height
+        id: card
         StackLayout:
             id: action_box_layout
             size_hint_y: None
@@ -247,7 +249,7 @@ MainScreen:
         pos_hint: {'center_x': .5, 'center_y': .5}
         size_hint_x: .8
         size_hint_y: None
-        
+        md_bg_color: root.getColor('white')
         height: action_box_layout.height
         StackLayout:
             id: action_box_layout
@@ -332,6 +334,7 @@ MainScreen:
         size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
+        md_bg_color: root.getColor('white')
         id: card
         height: card_content.height
         StackLayout:
@@ -374,6 +377,7 @@ MainScreen:
         orientation: 'vertical'
         id: card
         width: '160dp'
+        md_bg_color: root.getColor('white')
         username: "Daviado"
         Label:
             text: "Daviado"
@@ -389,7 +393,7 @@ MainScreen:
 <Subgroup>:
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -532,32 +536,35 @@ MainScreen:
 <Action>:
     padding: '40dp'
     size_hint_y: None
+    height: card.height
     MDCard:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: None
+        size_hint_x: .8
         size_hint_y: None
+        md_bg_color: root.getColor('white')
         orientation: 'vertical'
-        width: '600dp'
-        height: '160dp'
         padding: '32dp'
         md_bg_color: root.getColor('light')
+        height: contents.height
+        id: card
         StackLayout:
+            id: contents
             height: self.minimum_height
             pos_hint: {'center_x': .5, 'center_y': .5}
             Label:
                 id: title
                 text: 'Add Landing Item'
                 color: root.getColor('white')
-                font_size: '40dp'
+                font_size: '24sp'
                 bold: True
                 size_hint_y: None
             Label:
                 id: title
                 text: 'Leads can add landing page items whenever!'
                 color: root.getColor('white')
-                font_size: '20dp'
+                font_size: '14sp'
                 size_hint_y: None
 
 
@@ -574,6 +581,7 @@ MainScreen:
         size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
+        md_bg_color: root.getColor('white')
         id: card
         height: (signin_content.height)
 
@@ -680,6 +688,7 @@ MainScreen:
         size_hint_x: None
         size_hint_y: None
         orientation: 'vertical'
+        md_bg_color: root.getColor('white')
         id: card
         width: '300dp'
         height: card_content.height
@@ -720,6 +729,7 @@ MainScreen:
         size_hint_x: .8
         size_hint_y: None
         id: card
+        md_bg_color: root.getColor('white')
         height: content.height
         orientation: 'vertical'
         GridLayout:
@@ -764,7 +774,7 @@ MainScreen:
         size_hint_x: .8
         size_hint_y: None
         orientation: 'vertical'
-        
+        md_bg_color: root.getColor('white')
         height: (landingitem_content.height)
         id: card
 
@@ -774,7 +784,7 @@ MainScreen:
             height: self.minimum_height
             size_hint_y: None
             spacing: '16dp'
-            padding: ('20dp','20dp','20dp','20dp')
+            padding: ('20dp','20dp','20dp','10dp')
             GridLayout:
                 rows: 1
                 cols: 2
@@ -813,21 +823,37 @@ MainScreen:
             FloatLayout:
                 id: buttonct
                 size_hint_y: None
-
-                MDFillRoundFlatButton:
-                    id: button
-                    padding: '12dp'
-                    font_size: '12sp'
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-                    md_bg_color: root.getColor('primary')
-                    text: 'Open Link'
-                    on_press: root.openLink()
+                GridLayout:
+                    rows: 1
+                    id: buttonspan
+                    size_hint_y: None
+                    size_hint_x: None
+                    width: self.minimum_width
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    spacing: "5dp"
+                    padding: "10dp"
+                    MDFillRoundFlatButton:
+                        id: button
+                        padding: '12dp'
+                        font_size: '12sp'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        md_bg_color: root.getColor('primary')
+                        text: 'Open Link'
+                        on_press: root.openLink()
+                    MDFillRoundFlatButton:
+                        id: deletebutton
+                        padding: '12dp'
+                        font_size: '12sp'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        md_bg_color: root.getColor('red')
+                        text: 'Delete Item'
+                        on_press: root.deleteItem()
 
 <Actions>:
     name: "actions"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -847,7 +873,7 @@ MainScreen:
     name: "login"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -1042,7 +1068,7 @@ MainScreen:
     name: "landing"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -1069,7 +1095,7 @@ MainScreen:
     name: "custom"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -1082,7 +1108,7 @@ MainScreen:
     name: "account"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -1119,7 +1145,7 @@ MainScreen:
                 MDCard:
                     id: role_card
                     radius: '20dp'
-                    elevation: 4
+                    elevation: '2dp'
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     size_hint_y: None
                     size_hint_x: None
@@ -1132,6 +1158,19 @@ MainScreen:
                         text: 'STUDENT'
                         bold: True
                         font_size: '20dp'
+            FloatLayout:
+                size_hint_y: None
+                height: reset_password.height
+                IDButton:
+                    text: "Reset Password"
+                    id: reset_password
+                    md_bg_color:root.getColor("primary")
+                    color:root.getColor('white')
+                    font_size:"12sp"
+                    padding:"12dp"
+                    pos_hint:{"center_x":.5, "center_y":.5}
+                    on_release:root.showResetPassword(self)
+            
                         
             
 
@@ -1141,7 +1180,7 @@ MainScreen:
     name: "splash"
     canvas:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: root.getColor('white')
         Rectangle:
             pos: self.pos
             size: self.size
@@ -1152,7 +1191,7 @@ MainScreen:
             pos_hint: {'center_x': .5, 'center_y': .0}
             row_default_height: '20dp'
             row_force_default: True
-            spacing: '80dp'
+            spacing: '60dp'
             Image:
                 source: 'assets/lightning.png'
                 size: self.texture_size
