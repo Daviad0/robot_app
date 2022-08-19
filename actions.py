@@ -43,6 +43,7 @@ class SparkClub():
                     self.account["permissions"] = data["user"]["access"]["permissions"]
                     return True
         return False
+    #def get_permissions_of_role(self):
     def logout(self):
         self.account = {
             "loggedIn": False,
@@ -94,6 +95,15 @@ class SparkClub():
             return data["items"]
         else:
             return []
+    def get_this_user(self):
+        if not self.account["loggedIn"]:
+            return None
+        res = self._sendAPIRequest("GET", "/acc/verify")
+        if(res["status"] == 200):
+            return res["data"]["user"]
+        else:
+            return None
+        
     def get_meetings(self):
         if not self.account["loggedIn"]:
             return []
@@ -122,7 +132,15 @@ class SparkClub():
             return res["data"]
         else:
             return None
-    
+    def get_subgroups(self):
+        if not self.account["loggedIn"]:
+            return None
+        res = self._sendAPIRequest("GET", "/group/subgroups")
+        if(res["status"] == 200):
+            return res["data"]["items"]
+        
+        else:
+            return None
     def remove_subgroup_member(self, subgroup, admin, member):
         if not self.account["loggedIn"]:
             return None

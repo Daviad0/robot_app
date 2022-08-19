@@ -55,7 +55,7 @@ inPopup = False
 icons_item = {
             "exit-to-app": ["Sign out", "login"],
             "view-list": ["Landing Page", "landing"],
-            "checkbox-marked-circle-outline": ["Attendance", "landing"],
+            "checkbox-marked-circle-outline": ["Meetings", "attendance"],
             "list-status": ["Actions", "actions"],
             "account-circle": ["My Account", "account"]
         }
@@ -134,6 +134,9 @@ def changePage(page):
     elif(page == "account"):
         MDApp.get_running_app().root.ids.nav_bar_title.title = "My Account"
         MDApp.get_running_app().root.ids.accountpage.setup()
+    elif(page == "attendance"):
+        MDApp.get_running_app().root.ids.nav_bar_title.title = "Meeting Schedule"
+        MDApp.get_running_app().root.ids.attendancepage.show()
     
     
         
@@ -452,6 +455,177 @@ class MainScreen(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
 
+class SmallMeetingItem(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+
+class Attendance(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    
+    def getItems(self):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        a = SCI.get_meetings()
+        s = SCI.get_subgroups()
+        u = SCI.get_this_user()
+        Clock.schedule_once(lambda x : self.addItems(a, s, u), 0)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+    
+    def show(self):
+        
+        x = threading.Thread(target = self.getItems, args = (), daemon=True)
+        x.start()
+    
+    def triggerOverlay(self, *args):
+        card = args[0]
+        touch = args[1]
+        if(not card.collide_point(touch.x, touch.y)):
+            return
+        
+        if(not type(card) is ClickableMDCard):
+            return
+        
+        link = card.link
+        
+        if(link == "upcoming"):
+            self.showUpcomingOverlay(card)
+        elif(link == "past"):
+            self.showPastOverlay(card)
+    
+    def showUpcomingOverlay(self, card):
+        
+        id = card.identifier
+        m = next(x for x in self.meetings if x["_id"] == id)
+        
+        
+        attending = []
+        for sg in self.subgroups:
+            if(sg['name'] in m['subgroups']):
+                attending.append(sg['name'])
+        
+        fs = ""
+        for i in range(0, len(attending)):
+            
+            bold = attending[i] in self.user['access']['groups']
+            
+            fs += ("[b]"+attending[i]+"[/b]") if bold else attending[i]
+            if(i != len(attending) - 1):
+                fs += ", "
+        fs += " are attending this meeting!"
+        
+        
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'], m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, [])
+        MDApp.get_running_app().root.ids.action_box.show()
+        
+        
+        pass
+    
+    def showPastOverlay(self, card):
+        id = card.identifier
+        m = next(x for x in self.meetings if x["_id"] == id)
+        
+        
+        attending = []
+        for sg in self.subgroups:
+            if(sg['name'] in m['subgroups']):
+                attending.append(sg['name'])
+        
+        fs = ""
+        sgAttending = False
+        for i in range(0, len(attending)):
+            
+            bold = attending[i] in self.user['access']['groups']
+            if(bold):
+                sgAttending = True
+            
+            fs += ("[b]"+attending[i]+"[/b]") if bold else attending[i]
+            if(i != len(attending) - 1):
+                fs += ", "
+        fs += " attended this meeting!"
+
+        buttons = []
+        if(not m['_id'] in self.userAttended and sgAttending):
+            buttons.append({"name": "Request Record Change", "color": "success"})
+        
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'] + " (Past)", m['description'] + "\n\n" + str(m['length']) + " hours" + (("\n\n" + fs) if len(attending) > 0 else ""), buttons, self.handlePastOverlay)
+        MDApp.get_running_app().root.ids.action_box.show()
+        
+        
+        pass
+    def handlePastOverlay(self, buttonId):
+        pass
+    def addItems(self, mtgs, sgs, me):
+        f = "%Y-%m-%dT%H:%M:%S.%fZ"
+        now = datetime.now()
+        self.ids.upcomingmeetings.clear_widgets()
+        self.ids.pastmeetings.clear_widgets()
+        self.user = me
+        self.subgroups = sgs
+        self.meetings = mtgs
+        
+        attended = []
+        for a in me['attendance']:
+            attended.append(a["event"])
+        self.userAttended = attended
+        for m in mtgs:
+            dout = datetime.strptime(m["datetime"], f)
+            
+            if(dout > now):
+                inMeeting = False
+                for a in m["subgroups"]:
+                    if(a in me['access']['groups']):
+                        inMeeting = True
+                        break
+                
+                
+                sMI = SmallMeetingItem()
+                sMI.ids.card.identifier = m['_id']
+                sMI.ids.card.link = "upcoming"
+                sMI.ids.card.bind(on_touch_down = self.triggerOverlay)
+                sMI.ids.meeting_title.text = m['title']
+                sMI.ids.meeting_datetime.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
+                if(inMeeting):
+                    sMI.ids.meeting_status.icon = "calendar-check"
+                    sMI.ids.meeting_status.text_color = self.getColor('success')
+                else:
+                    sMI.ids.meeting_status.icon = "calendar-remove"
+                    sMI.ids.meeting_status.text_color = self.getColor('gray')
+                
+                self.ids.upcomingmeetings.add_widget(sMI)
+            else:
+                inMeeting = False
+                for a in m["subgroups"]:
+                    if(a in me['access']['groups']):
+                        inMeeting = True
+                        break
+                
+                attendedMeeting = m['_id'] in attended
+                    
+                
+                sMI = SmallMeetingItem()
+                sMI.ids.card.identifier = m['_id']
+                sMI.ids.card.link = "past"
+                sMI.ids.card.bind(on_touch_down = self.triggerOverlay)
+                sMI.ids.meeting_title.text = m['title']
+                sMI.ids.meeting_datetime.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
+                if(attendedMeeting):
+                    sMI.ids.meeting_status.icon = "account-check"
+                    sMI.ids.meeting_status.text_color = self.getColor('success')
+                else:
+                    if(inMeeting):
+                        sMI.ids.meeting_status.icon = "alert-circle"
+                        sMI.ids.meeting_status.text_color = self.getColor('red')
+                    else:
+                        sMI.ids.meeting_status.icon = "minus"
+                        sMI.ids.meeting_status.text_color = self.getColor('gray')
+                
+                self.ids.pastmeetings.add_widget(sMI)
+        
+        
+        pass
+        
+        
+    
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -459,6 +633,20 @@ class Landing(Screen):
         rows = [i for i in self.ids.all_items.children]
         for r in rows:
             self.ids.all_items.remove_widget(r)
+    # def showNewMember(self,d):
+    #     MDApp.get_running_app().root.ids.input_box.addData("New Landing Item", "Create a new landing item to be visible to all members of the team!", [
+    #         {"hint":"Username","multiline":False,"protected":False}
+    #     ], self.handleNewMember)
+    #     MDApp.get_running_app().root.ids.input_box.show()
+    # def handleNewMember(self, data):
+    #     print(data)
+    #     x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
+    #     x.start()
+    # def addMember(self, data):
+    #     Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+    #     SCI.create_new_item(data[0], data[1], data[2])
+    #     Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+    #     Clock.schedule_once(lambda x : changePage("landing"), 0)
     def showNewItem(self,d):
         MDApp.get_running_app().root.ids.input_box.addData("New Landing Item", "Create a new landing item to be visible to all members of the team!", [
             {"hint":"Title","multiline":False,"protected":False},

@@ -84,6 +84,8 @@ MainScreen:
                             id: actionspage
                         Subgroup:
                             id: subgrouppage
+                        Attendance:
+                            id: attendancepage
                     StackLayout:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
@@ -196,6 +198,7 @@ MainScreen:
                 text_size: self.width, None
                 height: self.texture_size[1]
                 halign: 'center'
+                markup: True
             StackLayout:
                 size_hint_y: None
                 height: self.minimum_height
@@ -519,6 +522,18 @@ MainScreen:
                 size_hint_y: None
                 color: root.getColor('secondary')
                 bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: new_item.height
+                IDButton:
+                    text: "Add New Member"
+                    id: new_member
+                    md_bg_color:root.getColor("primary")
+                    color:root.getColor('white')
+                    font_size:"12sp"
+                    padding:"12dp"
+                    pos_hint:{"center_x":.5, "center_y":.5}
+                    on_release:root.showNewItem()
             FloatLayout:
                 size_hint_y: None
                 height: members.height
@@ -1083,7 +1098,116 @@ MainScreen:
             id: all_items
             height: self.minimum_height
                 
-            
+<SmallMeetingItem>:
+    size_hint_y: None
+    height: card.height
+    ClickableMDCard:
+        radius: '12dp'
+        elevation: '4dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        orientation: 'vertical'
+        md_bg_color: root.getColor('white')
+        id: card
+        GridLayout:
+            rows: 1
+            size_hint_y: None
+            Label:
+                text: 'A Meeting'
+                id: meeting_title
+                font_name: 'Roboto'
+                font_size: '12sp'
+                size_hint_y: None
+                color: root.getColor('secondary')
+                halign: 'left'
+                bold: True
+            Label:
+                text: '8/17 @ 8:30PM'
+                id: meeting_datetime
+                font_name: 'Roboto'
+                font_size: '12sp'
+                size_hint_y: None
+                color: root.getColor('secondary')
+                halign: 'left'
+            MDIconButton:
+                icon: 'magnify'
+                id: meeting_status
+                size_hint_x: None
+                theme_text_color: "Custom"
+                font_size: '16sp'
+                text_color: root.getColor('secondary')
+
+
+    
+<Attendance>:
+    name: "attendance"
+    canvas:
+        Color:
+            rgba: root.getColor('white')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    padding: '40dp'
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        StackLayout:
+            padding: ('0dp', '80dp', '0dp', '0dp')
+            size_hint_y: None
+            spacing: '12dp'
+            id: all_items
+            height: self.minimum_height
+                
+            Label:
+                text: "Your Attendance Stats"
+                font_name: 'Roboto'
+                font_size: '20sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            Label:
+                text: "Upcoming Meetings"
+                font_name: 'Roboto'
+                font_size: '20sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: upcomingmeetings.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
+                    
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                
+                    id: upcomingmeetings
+                    height: self.minimum_height
+            Label:
+                text: "Past Meetings"
+                font_name: 'Roboto'
+                font_size: '20sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: pastmeetings.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
+                    
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                
+                    id: pastmeetings
+                    height: self.minimum_height
             
 
                             
