@@ -1210,7 +1210,86 @@ MainScreen:
                     height: self.minimum_height
             
 
-                            
+<Meeting>:
+    name: "confirmattendance"
+    canvas:
+        Color:
+            rgba: root.getColor('white')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    padding: '40dp'
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        StackLayout:
+            padding: ('0dp', '80dp', '0dp', '0dp')
+            size_hint_y: None
+            spacing: '12dp'
+            id: all_items
+            height: self.minimum_height
+            MDCard:
+                radius: "10dp"
+                elevation: '4dp'
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                size_hint_x: .8
+                size_hint_y: None
+                md_bg_color: root.getColor('white')
+                height: meeting_contents.height
+                id: card
+                StackLayout:
+                    id: meeting_contents
+                    size_hint_y: None
+                    height: self.minimum_height
+                    padding: '20dp'
+                    Label:
+                        text: "Meeting on 8/17 @ 8:30PM"
+                        font_name: 'Roboto'
+                        font_size: '24sp'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_y: None
+                        id: meeting_title_datetime
+                        color: root.getColor('secondary')
+                        bold: True
+                    Label:
+                        text: "A very fun meeting!"
+                        font_name: 'Roboto'
+                        font_size: '14sp'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_y: None
+                        id: meeting_description
+                        color: root.getColor('secondary')
+                    Label:
+                        text: "No one is attending..."
+                        font_name: 'Roboto'
+                        font_size: '14sp'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_y: None
+                        id: meeting_subgroups
+                        color: root.getColor('secondary')
+                        markup: True
+            Label:
+                text: "Requests"
+                font_name: 'Roboto'
+                font_size: '20sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: requests.height
+                padding: '20dp'
+                StackLayout:
+                    size_hint_y: None
+                    
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    spacing: '10dp'
+                
+                    id: requests
+                    height: self.minimum_height
+            
                 
         
 

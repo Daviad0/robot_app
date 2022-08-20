@@ -211,6 +211,11 @@ class MessageBox(FloatLayout):
         return COLORS[name.lower()]
     pass
 
+class Meeting(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
 class IDButton(MDFillRoundFlatButton):
     buttonid = NumericProperty(0)
 
@@ -219,12 +224,14 @@ class ActionBox(FloatLayout):
         return COLORS[name.lower()]
     def show(self):
         
-        self.opacity = 0
+        
         
         global inPopup
         if(inPopup):
+            
             return
         inPopup = True
+        self.opacity = 0
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
@@ -235,6 +242,7 @@ class ActionBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
         
     def hide(self):
+        print("HIDE")
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
         
     def addData(self, title, contents, buttons, callback=None):
@@ -504,17 +512,25 @@ class Attendance(Screen):
                 attending.append(sg['name'])
         
         fs = ""
+        sgAttending = False
         for i in range(0, len(attending)):
             
             bold = attending[i] in self.user['access']['groups']
-            
+            if(bold):
+                sgAttending = True
             fs += ("[b]"+attending[i]+"[/b]") if bold else attending[i]
             if(i != len(attending) - 1):
                 fs += ", "
         fs += " are attending this meeting!"
         
+        if(len(attending) < 1):
+            fs = "No one is attending this meeting yet!"
         
-        MDApp.get_running_app().root.ids.action_box.addData(m['title'], m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, [])
+        buttons = []
+        if(sgAttending):
+            buttons.append({"name": "Request 'EXCUSED' Status", "color": "primary"})
+        
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'], m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, buttons, self.handleUpcomingOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
         
         
@@ -542,18 +558,39 @@ class Attendance(Screen):
             if(i != len(attending) - 1):
                 fs += ", "
         fs += " attended this meeting!"
+        
+        if(len(attending) < 1):
+            fs = "No one attended this meeting!"
 
         buttons = []
         if(not m['_id'] in self.userAttended and sgAttending):
-            buttons.append({"name": "Request Record Change", "color": "success"})
+            buttons.append({"name": "Request 'ATTENDED' Status", "color": "success"})
+            buttons.append({"name": "Request 'EXCUSED' Status", "color": "primary"})
         
-        MDApp.get_running_app().root.ids.action_box.addData(m['title'] + " (Past)", m['description'] + "\n\n" + str(m['length']) + " hours" + (("\n\n" + fs) if len(attending) > 0 else ""), buttons, self.handlePastOverlay)
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'] + " (Past)", m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, buttons, self.handlePastOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
         
         
         pass
+    
+    def sendRequest(self, finalRes):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.send_attendance_request(finalRes)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("attendance"), 0)
+    def handleUpcomingOverlay(self, buttonId):
+        print("Handle this overlay")
+        if(buttonId == 0):
+            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",), daemon=True)
+            x.start()
     def handlePastOverlay(self, buttonId):
-        pass
+        print("Handle this overlay")
+        if(buttonId == 0):
+            x = threading.Thread(target = self.sendRequest, args = ("ATTEND",), daemon=True)
+            x.start()
+        elif(buttonId == 1):
+            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",), daemon=True)
+            x.start()
     def addItems(self, mtgs, sgs, me):
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         now = datetime.now()
