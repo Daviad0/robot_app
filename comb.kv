@@ -86,6 +86,8 @@ MainScreen:
                             id: subgrouppage
                         Attendance:
                             id: attendancepage
+                        Meeting:
+                            id: meetingpage
                     StackLayout:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
@@ -759,7 +761,7 @@ MainScreen:
                 text: 'Subgroup Name'
                 id: subgroup_name
                 font_name: 'Roboto'
-                font_size: '12sp'
+                font_size: '14sp'
                 size_hint_y: None
                 color: root.getColor('secondary')
                 halign: 'left'
@@ -1211,7 +1213,7 @@ MainScreen:
             
 
 <Meeting>:
-    name: "confirmattendance"
+    name: "meeting"
     canvas:
         Color:
             rgba: root.getColor('white')
@@ -1229,48 +1231,52 @@ MainScreen:
             spacing: '12dp'
             id: all_items
             height: self.minimum_height
-            MDCard:
-                radius: "10dp"
-                elevation: '4dp'
-                pos_hint: {'center_x': .5, 'center_y': .5}
-                size_hint_x: .8
+            FloatLayout:
                 size_hint_y: None
-                md_bg_color: root.getColor('white')
-                height: meeting_contents.height
-                id: card
-                StackLayout:
-                    id: meeting_contents
+                padding: '20dp'
+                height: card.height
+                MDCard:
+                    radius: "10dp"
+                    elevation: '4dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: .8
                     size_hint_y: None
-                    height: self.minimum_height
-                    padding: '20dp'
-                    Label:
-                        text: "Meeting on 8/17 @ 8:30PM"
-                        font_name: 'Roboto'
-                        font_size: '24sp'
-                        pos_hint: {'center_x': 0.5}
+                    md_bg_color: root.getColor('white')
+                    height: meeting_contents.height
+                    id: card
+                    StackLayout:
+                        id: meeting_contents
                         size_hint_y: None
-                        id: meeting_title_datetime
-                        color: root.getColor('secondary')
-                        bold: True
-                    Label:
-                        text: "A very fun meeting!"
-                        font_name: 'Roboto'
-                        font_size: '14sp'
-                        pos_hint: {'center_x': 0.5}
-                        size_hint_y: None
-                        id: meeting_description
-                        color: root.getColor('secondary')
-                    Label:
-                        text: "No one is attending..."
-                        font_name: 'Roboto'
-                        font_size: '14sp'
-                        pos_hint: {'center_x': 0.5}
-                        size_hint_y: None
-                        id: meeting_subgroups
-                        color: root.getColor('secondary')
-                        markup: True
+                        height: self.minimum_height
+                        padding: '20dp'
+                        Label:
+                            text: "Meeting"
+                            font_name: 'Roboto'
+                            font_size: '24sp'
+                            pos_hint: {'center_x': 0.5}
+                            size_hint_y: None
+                            id: meeting_title_datetime
+                            color: root.getColor('secondary')
+                            bold: True
+                        Label:
+                            text: "A very fun meeting!"
+                            font_name: 'Roboto'
+                            font_size: '14sp'
+                            pos_hint: {'center_x': 0.5}
+                            size_hint_y: None
+                            id: meeting_description
+                            color: root.getColor('secondary')
+                        Label:
+                            text: "No one is attending..."
+                            font_name: 'Roboto'
+                            font_size: '14sp'
+                            pos_hint: {'center_x': 0.5}
+                            size_hint_y: None
+                            id: meeting_attending
+                            color: root.getColor('secondary')
+                            markup: True
             Label:
-                text: "Requests"
+                text: "Member Statuses"
                 font_name: 'Roboto'
                 font_size: '20sp'
                 pos_hint: {'center_x': 0.5}
@@ -1279,7 +1285,7 @@ MainScreen:
                 bold: True
             FloatLayout:
                 size_hint_y: None
-                height: requests.height
+                height: statuses.height
                 padding: '20dp'
                 StackLayout:
                     size_hint_y: None
@@ -1287,10 +1293,83 @@ MainScreen:
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: '10dp'
                 
-                    id: requests
+                    id: statuses
                     height: self.minimum_height
             
+<MemberStatus>:
+    size_hint_y: None
+    height: card.height
+    ClickableMDCard:
+        radius: '12dp'
+        elevation: '4dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        orientation: 'vertical'
+        md_bg_color: root.getColor('white')
+        id: card
+        height: content.height
+        GridLayout:
+            rows: 1
+            size_hint_y: None
+            id: content
+            padding: '10dp'
+            height: self.minimum_height
+            Label:
+                text: 'Member Name'
+                id: status_member
+                font_name: 'Roboto'
+                font_size: '14sp'
+                size_hint_y: None
+                color: root.getColor('secondary')
+                halign: 'left'
+                bold: True
+            Label:
+                text: 'Currently Excused'
+                id: status_current
+                font_name: 'Roboto'
+                font_size: '12sp'
+                size_hint_y: None
+                color: root.getColor('secondary')
+                halign: 'left'
+            GridLayout:
+                rows: 1
+                cols: 3
+                size_hint_y: None
+                spacing: '10dp'
                 
+                size_hint_x: None
+                width: self.minimum_width
+                MDIconButton:
+                    icon: 'account-check'
+                    id: icon
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    font_size: '12sp'
+                    text_color: root.getColor('white')
+                    md_bg_color: root.getColor('lightgray')
+                    id: status_button_attend
+                    on_release: root.selectStatus("attend")
+                MDIconButton:
+                    icon: 'minus'
+                    id: icon
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    font_size: '12sp'
+                    text_color: root.getColor('white')
+                    md_bg_color: root.getColor('lightgray')
+                    id: status_button_excused
+                    on_release: root.selectStatus("excused")
+                MDIconButton:
+                    icon: 'alert-circle'
+                    id: icon
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    font_size: '12sp'
+                    text_color: root.getColor('white')
+                    md_bg_color: root.getColor('lightgray')
+                    id: status_button_absent
+                    on_release: root.selectStatus("absent")
         
 
 
@@ -1333,7 +1412,7 @@ MainScreen:
 
                 text: 'Hey There,'
                 color: root.getColor('secondary')
-                font_size: '24dp'
+                font_size: '20sp'
                 
             Label:
                 size_hint_y: None
@@ -1341,7 +1420,7 @@ MainScreen:
                 text: 'Daviado'
                 color: root.getColor('primary')
                 bold: True
-                font_size: '40dp'
+                font_size: '36sp'
             FloatLayout:
                 size_hint_y: None
                 height: role_card.height + 60
@@ -1361,6 +1440,49 @@ MainScreen:
                         text: 'STUDENT'
                         bold: True
                         font_size: '20dp'
+
+            
+            FloatLayout:
+                size_hint_y: None
+                height: details.height+60
+                ClickableMDCard:
+                    radius: '12dp'
+                    elevation: '4dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: .8
+                    size_hint_y: None
+                    orientation: 'vertical'
+                    md_bg_color: root.getColor('white')
+                    height: (landingitem_content.height)
+                    id: details
+
+                    StackLayout:
+                    
+                        id: landingitem_content
+                        height: self.minimum_height
+                        size_hint_y: None
+                        spacing: '16dp'
+                        padding: ('20dp','20dp','20dp','10dp')
+                        Label:
+                            size_hint_y: None
+                            id: details_fullname
+                            text: 'Daviado'
+                            color: root.getColor('secondary')
+                            font_size: '16sp'
+                        Label:
+                            size_hint_y: None
+                            id: details_email
+                            text: 'Daviado'
+                            color: root.getColor('secondary')
+                            font_size: '16sp'
+                        Label:
+                            size_hint_y: None
+                            id: details_subgroups
+                            text: 'Daviado'
+                            color: root.getColor('secondary')
+                            font_size: '16sp'
+
+
             FloatLayout:
                 size_hint_y: None
                 height: reset_password.height

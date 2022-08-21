@@ -111,6 +111,14 @@ class SparkClub():
             return res["data"]
         else:
             return None
+    def send_override(self, meetingId, userId, override):
+        if not self.account["loggedIn"]:
+            return None
+        res = self._sendAPIRequest("POST", "/group/attendance/override", data={"meetingId": meetingId, "uid": userId, "override": override})
+        if(res["status"] == 200):
+            return res["data"]
+        else:
+            return None
     def get_meetings(self):
         if not self.account["loggedIn"]:
             return []
