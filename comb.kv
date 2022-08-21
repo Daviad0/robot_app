@@ -1348,11 +1348,13 @@ MainScreen:
                 halign: 'center'
             FloatLayout:
                 size_hint_y: None
-                height: status_button.height
+                height: status_buttons.height
+                pos_hint: {'center_x': .5, 'center_y': .5}
                 GridLayout:
                     rows: 1
                     cols: 3
                     size_hint_y: None
+                    pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: '10dp'
                     id: status_buttons
                     size_hint_x: None
