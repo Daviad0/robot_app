@@ -1252,6 +1252,8 @@ MainScreen:
                         size_hint_y: None
                         height: self.minimum_height
                         padding: '20dp'
+                        spacing: '10dp'
+
                         Label:
                             text: "Meeting"
                             font_name: 'Roboto'
@@ -1263,6 +1265,7 @@ MainScreen:
                             height: self.texture_size[1]
                             color: root.getColor('secondary')
                             bold: True
+                            halign: 'center'
                         Label:
                             text: "A very fun meeting!"
                             font_name: 'Roboto'
@@ -1273,6 +1276,7 @@ MainScreen:
                             text_size: self.width, None
                             height: self.texture_size[1]
                             color: root.getColor('secondary')
+                            halign: 'center'
                         Label:
                             text: "No one is attending..."
                             text_size: self.width, None
@@ -1284,6 +1288,7 @@ MainScreen:
                             id: meeting_attending
                             color: root.getColor('secondary')
                             markup: True
+                            halign: 'center'
             Label:
                 text: "Member Statuses"
                 font_name: 'Roboto'
@@ -1322,7 +1327,7 @@ MainScreen:
             spacing: '4dp'
             size_hint_y: None
             id: content
-            padding: '10dp'
+            padding: '20dp'
             height: self.minimum_height
             Label:
                 text: 'Member Name'
@@ -1341,14 +1346,17 @@ MainScreen:
                 size_hint_y: None
                 color: root.getColor('secondary')
                 halign: 'center'
-            GridLayout:
-                rows: 1
-                cols: 3
+            FloatLayout:
                 size_hint_y: None
-                spacing: '10dp'
-                id: status_buttons
-                size_hint_x: None
-                width: self.minimum_width
+                height: status_button.height
+                GridLayout:
+                    rows: 1
+                    cols: 3
+                    size_hint_y: None
+                    spacing: '10dp'
+                    id: status_buttons
+                    size_hint_x: None
+                    width: self.minimum_width
                 
         
 
@@ -1469,6 +1477,7 @@ MainScreen:
                             height: self.texture_size[1]
                             color: root.getColor('secondary')
                             font_size: '12sp'
+                            halign: 'center'
 
 
 
