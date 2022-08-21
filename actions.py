@@ -22,6 +22,14 @@ class SparkClub():
             "role": "",
             "id": ""
         }
+    def permissionCheck(self,allowed):
+        if("*" in self.account["permissions"]):
+            return True
+    
+        for permission in allowed:
+            if(permission in self.account["permissions"]):
+                return True
+        return False
     def initialize(self):
         global path
         path = os.path.join(MDApp.get_running_app().user_data_dir, "account.json")
@@ -40,7 +48,7 @@ class SparkClub():
                 else:
                     self.account["subgroups"] = data["user"]["access"]["groups"]
                     self.account["role"] = data["user"]["access"]["role"]
-                    self.account["permissions"] = data["user"]["access"]["permissions"]
+                    self.account["permissions"] = data["user"]["permissions"]
                     return True
         return False
     #def get_permissions_of_role(self):
@@ -66,7 +74,7 @@ class SparkClub():
         if(res["status"] == 200 and data["successful"]):
             self.account["loggedIn"] = True
             self.account["token"] = data["token"]
-            self.account["permissions"] = data["user"]["access"]["permissions"]
+            self.account["permissions"] = data["user"]["permissions"]
             self.account["username"] = data["user"]["username"]
             self.account["email"] = data["user"]["email"]
             self.account["subgroups"] = data["user"]["access"]["groups"]

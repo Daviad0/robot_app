@@ -1337,39 +1337,10 @@ MainScreen:
                 cols: 3
                 size_hint_y: None
                 spacing: '10dp'
-                
+                id: status_buttons
                 size_hint_x: None
                 width: self.minimum_width
-                MDIconButton:
-                    icon: 'account-check'
-                    id: icon
-                    size_hint_x: None
-                    theme_text_color: "Custom"
-                    font_size: '12sp'
-                    text_color: root.getColor('white')
-                    md_bg_color: root.getColor('lightgray')
-                    id: status_button_attend
-                    on_release: root.selectStatus("attend")
-                MDIconButton:
-                    icon: 'minus'
-                    id: icon
-                    size_hint_x: None
-                    theme_text_color: "Custom"
-                    font_size: '12sp'
-                    text_color: root.getColor('white')
-                    md_bg_color: root.getColor('lightgray')
-                    id: status_button_excused
-                    on_release: root.selectStatus("excused")
-                MDIconButton:
-                    icon: 'alert-circle'
-                    id: icon
-                    size_hint_x: None
-                    theme_text_color: "Custom"
-                    font_size: '12sp'
-                    text_color: root.getColor('white')
-                    md_bg_color: root.getColor('lightgray')
-                    id: status_button_absent
-                    on_release: root.selectStatus("absent")
+                
         
 
 
@@ -1461,7 +1432,7 @@ MainScreen:
                         id: landingitem_content
                         height: self.minimum_height
                         size_hint_y: None
-                        spacing: '16dp'
+                        spacing: '4dp'
                         padding: ('20dp','20dp','20dp','10dp')
                         Label:
                             size_hint_y: None
@@ -1481,6 +1452,13 @@ MainScreen:
                             text: 'Daviado'
                             color: root.getColor('secondary')
                             font_size: '16sp'
+                        Label:
+                            size_hint_y: None
+                            id: details_permissions
+                            text: '[]'
+                            color: root.getColor('secondary')
+                            font_size: '12sp'
+
 
 
             FloatLayout:

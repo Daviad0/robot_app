@@ -10,6 +10,7 @@ from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.toolbar import MDToolbar
+from kivymd.uix.button import MDIconButton
 # import MDCard
 from kivymd.uix.card import MDCard
 
@@ -149,8 +150,9 @@ def getLandingPageItems():
     i = SCI.get_items("H")
     m = SCI.get_meeting_today()
     p = SCI.get_protons()
+    s = SCI.get_subgroups()
     Clock.schedule_once(lambda x : toggle_message_box(False), 0)
-    return (i, m, p)
+    return (i, m, p, s)
  
  
 initialPage = "landing"
@@ -231,6 +233,7 @@ class Meeting(Screen):
         print(thisMeeting)
         tM = next(x for x in m if x["_id"] == thisMeeting)
         
+        
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         dout = datetime.strptime(tM["datetime"], f)
         
@@ -277,7 +280,6 @@ class Meeting(Screen):
                 if(aI['event'] == thisMeeting):
                     attendanceItem = aI
                     break
-                
             
             
             
@@ -286,14 +288,9 @@ class Meeting(Screen):
             mS.uid = user["id"]
             
             if(not attendanceItem == None):
-                if(attendanceItem["overriddenstatus"] == "ABSENT"):
-                    mS.ids.status_button_absent.text_color = self.getColor("red")
-                elif(attendanceItem["overriddenstatus"] == "ATTEND"):
-                    mS.ids.status_button_attend.text_color = self.getColor("success")
-                elif(attendanceItem["overriddenstatus"] == "EXCUSED"):
-                    mS.ids.status_button_excused.text_color = self.getColor("gray")
+                mS.init(attendanceItem["overriddenstatus"])
                 
-                if(attendanceItem["overriddenstatus"] == ""):
+                if(attendanceItem["status"] != ""):
                     mS.ids.status_current.text = "Currently " + attendanceItem["status"]
                 else:
                     mS.ids.status_current.text = "Currently *" + attendanceItem["overriddenstatus"]
@@ -482,23 +479,36 @@ class SubgroupItem(FloatLayout):
 
 class MemberStatus(FloatLayout):
     uid = StringProperty()
+
     def getColor(self, name):
         return COLORS[name.lower()]
     
     def sendToServer(self, override):
         res = SCI.send_override(thisMeeting, self.uid, override)
 
-    def selectStatus(self, type):
-        self.ids.status_button_absent.text_color = self.getColor('white')
-        self.ids.status_button_excused.text_color = self.getColor('white')
-        self.ids.status_button_attend.text_color = self.getColor('white')
 
-        if(type == "absent"):
-            self.ids.status_button_absent.text_color = self.getColor('red')
-        elif(type == "excused"):
-            self.ids.status_button_excused.text_color = self.getColor('gray')
-        elif(type == "attend"):
-            self.ids.status_button_attend.text_color = self.getColor('success')
+    def reAddButtons(self):
+        self.ids.status_buttons.clear_widgets()
+        
+        attend = MDIconButton(icon="account-check", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('success' if self.chosen.lower() == "attend" else "lightgray"), on_release=lambda x: self.selectStatus("attend"), font_size="12sp", padding="12dp")
+        excused = MDIconButton(icon="minus", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('gray' if self.chosen.lower() == "excused" else "lightgray"), on_release=lambda x: self.selectStatus("excused"), font_size="12sp", padding="12dp")
+        absent = MDIconButton(icon="alert-circle", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('red' if self.chosen.lower() == "absent" else "lightgray"), on_release=lambda x: self.selectStatus("absent"), font_size="12sp", padding="12dp")
+        
+        self.ids.status_buttons.add_widget(attend)
+        self.ids.status_buttons.add_widget(excused)
+        self.ids.status_buttons.add_widget(absent)
+        
+
+    def init(self, initial):
+        self.chosen = initial
+        self.reAddButtons()
+
+    
+
+
+    def selectStatus(self, type):
+        self.chosen = type
+        self.reAddButtons()
             
         x = threading.Thread(target = self.sendToServer, args = (type,), daemon=True)
         x.start()
@@ -862,11 +872,12 @@ class Landing(Screen):
         self.ids.all_items.add_widget(EmptySpace())
         
         
-        admin = True
+        admin = SCI.permissionCheck(["ADMIN_LANDING"])
+        canCreate = SCI.permissionCheck(["ADMIN_LANDING_CREATE", "ADMIN_LANDING"])
         
         
         
-        if(not r[1] == None):
+        if(not r[1] == None and SCI.permissionCheck(["VIEW_SCHEDULE_SIGNIN"])):
             l = Label(text = "Current Meeting", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
         
             self.ids.all_items.add_widget(l)
@@ -918,7 +929,7 @@ class Landing(Screen):
         l = Label(text = "Active Items", font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
         
         self.ids.all_items.add_widget(l)
-        if(admin):
+        if(canCreate):
             fL = FloatLayout(size_hint_y= None)
             b = IDButton(text="Add New Item", md_bg_color=self.getColor("primary"), color=self.getColor('white'), font_size="12sp", padding="12dp", pos_hint={"center_x":.5, "center_y":.5}, on_release=self.showNewItem)
             fL.add_widget(b)
@@ -978,11 +989,18 @@ class Landing(Screen):
         
         
         self.ids.all_items.add_widget(l)
-        for s in SCI.account["subgroups"]:
-        
-            nS = SubgroupItem(togoto = s)
-            nS.ids.subgroup_name.text = s
-            self.ids.all_items.add_widget(nS)
+        if(SCI.permissionCheck(["ADMIN_SUBGROUPS_MANAGER"])):
+            for s in r[3]:
+            
+                nS = SubgroupItem(togoto = s["name"])
+                nS.ids.subgroup_name.text = s["name"] + " (Not Apart Of)"
+                self.ids.all_items.add_widget(nS)
+        else:
+            for s in SCI.account["subgroups"]:
+            
+                nS = SubgroupItem(togoto = s)
+                nS.ids.subgroup_name.text = s
+                self.ids.all_items.add_widget(nS)
         self.ids.all_items.add_widget(EmptySpace())
         
     
@@ -1018,6 +1036,13 @@ class Account(Screen):
         self.ids.details_fullname.text = me["fullname"]
         self.ids.details_email.text = me["email"]
         self.ids.details_subgroups.text = "In " + str(len(me['access']['groups'])) + " subgroups!"
+        
+        permString = ""
+        for p in SCI.account['permissions']:
+            permString += p + ", "
+        permString = permString[:-2]
+        
+        self.ids.details_permissions.text = permString
         self.ids.account_role.text = me['access']["role"].upper()
         
     def setup(self):
@@ -1099,6 +1124,8 @@ class Subgroup(Screen):
         self.ids.tag.text = ("• " if (sgD[1]) else "" ) + sg["tag"]
         self.ids.subgroup_name.text = sg["name"]
         self.admin = sgD[1]
+        if(SCI.permissionCheck(["ADMIN_SUBGROUPS_MANAGER"])):
+            self.admin = True
         self.users = users
         self.subgroup = sg
         self.meetings = meetings
@@ -1176,7 +1203,7 @@ class Subgroup(Screen):
             else:
                 lI.weblink = i["result"]["data"]
             
-            if(not self.admin):
+            if(not self.admin or not SCI.permissionCheck(["ADMIN_LANDING"])):
                 lI.ids.buttonspan.remove_widget(lI.ids.deletebutton)
                 buttonsGone += 1
             else:
@@ -1256,6 +1283,12 @@ class Subgroup(Screen):
                 buttons.append({"name" : "We Are Attending", "color": "success"})
             else:
                 buttons.append({"name" : "We Aren't Attending", "color" : "red"})
+        elif(SCI.permissionCheck(["ADMIN_SUBGROUPS_MANAGER","ADMIN_SCHEDULE"])):
+            if not self.subgroup['name'] in self.selectedMeeting['subgroups']:
+                buttons.append({"name" : "They Are Attending", "color": "success"})
+            else:
+                buttons.append({"name" : "They Aren't Attending", "color" : "red"})
+            
         
         MDApp.get_running_app().root.ids.action_box.addData(m['title'], "on " + str(dout.month) + "/" + str(dout.day) + "/" + str(dout.year) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM") + "\n\n" + m["description"] + "\n\n" + str(len(m["subgroups"])) + " subgroups attending", buttons, self.handleMeetingOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
