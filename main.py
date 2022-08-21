@@ -448,6 +448,7 @@ class LandingItem(FloatLayout):
         return COLORS[name.lower()]
     def openLink(self):
         #print(self.weblink)
+        
         webbrowser.open(self.weblink)
         #print("A")
         
@@ -456,13 +457,15 @@ class LandingItem(FloatLayout):
             x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
             x.start()
     def deleteItem(self):
+        self.context = MDApp.get_running_app().root.ids.window_manager.current
+        print(self.context)
         MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "This will delete the Landing Item for EVERYONE, not just you seeing it!", [{"name" : "Delete", "color": "red"}], self.handleConfirmation)
         MDApp.get_running_app().root.ids.action_box.show()
     def bgDeleteItem(self, id):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
         SCI.remove_item(id)
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
-        Clock.schedule_once(lambda x : changePage("landing"), 0)
+        Clock.schedule_once(lambda x : changePage(self.context), 0)
         
     pass
 
@@ -993,7 +996,10 @@ class Landing(Screen):
             for s in r[3]:
             
                 nS = SubgroupItem(togoto = s["name"])
-                nS.ids.subgroup_name.text = s["name"] + " (Not Apart Of)"
+                if(s["name"] in SCI.account["subgroups"]):
+                    nS.ids.subgroup_name.text = s["name"]
+                else:
+                    nS.ids.subgroup_name.text = s["name"] + " (Not Apart Of)"
                 self.ids.all_items.add_widget(nS)
         else:
             for s in SCI.account["subgroups"]:
