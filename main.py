@@ -326,8 +326,11 @@ class ActionBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
-        if(platform == "android" or platform == "ios"):
-            vibrator.vibrate(0.2)
+        try:
+            if(platform == "android" or platform == "ios"):
+                vibrator.vibrate(0.2)
+        except:
+            pass
     def actualHide(self):
         global inPopup
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
@@ -383,8 +386,11 @@ class InputBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
-        if(platform == "android" or platform == "ios"):
-            vibrator.vibrate(0.1)
+        try:
+            if(platform == "android" or platform == "ios"):
+                vibrator.vibrate(0.1)
+        except:
+            pass
     def actualHide(self):
         global inPopup
         

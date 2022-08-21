@@ -761,7 +761,7 @@ MainScreen:
                 text: 'Subgroup Name'
                 id: subgroup_name
                 font_name: 'Roboto'
-                font_size: '14sp'
+                font_size: '12sp'
                 size_hint_y: None
                 color: root.getColor('secondary')
                 halign: 'left'
@@ -801,7 +801,7 @@ MainScreen:
             height: self.minimum_height
             size_hint_y: None
             spacing: '16dp'
-            padding: ('20dp','20dp','20dp','10dp')
+            padding: ('20dp','20dp','20dp','20dp')
             GridLayout:
                 rows: 1
                 cols: 2
@@ -1112,9 +1112,12 @@ MainScreen:
         orientation: 'vertical'
         md_bg_color: root.getColor('white')
         id: card
+        height: contents.height
         GridLayout:
             rows: 1
             size_hint_y: None
+            id: contents
+            height: self.minimum_height
             Label:
                 text: 'A Meeting'
                 id: meeting_title
@@ -1256,6 +1259,8 @@ MainScreen:
                             pos_hint: {'center_x': 0.5}
                             size_hint_y: None
                             id: meeting_title_datetime
+                            text_size: self.width, None
+                            height: self.texture_size[1]
                             color: root.getColor('secondary')
                             bold: True
                         Label:
@@ -1265,9 +1270,13 @@ MainScreen:
                             pos_hint: {'center_x': 0.5}
                             size_hint_y: None
                             id: meeting_description
+                            text_size: self.width, None
+                            height: self.texture_size[1]
                             color: root.getColor('secondary')
                         Label:
                             text: "No one is attending..."
+                            text_size: self.width, None
+                            height: self.texture_size[1]
                             font_name: 'Roboto'
                             font_size: '14sp'
                             pos_hint: {'center_x': 0.5}
@@ -1309,8 +1318,8 @@ MainScreen:
         md_bg_color: root.getColor('white')
         id: card
         height: content.height
-        GridLayout:
-            rows: 1
+        StackLayout:
+            spacing: '4dp'
             size_hint_y: None
             id: content
             padding: '10dp'
@@ -1322,7 +1331,7 @@ MainScreen:
                 font_size: '14sp'
                 size_hint_y: None
                 color: root.getColor('secondary')
-                halign: 'left'
+                halign: 'center'
                 bold: True
             Label:
                 text: 'Currently Excused'
@@ -1331,7 +1340,7 @@ MainScreen:
                 font_size: '12sp'
                 size_hint_y: None
                 color: root.getColor('secondary')
-                halign: 'left'
+                halign: 'center'
             GridLayout:
                 rows: 1
                 cols: 3
@@ -1456,6 +1465,8 @@ MainScreen:
                             size_hint_y: None
                             id: details_permissions
                             text: '[]'
+                            text_size: self.width, None
+                            height: self.texture_size[1]
                             color: root.getColor('secondary')
                             font_size: '12sp'
 
