@@ -218,6 +218,16 @@ class SparkClub():
             return True
         else:
             return False
+    def add_user_to_subgroup(self, uid, subgroup):
+        if not self.account["loggedIn"]:
+            return False
+        
+        res = self._sendAPIRequest('POST', '/group/subgroup/add', data={"uid": uid, "group": subgroup})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def get_meeting_today(self):
         if not self.account["loggedIn"]:
             return {}
@@ -253,7 +263,13 @@ class SparkClub():
             cookies["session"] = self.account["token"]
             print(self.account["token"])
         res = requests.request(method, "http://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
+        
+        if(res.status_code != 200):
+            MDApp.get_running_app().root.show_error("Error Code: " + str(res.status_code))
         data = res.json()
+        
+        
+        
         return {"status": res.status_code, "data": data}
         
     

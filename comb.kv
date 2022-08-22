@@ -88,6 +88,8 @@ MainScreen:
                             id: attendancepage
                         Meeting:
                             id: meetingpage
+                        Error:
+                            id: errorpage
                     StackLayout:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
@@ -240,6 +242,8 @@ MainScreen:
                             padding: '12sp'
                             md_bg_color: root.getColor('gray')
                             color: root.getColor('white')
+                    
+
 
 <InputBox>:
     canvas:
@@ -535,7 +539,7 @@ MainScreen:
                     font_size:"12sp"
                     padding:"12dp"
                     pos_hint:{"center_x":.5, "center_y":.5}
-                    on_release:root.showNewItem()
+                    on_release:root.showAddMember()
             FloatLayout:
                 size_hint_y: None
                 height: members.height
@@ -584,8 +588,64 @@ MainScreen:
                 font_size: '14sp'
                 size_hint_y: None
 
-
-
+<Error>:
+    name: 'error'
+    canvas:
+        Color:
+            rgba: root.getColor('white')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        padding: '40dp'
+        StackLayout:
+            size_hint_y: None
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: '20dp'
+            height: self.minimum_height
+            padding: '60dp'
+            Label:
+                id: title
+                text: 'Oops!'
+                text_size: self.width, None
+                height: self.texture_size[1]
+                color: root.getColor('primary')
+                halign: 'center'
+                font_size: '36sp'
+                bold: True
+                size_hint_y: None
+            Label:
+                id: desc
+                text: "Something went wrong on our end that we weren't expecting! Please naviagate back to the landing page, or try performing the action again later on!"
+                text_size: self.width, None
+                height: self.texture_size[1]
+                color: root.getColor('secondary')
+                halign: 'center'
+                font_size: '16sp'
+                bold: True
+                
+                size_hint_y: None
+            Label:
+                id: details
+                text: "Oops!"
+                text_size: self.width, None
+                height: self.texture_size[1]
+                color: root.getColor('secondary')
+                halign: 'center'
+                font_size: '12sp'
+                italic: True
+                
+                size_hint_y: None
+            FloatLayout:
+                size_hint_y: None
+                height: action_button.height
+                MDFillRoundFlatButton:
+                    text: "Back to Landing Page"
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    id: action_button
+                    on_release: root.back()
+                    md_bg_color: root.getColor('primary')
+                    color: root.getColor('white')
 
 <AttendanceItemEx>:
     padding: '40dp'

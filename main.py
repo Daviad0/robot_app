@@ -132,6 +132,9 @@ def changePage(page):
         MDApp.get_running_app().root.ids.nav_bar_title.title = "You Shouldn't See This..."
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 10}
         SCI.logout()
+    elif(page == "error"):
+        MDApp.get_running_app().root.ids.nav_bar_title.title = "You Shouldn't See This..."
+        MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 10}
     elif(page == "account"):
         MDApp.get_running_app().root.ids.nav_bar_title.title = "My Account"
         MDApp.get_running_app().root.ids.accountpage.setup()
@@ -599,6 +602,19 @@ class Actions(Screen):
 class MainScreen(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
+    def perform_ui_error(self, details):
+        global inPopup
+        MDApp.get_running_app().root.ids.errorpage.ids.details.text = details
+        changePage("error")
+        MDApp.get_running_app().root.ids.input_box.hide()
+        MDApp.get_running_app().root.ids.action_box.hide()
+        toggle_message_box(False)
+        inPopup = False
+        
+        
+    def show_error(self, errorDetails):
+        Clock.schedule_once(lambda x : self.perform_ui_error(errorDetails), 0)
+        
 
 class SmallMeetingItem(FloatLayout):
     def getColor(self, name):
@@ -834,7 +850,12 @@ class Attendance(Screen):
         
         
         pass
-        
+
+class Error(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def back(self):
+        changePage("landing")
         
     
 class Landing(Screen):
@@ -1316,7 +1337,50 @@ class Subgroup(Screen):
                 action = "add"
             x = threading.Thread(target = self.changeAttendance, args = (action,), daemon=True)
             x.start()
-            
+    def addMemberAPI(self, uid):
+        Clock.schedule_once(lambda dt: toggle_message_box(True), 0)
+        SCI.add_user_to_subgroup(uid, self.subgroup["name"])
+        Clock.schedule_once(lambda dt: toggle_message_box(False), 0)
+        Clock.schedule_once(lambda dt: changePage("subgroup"), 0)
+    def handleAddMember(self, buttonId):
+        global inPopup
+        if(buttonId == 0):
+            inPopup = False
+            self.showAddMember()
+            return
+        index = buttonId - 1
+        x = threading.Thread(target = self.addMemberAPI, args = (self.users[index]["id"],), daemon=True)
+        x.start()
+    def showMembersToAdd(self,data):
+        global inPopup
+        
+        username = data[0]
+        fullname = data[1]
+        
+        listUsers = []
+        for x in self.users:
+            if(username in x["username"] and username != ""):
+                listUsers.append(x)
+            elif(fullname in x["fullname"] and fullname != ""):
+                
+                listUsers.append(x)
+            elif(username == "" and fullname == ""):
+                listUsers.append(x)
+        self.listUsers = listUsers
+        buttons = [{"name" : "Search Again", "color": "red"}]
+        for l in listUsers:
+            buttons.append({"name" : l["username"], "color": "primary"})
+        inPopup = False
+        MDApp.get_running_app().root.ids.action_box.addData("Find User", "Select one of these users from the buttons below, or refine your search!", buttons, self.handleAddMember)
+        MDApp.get_running_app().root.ids.action_box.show()
+        
+         
+    def showAddMember(self):
+        MDApp.get_running_app().root.ids.input_box.addData("Search for Member", "Search for a member that you would like to add to the subgroup!", [
+            {"hint":"Username (contains)","multiline":False,"protected":False},
+            {"hint":"Full Name (contains)","multiline":False,"protected":False}
+        ], self.showMembersToAdd)
+        MDApp.get_running_app().root.ids.input_box.show()
     def changeAttendance(self, action):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
         SCI.change_subgroup_attendance(self.subgroup, self.admin, self.selectedMeeting, action)
@@ -1398,6 +1462,6 @@ class Main(MDApp):
         
         x = threading.Thread(target = handleLogin, args = (True,), daemon=True)
         x.start()
-
+    
 Window.fullscreen = False
 Main().run()
