@@ -56,9 +56,9 @@ inPopup = False
 
 icons_item = {
             "exit-to-app": ["Sign out", "login"],
-            "view-list": ["Landing Page", "landing"],
+            "view-list": ["Home", "landing"],
             "checkbox-marked-circle-outline": ["Meetings", "attendance"],
-            "list-status": ["Actions", "actions"],
+            "list-status": ["Settings", "actions"],
             "account-circle": ["My Account", "account"]
         }
 class ItemDrawer(OneLineIconListItem):
@@ -175,6 +175,8 @@ def handleLogin(token, data={}):
         if(res):
             Clock.schedule_once(lambda x: changePage(initialPage), 0)
             
+        else:
+            Clock.schedule_once(lambda x: MDApp.get_running_app().root.ids.loginpage.showWrongInformation(), 0)
             
             # add a bad response here?
         
@@ -331,18 +333,15 @@ class ActionBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
-        try:
-            if(platform == "android" or platform == "ios"):
-                vibrator.vibrate(0.2)
-        except:
-            pass
+        
     def actualHide(self):
         global inPopup
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
         
     def hide(self):
         #print("HIDE")
-        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        fadeto(self, 0, .2)
+        Clock.schedule_once(lambda x : self.actualHide(), .2)
         
     def addData(self, title, contents, buttons, callback=None):
         if(inPopup):
@@ -389,18 +388,14 @@ class DateTimeBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
-        try:
-            if(platform == "android" or platform == "ios"):
-                vibrator.vibrate(0.2)
-        except:
-            pass
     def actualHide(self):
         global inPopup
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
         
     def hide(self):
         #print("HIDE")
-        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        fadeto(self, 0, .2)
+        Clock.schedule_once(lambda x : self.actualHide(), .2)
         
     def addData(self, title, contents, callback=None):
         if(inPopup):
@@ -408,6 +403,7 @@ class DateTimeBox(FloatLayout):
         # Each callback should have an argument for the buttonid
         self.ids.title.text = title
         self.ids.contents.text = contents
+        self.ids.submit_button.disabled = True
         self.date = None
         self.time = None
         self.ids.date_button.text = "Pick Date"
@@ -419,10 +415,13 @@ class DateTimeBox(FloatLayout):
         global inPopup
         buttonId = args[0].buttonid
         #print("Action Performed: " + str(buttonId))
-        if(buttonId == -1):
+        if(buttonId == 0):
             self.hide()
             inPopup = False
             self.callback(self.date, self.time)
+        else:
+            inPopup = False
+            self.hide()
         
     def showDate(self):
         date_dialog = MDDatePicker(primary_color=self.getColor("secondary"))
@@ -432,6 +431,8 @@ class DateTimeBox(FloatLayout):
         self.date = val
         self.ids.date_button.text = str(val)
         self.ids.date_button.mg_bg_color = self.getColor('success')
+        if(self.date != None and self.time != None):
+            self.ids.submit_button.disabled = False
     def showTime(self):
         time_dialog = MDTimePicker()
         time_dialog.bind(on_save=self.saveTime)
@@ -440,6 +441,8 @@ class DateTimeBox(FloatLayout):
         self.time = val
         self.ids.time_button.text = str(val)
         self.ids.time_button.mg_bg_color = self.getColor('success')
+        if(self.date != None and self.time != None):
+            self.ids.submit_button.disabled = False
     
     pass
 
@@ -463,18 +466,16 @@ class InputBox(FloatLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         fadeto(self, 1, .2)
         #vibrate(0.4)
-        try:
-            if(platform == "android" or platform == "ios"):
-                vibrator.vibrate(0.1)
-        except:
-            pass
+
     def actualHide(self):
         global inPopup
-        
-        inPopup = False
-    def hide(self):
-        
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        
+    def hide(self):
+        #print("HIDE")
+        fadeto(self, 0, .2)
+        Clock.schedule_once(lambda x : self.actualHide(), .2)
+        
     def addData(self, title, contents, inputs, callback=None):
         global inPopup
         if(inPopup):
@@ -612,7 +613,17 @@ class Login(Screen):
         #print("Submitted form!")
         x = threading.Thread(target = handleLogin, args = (False,{"username": self.ids.username.text, "password" : self.ids.password.text},), daemon=True)
         x.start()
+    def showWrongInformation(self):
         
+        try:
+            if(platform == "android" or platform == "ios"):
+                vibrator.vibrate(0.2)
+        except:
+            pass
+        MDApp.get_running_app().root.ids.action_box.addData("Incorrect Login", "Your username or password is incorrect! Please double check you are entering it in correctly!", [])
+        MDApp.get_running_app().root.ids.action_box.show()
+        
+        pass
         
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -620,6 +631,10 @@ class Login(Screen):
         #print("Go to temp login")
         self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
         self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+    def goToLogin(self):
+        #print("Go to temp login")
+        self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+        self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def usernameChange(self):
         self.ids.username.icon_right = ""
         if(self.ids.username.text == ""):
@@ -792,10 +807,30 @@ class Attendance(Screen):
         SCI.new_meeting(title, description, length, datetime)
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("attendance"), 0)
+    def reShowInput(self):
+        MDApp.get_running_app().root.ids.input_box.addData("New Meeting", "Make sure you fill out all fields with appropriate values!\n" + str(self.date) + " " + str(self.time), [
+            {"hint":"Name","multiline":False,"protected":False},
+            {"hint":"Purpose","multiline":True,"protected":False},
+            {"hint":"Length (in hours)","multiline":False,"protected":False}
+        ], self.handleMeetingDetails)
+        MDApp.get_running_app().root.ids.input_box.show()
     def handleMeetingDetails(self, data):
-        datetimeObject = datetime.strptime(str(self.date) + " " + str(self.time), '%Y-%m-%d %H:%M:%S')
-        x = threading.Thread(target = self.createMeeting, args = (data[0], data[1], int(data[2]), datetimeObject), daemon=True)
-        x.start()
+        global inPopup
+        try:
+            if(data[0] == "" or data[1] == ""):
+                raise Exception()
+            if(int(data[2]) < 1):
+                raise Exception()
+            datetimeObject = datetime.strptime(str(self.date) + " " + str(self.time), '%Y-%m-%d %H:%M:%S')
+            x = threading.Thread(target = self.createMeeting, args = (data[0], data[1], int(data[2]), datetimeObject), daemon=True)
+            x.start()
+        except:
+            inPopup = False
+            
+            Clock.schedule_once(lambda x : self.reShowInput(), 0.2)
+            
+            
+            pass
     def showPastOverlay(self, card):
         if(not inPopup):
             self.use = card.identifier
@@ -1567,9 +1602,14 @@ class Main(MDApp):
     def on_start(self):
         
         for icon_name in icons_item.keys():
-            self.root.ids.content_drawer.ids.md_list.add_widget(
-                ItemDrawer(icon=icon_name, text=icons_item[icon_name][0])
-            )
+            if(icon_name == "exit-to-app"):
+                self.root.ids.content_drawer.ids.md_list2.add_widget(
+                    ItemDrawer(icon=icon_name, text=icons_item[icon_name][0])
+                )
+            else:
+                self.root.ids.content_drawer.ids.md_list.add_widget(
+                    ItemDrawer(icon=icon_name, text=icons_item[icon_name][0])
+                )
         
         x = threading.Thread(target = handleLogin, args = (True,), daemon=True)
         x.start()

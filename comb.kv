@@ -5,6 +5,7 @@
     IconLeftWidget:
         id: icon
         icon: root.icon
+        on_release: root.clickItem()
         theme_text_color: "Custom"
         text_color: root.text_color
 
@@ -51,7 +52,14 @@
 
         DrawerList:
             id: md_list
+    EmptySpace:
+        size_hint_y: None
+        height: '10dp'
+    ScrollView:
 
+        DrawerList:
+            id: md_list2
+        
 
 
 MainScreen:
@@ -99,7 +107,7 @@ MainScreen:
                             elevation: '4dp'
                             font_size: '16sp'
                             left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
-                            right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
+                            #right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
                             md_bg_color: root.getColor('primary')
                             color: root.getColor('secondary')
                     MessageBox:
@@ -145,8 +153,19 @@ MainScreen:
             size_hint_y: None
             height: self.minimum_height
             id: message_box_layout
-            padding: "10dp"
+            padding: "14dp"
             spacing: '0dp'
+            FloatLayout:
+                size_hint_y: None
+                height: gif.height
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                Image:
+                    id: gif
+                    source: 'assets/load.gif'
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    size_hint: None, None
+                    anim_delay: .01
+                    anim_loop: -1
             Label:
                 text: "Please Wait..."
                 id: message
@@ -164,6 +183,7 @@ MainScreen:
                 pos_hint: {'center_x': 0.5}
                 size_hint_y: None
                 color: root.getColor('secondary')
+            
 <ActionBox>:
     canvas:
         Color:
@@ -338,8 +358,17 @@ MainScreen:
                         IDButton:
                             on_release: root.performAction((self))
                             buttonid: -1
-                            text: "Submit"
+                            text: "Cancel"
                             id: action_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('gray')
+                            color: root.getColor('white')
+                        IDButton:
+                            on_release: root.performAction((self))
+                            buttonid: 0
+                            text: "Submit"
+                            id: submit_button
                             font_size: '12sp'
                             padding: '12sp'
                             md_bg_color: root.getColor('primary')
@@ -1164,7 +1193,7 @@ MainScreen:
                 size_hint_y: None
                 padding: '20dp'
                 GridLayout:
-                    rows: 3
+                    rows: 4
                     cols: 1
                     row_default_height: '32dp'
                     row_force_default: True
@@ -1242,6 +1271,12 @@ MainScreen:
                         border_color: 0,0,0,1
                         spacing: (20,20,20,20)
                         padding: (20,20,20,20)
+                    MDFillRoundFlatButton:
+                        text: "Back"
+                        id: back_button
+                        md_bg_color: root.getColor('gray')
+                        color: root.getColor('white')
+                        on_release: root.goToLogin()
                         
 <Landing>:
     name: "landing"
