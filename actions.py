@@ -218,6 +218,16 @@ class SparkClub():
             return True
         else:
             return False
+    def new_meeting(self, title, description, length, datetime):
+        if not self.account["loggedIn"]:
+            return False
+        
+        res = self._sendAPIRequest('POST', '/group/meeting', data={"title": title, "description": description, "length": length, "datetime": datetime, "action": "create", "subgroups": []})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def add_user_to_subgroup(self, uid, subgroup):
         if not self.account["loggedIn"]:
             return False

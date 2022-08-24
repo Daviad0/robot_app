@@ -11,6 +11,7 @@ from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.toolbar import MDToolbar
 from kivymd.uix.button import MDIconButton
+from kivymd.uix.picker import MDDatePicker, MDTimePicker
 # import MDCard
 from kivymd.uix.card import MDCard
 
@@ -299,6 +300,7 @@ class Meeting(Screen):
                     mS.ids.status_current.text = "Currently *" + attendanceItem["overriddenstatus"]
             else:
                 mS.ids.status_current.text = "No Record..."
+                mS.init("")
             
             mS.ids.status_member.text = user['username']
             
@@ -371,6 +373,77 @@ class ActionBox(FloatLayout):
     
     pass
 
+class DateTimeBox(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def show(self):
+        
+        
+        
+        global inPopup
+        if(inPopup):
+            
+            return
+        inPopup = True
+        self.opacity = 0
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        fadeto(self, 1, .2)
+        #vibrate(0.4)
+        try:
+            if(platform == "android" or platform == "ios"):
+                vibrator.vibrate(0.2)
+        except:
+            pass
+    def actualHide(self):
+        global inPopup
+        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        
+    def hide(self):
+        #print("HIDE")
+        self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        
+    def addData(self, title, contents, callback=None):
+        if(inPopup):
+            return
+        # Each callback should have an argument for the buttonid
+        self.ids.title.text = title
+        self.ids.contents.text = contents
+        self.date = None
+        self.time = None
+        self.ids.date_button.text = "Pick Date"
+        self.ids.time_button.text = "Pick Time"
+        
+        self.callback = callback
+        
+    def performAction(self, *args):
+        global inPopup
+        buttonId = args[0].buttonid
+        #print("Action Performed: " + str(buttonId))
+        if(buttonId == -1):
+            self.hide()
+            inPopup = False
+            self.callback(self.date, self.time)
+        
+    def showDate(self):
+        date_dialog = MDDatePicker(primary_color=self.getColor("secondary"))
+        date_dialog.bind(on_save=self.saveDate)
+        date_dialog.open()
+    def saveDate(self, i, val,r):
+        self.date = val
+        self.ids.date_button.text = str(val)
+        self.ids.date_button.mg_bg_color = self.getColor('success')
+    def showTime(self):
+        time_dialog = MDTimePicker()
+        time_dialog.bind(on_save=self.saveTime)
+        time_dialog.open()
+    def saveTime(self, i, val):
+        self.time = val
+        self.ids.time_button.text = str(val)
+        self.ids.time_button.mg_bg_color = self.getColor('success')
+    
+    pass
+
+
 class IDInput(MDTextField):
     inputid = NumericProperty(0)
     def getColor(self, name):
@@ -381,6 +454,7 @@ class InputBox(FloatLayout):
         return COLORS[name.lower()]
     def show(self):
         global inPopup
+        print("SHOW INPUTBOX", inPopup)
         if(inPopup):
             return
         self.opacity = 0
@@ -402,8 +476,10 @@ class InputBox(FloatLayout):
         
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def addData(self, title, contents, inputs, callback=None):
+        global inPopup
         if(inPopup):
             return
+        
         # Each callback should have an argument for the buttonid
         self.ids.title.text = title
         self.ids.contents.text = contents
@@ -690,6 +766,36 @@ class Attendance(Screen):
         
         pass
     
+    def showNewMeeting(self):
+        MDApp.get_running_app().root.ids.datetime_box.addData("Select Date/Time", "Every good meeting has to have a date and a time, or else no one will know when to show!", self.handleSelectDateTime)
+        MDApp.get_running_app().root.ids.datetime_box.show()
+    def handleSelectDateTime(self, date, time):
+        
+        global inPopup
+        
+        
+        print(date, time)
+        if(date == None or time == None):
+            return
+        self.date = date
+        self.time = time
+        inPopup = False
+        
+        MDApp.get_running_app().root.ids.input_box.addData("New Meeting", "Please describe the meeting that you are creating for the datetime below\n" + str(date) + " " + str(time), [
+            {"hint":"Name","multiline":False,"protected":False},
+            {"hint":"Purpose","multiline":True,"protected":False},
+            {"hint":"Length (in hours)","multiline":False,"protected":False}
+        ], self.handleMeetingDetails)
+        MDApp.get_running_app().root.ids.input_box.show()
+    def createMeeting(self, title, description, length, datetime):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.new_meeting(title, description, length, datetime)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage("attendance"), 0)
+    def handleMeetingDetails(self, data):
+        datetimeObject = datetime.strptime(str(self.date) + " " + str(self.time), '%Y-%m-%d %H:%M:%S')
+        x = threading.Thread(target = self.createMeeting, args = (data[0], data[1], int(data[2]), datetimeObject), daemon=True)
+        x.start()
     def showPastOverlay(self, card):
         if(not inPopup):
             self.use = card.identifier
@@ -763,6 +869,11 @@ class Attendance(Screen):
         self.user = me
         self.subgroups = sgs
         self.meetings = mtgs
+        
+        if(not SCI.permissionCheck(["ADMIN_SCHEDULE"])):
+            self.ids.new_meeting.disabled = True
+        else:
+            self.ids.new_meeting.disabled = False
         
         attended = []
         for a in me['attendance']:

@@ -111,6 +111,9 @@ MainScreen:
                     InputBox:
                         id: input_box
                         pos_hint: {'center_x': .5, 'center_y': 10}
+                    DateTimeBox:
+                        id: datetime_box
+                        pos_hint: {'center_x': .5, 'center_y': 10}
 
 
         MDNavigationDrawer:
@@ -241,6 +244,105 @@ MainScreen:
                             font_size: '12sp'
                             padding: '12sp'
                             md_bg_color: root.getColor('gray')
+                            color: root.getColor('white')
+
+
+<DateTimeBox>:
+    canvas:
+        Color:
+            rgba: (0,0,0, .4)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    MDCard:
+        radius: "10dp"
+        elevation: '4dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        md_bg_color: root.getColor('white')
+        height: datetime_box_layout.height
+        id: card
+        StackLayout:
+            id: datetime_box_layout
+            size_hint_y: None
+            height: self.minimum_height
+            padding: '20dp'
+            Label:
+                text: "Do This Action?"
+                id: title
+                font_name: 'Roboto'
+                font_size: '16sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('primary')
+                bold: True
+            Label:
+                text: "Here are some details about the action you are about to do!"
+                id: contents
+                font_name: 'Roboto'
+                font_size: '12sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('secondary')
+                text_size: self.width, None
+                height: self.texture_size[1]
+                halign: 'center'
+                markup: True
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ('20dp', '20dp', '20dp', '0dp')
+                spacing: '4dp'
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: buttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "5dp"
+                        padding: "5dp"
+                        IDButton:
+                            on_release: root.showDate()
+                            text: "Pick Date"
+                            id: date_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('red')
+                            color: root.getColor('white')
+                        IDButton:
+                            on_release: root.showTime()
+                            text: "Pick Time"
+                            id: time_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('red')
+                            color: root.getColor('white')
+                
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: defaultbuttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "5dp"
+                        padding: "5dp"
+                        IDButton:
+                            on_release: root.performAction((self))
+                            buttonid: -1
+                            text: "Submit"
+                            id: action_button
+                            font_size: '12sp'
+                            padding: '12sp'
+                            md_bg_color: root.getColor('primary')
                             color: root.getColor('white')
                     
 
@@ -1225,14 +1327,14 @@ MainScreen:
             id: all_items
             height: self.minimum_height
                 
-            Label:
-                text: "Your Attendance Stats"
-                font_name: 'Roboto'
-                font_size: '20sp'
-                pos_hint: {'center_x': 0.5}
-                size_hint_y: None
-                color: root.getColor('secondary')
-                bold: True
+            # Label:
+            #     text: "Your Attendance Stats"
+            #     font_name: 'Roboto'
+            #     font_size: '20sp'
+            #     pos_hint: {'center_x': 0.5}
+            #     size_hint_y: None
+            #     color: root.getColor('secondary')
+            #     bold: True
             Label:
                 text: "Upcoming Meetings"
                 font_name: 'Roboto'
@@ -1241,6 +1343,18 @@ MainScreen:
                 size_hint_y: None
                 color: root.getColor('secondary')
                 bold: True
+            FloatLayout:
+                size_hint_y: None
+                height: new_meeting.height
+                IDButton:
+                    text: "Create New Meeting"
+                    id: new_meeting
+                    md_bg_color:root.getColor("primary")
+                    color:root.getColor('white')
+                    font_size:"12sp"
+                    padding:"12dp"
+                    pos_hint:{"center_x":.5, "center_y":.5}
+                    on_release:root.showNewMeeting()
             FloatLayout:
                 size_hint_y: None
                 height: upcomingmeetings.height
