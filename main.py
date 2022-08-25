@@ -25,7 +25,7 @@ from kivy.core.window import Window
 
 # import MDFillRoundFlatButton from kivymd
 from kivymd.uix.button import MDFillRoundFlatButton
-#from kivy.utils import platform
+from kivy.utils import platform
 
 import kivy
 from kivy.clock import Clock
@@ -34,7 +34,7 @@ import kivy.uix.screenmanager as t
 from kivy.storage.jsonstore import JsonStore
 import webbrowser
 import threading
-from kivy.utils import platform
+#from kivy.utils import platform
 
 from kivy.config import Config
 from settings import AppSettings
@@ -42,6 +42,9 @@ Config.set('graphics', 'fullscreen', '0')
 Config.set("graphics", "resizable", 0)
 
 from plyer import vibrator
+
+if(platform == "ios"):
+    from pyobjus import autoclass, objc_dict
 
 window_size = [600,600]
 
@@ -167,6 +170,7 @@ def handleLogin(token, data={}):
         if(SCI.try_login_with_key()):
             #changePage("landing")
             Clock.schedule_once(lambda x: changePage(initialPage), 0)
+            MDApp.get_running_app().setUserId(SCI.account['id'], SCI.account['username'])
             
             
         else:
@@ -175,6 +179,8 @@ def handleLogin(token, data={}):
         res = SCI.login(data["username"], data["password"])
         if(res):
             Clock.schedule_once(lambda x: changePage(initialPage), 0)
+            
+            MDApp.get_running_app().setUserId(SCI.account['id'], SCI.account['username'])
             
         else:
             Clock.schedule_once(lambda x: MDApp.get_running_app().root.ids.loginpage.showWrongInformation(), 0)
@@ -407,19 +413,81 @@ class DateTimeBox(FloatLayout):
         self.ids.submit_button.disabled = True
         self.date = None
         self.time = None
-        self.ids.date_button.text = "Pick Date"
-        self.ids.time_button.text = "Pick Time"
+        self.items = [False, False, False, False, False]
+        #self.ids.date_button.text = "Pick Date"
+        #self.ids.time_button.text = "Pick Time"
         
         self.callback = callback
-        
+    def validateComponent(self, component, l, min, max, i):
+        if(len(component.text) > l):
+            component.text = component.text[:l]
+        try:
+            val = int(component.text)
+            if(val < min or val > max):
+                raise Exception()
+            component.text_color = self.getColor('primary')
+            self.items[i] = True
+            if(len(component.text) == l):
+                return True
+        except:
+            component.text_color = self.getColor('red')
+            self.items[i] = False
+            pass
+        return False
+    def checkEntries(self):
+        for i in self.items:
+            if(not i):
+                self.ids.submit_button.disabled = True
+                return
+        self.ids.submit_button.disabled = False
+    def dateChange(self, type):
+        if(type == "M"):
+            
+            n = self.validateComponent(self.ids.m_date,2, 1, 12, 0)
+            if(n):
+                self.ids.m_date.focus = False
+                self.ids.d_date.focus = True
+            self.checkEntries()
+        elif(type == "D"):
+            
+            n = self.validateComponent(self.ids.d_date,2, 1, 31, 1)
+            if(n):
+                self.ids.d_date.focus = False
+                self.ids.y_date.focus = True
+            self.checkEntries()
+        elif(type == "Y"):
+            
+            n = self.validateComponent(self.ids.y_date, 4, 2020, 2024, 2)
+            if(n):
+                self.ids.y_date.focus = False
+            self.checkEntries()
+    def timeChange(self, type):
+        if(type == "H"):
+            
+            n = self.validateComponent(self.ids.h_time,2, 1, 24, 3)
+            if(n):
+                self.ids.h_time.focus = False
+                self.ids.m_time.focus = True
+            self.checkEntries()
+        elif(type == "M"):
+            
+            n = self.validateComponent(self.ids.m_time,2, 0, 59, 4)
+            if(n):
+                self.ids.h_time.focus = False
+                self.ids.m_time.focus = True
+            else:
+                self.items[4] = False
+            self.checkEntries()
     def performAction(self, *args):
         global inPopup
         buttonId = args[0].buttonid
         #print("Action Performed: " + str(buttonId))
         if(buttonId == 0):
+            date = self.ids.y_date.text + "-" + self.ids.m_date.text + "-" + self.ids.d_date.text
+            time = self.ids.h_time.text + ":" + self.ids.m_time.text
             self.hide()
             inPopup = False
-            self.callback(self.date, self.time)
+            self.callback(date, time)
         else:
             inPopup = False
             self.hide()
@@ -1599,6 +1667,21 @@ class Main(MDApp):
     def getColor(self, name):
         return COLORS[name.lower()]
     
+    
+    def finish_ios_init(self, *args):
+        self.onesignal_object = autoclass("OneSignal")
+        mock_launch_options = objc_dict({})
+        print(dir(self.onesignal_object))
+        self.onesignal_object.initWithLaunchOptions_(mock_launch_options)
+        self.onesignal_object.setAppId_("8ec8f18d-38ef-449b-8e10-69025823a4a5")
+        self.onesignal_object.promptForPushNotificationsWithUserResponse_(self.notif_success)
+    def setUserId(self, uid, userName):
+        if(platform == "ios"):
+            self.onesignal_object.setExternalUserId_(uid)
+            self.onesignal_object.sendTag_("username", userName)
+            
+    def notif_success(self, *args):
+        print("Prompt Success!")
     def build(self):
         global COLORS
         SCI.initialize()
@@ -1644,6 +1727,9 @@ class Main(MDApp):
             "blue": rgba255to1((0, 0, 255,1))
         }
         self.icon = "AppIcons/playstore.png"
+        
+        if platform == "ios":
+            Clock.schedule_once(self.finish_ios_init, 0)
         
         #print("Hello World")
         return Builder.load_string(KVContents)

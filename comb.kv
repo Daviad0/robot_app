@@ -322,8 +322,16 @@ MainScreen:
             StackLayout:
                 size_hint_y: None
                 height: self.minimum_height
-                padding: ('20dp', '20dp', '20dp', '0dp')
+                padding: ('20dp', '10dp', '20dp', '0dp')
                 spacing: '4dp'
+                Label:
+                    text: "Date of Event"
+                    font_name: 'Roboto'
+                    font_size: '14sp'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    color: root.getColor('primary')
+                    bold: True
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -334,24 +342,99 @@ MainScreen:
                         size_hint_x: None
                         width: self.minimum_width
                         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                        spacing: "5dp"
+                        spacing: "8dp"
                         padding: "5dp"
-                        IDButton:
-                            on_release: root.showDate()
-                            text: "Pick Date"
-                            id: date_button
-                            font_size: '12sp'
-                            padding: '12sp'
-                            md_bg_color: root.getColor('red')
-                            color: root.getColor('white')
-                        IDButton:
-                            on_release: root.showTime()
-                            text: "Pick Time"
-                            id: time_button
-                            font_size: '12sp'
-                            padding: '12sp'
-                            md_bg_color: root.getColor('red')
-                            color: root.getColor('white')
+                        MDTextField:
+                            id: m_date
+                            multiline: False
+                            icon_right_color: root.getColor('primary')
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'MM'
+                            size_hint_x: None
+                            width: '40dp'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            on_text: root.dateChange("M")
+                        MDTextField:
+                            id: d_date
+                            multiline: False
+                            icon_right_color: root.getColor('primary')
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'DD'
+                            size_hint_x: None
+                            width: '40dp'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            on_text: root.dateChange("D")
+                        MDTextField:
+                            id: y_date
+                            multiline: False
+                            icon_right_color: root.getColor('primary')
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'YYYY'
+                            size_hint_x: None
+                            width: '60dp'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            on_text: root.dateChange("Y")
+                Label:
+                    text: "Time of Event"
+                    font_name: 'Roboto'
+                    font_size: '14sp'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    color: root.getColor('primary')
+                    bold: True
+                FloatLayout:
+                    size_hint_y: None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    GridLayout:
+                        rows: 1
+                        id: buttons
+                        size_hint_y: None
+                        size_hint_x: None
+                        width: self.minimum_width
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: "8dp"
+                        padding: "5dp"
+                        MDTextField:
+                            id: h_time
+                            multiline: False
+                            icon_right_color: root.getColor('primary')
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'HH'
+                            size_hint_x: None
+                            width: '40dp'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            on_text: root.timeChange("H")
+                        MDTextField:
+                            id: m_time
+                            multiline: False
+                            icon_right_color: root.getColor('primary')
+                            line_color_focus: root.getColor('primary')
+                            active_line: True
+                            hint_text: 'MM'
+                            size_hint_x: None
+                            width: '40dp'
+                            pos_hint: {'center_x': 0.5}
+                            font_name: 'Roboto'
+                            border: (2,2,2,2)
+                            border_color: 0,0,0,1
+                            on_text: root.timeChange("M")
+                        
                 
                 FloatLayout:
                     size_hint_y: None
