@@ -197,7 +197,7 @@ class SparkClub():
             return res["data"]
         else:
             return None
-    def create_new_item(self, title, contents, linkto, subgroup=None):
+    def create_new_item(self, title, contents, linkto, subgroup=None, icon="star"):
         if not self.account["loggedIn"]:
             return False
         
@@ -207,7 +207,6 @@ class SparkClub():
             "data": linkto
         }
         
-        icon = "star"
         show = 1
         subgroups = [] if subgroup == None else [subgroup]
         

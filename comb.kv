@@ -157,15 +157,25 @@ MainScreen:
             spacing: '0dp'
             FloatLayout:
                 size_hint_y: None
-                height: gif.height
+                height: spin_container.height
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                Image:
-                    id: gif
-                    source: 'assets/load.gif'
+                StackLayout:
+                    
+                    size_hint_y: None
+                    size_hint_x: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                    size_hint: None, None
-                    anim_delay: .01
-                    anim_loop: -1
+                    padding: "12dp"
+                    height: spinnnnn.height + 36
+                    id: spin_container
+                    MDSpinner:
+                        id: spinnnnn
+                        size_hint: None, None
+                        size: "20dp", "20dp"
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        active: True
+                        palette:
+                            root.getColor("primary"), root.getColor("secondary"), root.getColor("light")
+                    
             Label:
                 text: "Please Wait..."
                 id: message
@@ -396,6 +406,7 @@ MainScreen:
             size_hint_y: None
             height: self.minimum_height
             padding: '20dp'
+            spacing: '6dp'
             Label:
                 text: "Create Something"
                 id: title
@@ -420,7 +431,7 @@ MainScreen:
                 size_hint_y: None
                 height: self.minimum_height
                 padding: ('20dp', '20dp', '20dp', '0dp')
-                spacing: '4dp'
+                spacing: '8dp'
                 StackLayout:
                     id: inputs
                     size_hint_y: None

@@ -11,6 +11,7 @@ from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.toolbar import MDToolbar
 from kivymd.uix.button import MDIconButton
+from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.picker import MDDatePicker, MDTimePicker
 # import MDCard
 from kivymd.uix.card import MDCard
@@ -488,18 +489,64 @@ class InputBox(FloatLayout):
         self.ids.inputs.clear_widgets()
         self.callback = callback
         self.data = []
+        self.dropdowns = {}
+        self.items = {}
         n = 0
         for b in inputs:
-            hint = b["hint"]
-            multiline = b["multiline"]
-            protected = b["protected"]
-            id = "form" + str(n)
-            i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
-            i.bind(text=self.changeText)
-            i.line_color_focus = self.getColor('primary')
-            self.ids.inputs.add_widget(i)
+            if(b["type"] == "input"):
+                hint = b["hint"]
+                multiline = b["multiline"]
+                protected = b["protected"]
+                id = "form" + str(n)
+                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_size="12sp", font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
+                i.bind(text=self.changeText)
+                i.line_color_focus = self.getColor('primary')
+                self.items[str(n)] = i
+                self.ids.inputs.add_widget(i)
+            elif(b["type"] == "dropdown"):
+                hint = b["hint"]
+                color = b["color"]
+                options = b["options"]
+                
+                
+                items = []
+                
+                for o in options:
+                    items.append({
+                        "text": o,
+                        "viewclass": "OneLineListItem",
+                        "on_release": lambda x=o, y=n: self.handleDropdown(x, y)
+                    })
+                
+                id = "form" + str(n)
+                fL = FloatLayout(size_hint=(1,None))
+                
+                
+                '''
+                MDFillRoundFlatButton:
+                        text: "Join"
+                        id: action_button
+                        on_release: root.showLeaveOverlay()
+                        md_bg_color: root.getColor('primary')
+                        color: root.getColor('white')'''
+                b = IDButton(text=hint, buttonid=n, md_bg_color=color, color=self.getColor('white'), on_release=(lambda x=n: self.openDropdown(x)), pos_hint={'center_x': 0.5, 'center_y': 0.5}, font_size="12sp", font_name= 'Roboto', padding="12dp")
+                fL.height = b.height
+                fL.add_widget(b)
+                dD = MDDropdownMenu(caller=b, items=items, width_mult=3)
+                self.items[str(n)] = b
+                self.dropdowns[str(n)] = dD
+                
+                self.ids.inputs.add_widget(fL)
             n+=1
             self.data.append("")
+    def openDropdown(self, key):
+
+        self.dropdowns[str(key.buttonid)].open()
+    def handleDropdown(self, item, index):
+        self.dropdowns[str(index)].dismiss()
+        self.items[str(index)].text = "Selected: " + item
+        self.data[index] = item
+        
     def changeText(self, *args):
         inputId = args[0].inputid
         #print("changed text: " + str(inputId))
@@ -797,9 +844,9 @@ class Attendance(Screen):
         inPopup = False
         
         MDApp.get_running_app().root.ids.input_box.addData("New Meeting", "Please describe the meeting that you are creating for the datetime below\n" + str(date) + " " + str(time), [
-            {"hint":"Name","multiline":False,"protected":False},
-            {"hint":"Purpose","multiline":True,"protected":False},
-            {"hint":"Length (in hours)","multiline":False,"protected":False}
+            {"hint":"Name","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Purpose","multiline":True,"protected":False, "type":"input"},
+            {"hint":"Length (in hours)","multiline":False,"protected":False, "type":"input"}
         ], self.handleMeetingDetails)
         MDApp.get_running_app().root.ids.input_box.show()
     def createMeeting(self, title, description, length, datetime):
@@ -809,9 +856,9 @@ class Attendance(Screen):
         Clock.schedule_once(lambda x : changePage("attendance"), 0)
     def reShowInput(self):
         MDApp.get_running_app().root.ids.input_box.addData("New Meeting", "Make sure you fill out all fields with appropriate values!\n" + str(self.date) + " " + str(self.time), [
-            {"hint":"Name","multiline":False,"protected":False},
-            {"hint":"Purpose","multiline":True,"protected":False},
-            {"hint":"Length (in hours)","multiline":False,"protected":False}
+            {"hint":"Name","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Purpose","multiline":True,"protected":False, "type":"input"},
+            {"hint":"Length (in hours)","multiline":False,"protected":False, "type":"input"}
         ], self.handleMeetingDetails)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleMeetingDetails(self, data):
@@ -1027,9 +1074,10 @@ class Landing(Screen):
     #     Clock.schedule_once(lambda x : changePage("landing"), 0)
     def showNewItem(self,d):
         MDApp.get_running_app().root.ids.input_box.addData("New Landing Item", "Create a new landing item to be visible to all members of the team!", [
-            {"hint":"Title","multiline":False,"protected":False},
-            {"hint":"Contents","multiline":True,"protected":False},
-            {"hint":"Link To (optional)","multiline":False,"protected":False},
+            {"hint":"Title","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Contents","multiline":True,"protected":False, "type":"input"},
+            {"hint":"Link To (optional)","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "alert-circle"], "type":"dropdown"}
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
@@ -1038,7 +1086,7 @@ class Landing(Screen):
         x.start()
     def createItem(self, data):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
-        SCI.create_new_item(data[0], data[1], data[2])
+        SCI.create_new_item(data[0], data[1], data[2], icon="star" if data[3] == "" else data[3])
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("landing"), 0)
     def showItems(self, r):
@@ -1229,9 +1277,9 @@ class Account(Screen):
         x.start()
     def showResetPassword(self,d):
         MDApp.get_running_app().root.ids.input_box.addData("Reset Your Password", "You will need your old password to change your password to a new one. Please note that this will not sign out your other accounts!", [
-            {"hint":"Current Password","multiline":False,"protected":True},
-            {"hint":"New Password","multiline":False,"protected":True},
-            {"hint":"Confirm New Password","multiline":False,"protected":True},
+            {"hint":"Current Password","multiline":False,"protected":True, "type":"input"},
+            {"hint":"New Password","multiline":False,"protected":True, "type":"input"},
+            {"hint":"Confirm New Password","multiline":False,"protected":True, "type":"input"},
         ], self.handleResetPassword)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleResetPassword(self, data):
@@ -1273,9 +1321,10 @@ class ClickableMDCard(MDCard):
 class Subgroup(Screen):
     def showNewItem(self):
         MDApp.get_running_app().root.ids.input_box.addData("New Subgroup Item", "Create a item that will only be visible to the " + self.subgroup["name"] + " subgroup", [
-            {"hint":"Title","multiline":False,"protected":False},
-            {"hint":"Contents","multiline":True,"protected":False},
-            {"hint":"Link To (optional)","multiline":False,"protected":False},
+            {"hint":"Title","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Contents","multiline":True,"protected":False, "type":"input"},
+            {"hint":"Link To (optional)","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "alert-circle"], "type":"dropdown"}
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
@@ -1284,7 +1333,7 @@ class Subgroup(Screen):
         x.start()
     def createItem(self, data):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
-        SCI.create_new_item(data[0], data[1], data[2], self.subgroup["tag"])
+        SCI.create_new_item(data[0], data[1], data[2], self.subgroup["tag"], icon="star" if data[3] == "" else data[3])
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("subgroup"), 0)
     def getColor(self, name):
@@ -1523,8 +1572,8 @@ class Subgroup(Screen):
          
     def showAddMember(self):
         MDApp.get_running_app().root.ids.input_box.addData("Search for Member", "Search for a member that you would like to add to the subgroup!", [
-            {"hint":"Username (contains)","multiline":False,"protected":False},
-            {"hint":"Full Name (contains)","multiline":False,"protected":False}
+            {"hint":"Username (contains)","multiline":False,"protected":False, "type":"input"},
+            {"hint":"Full Name (contains)","multiline":False,"protected":False, "type":"input"}
         ], self.showMembersToAdd)
         MDApp.get_running_app().root.ids.input_box.show()
     def changeAttendance(self, action):
