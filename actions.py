@@ -271,7 +271,7 @@ class SparkClub():
         if(self.account["loggedIn"]):
             cookies["session"] = self.account["token"]
             print(self.account["token"])
-        res = requests.request(method, "http://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
+        res = requests.request(method, "https://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
         
         if(res.status_code != 200):
             MDApp.get_running_app().root.show_error("Error Code: " + str(res.status_code))
