@@ -484,7 +484,7 @@ class DateTimeBox(FloatLayout):
         #print("Action Performed: " + str(buttonId))
         if(buttonId == 0):
             date = self.ids.y_date.text + "-" + self.ids.m_date.text + "-" + self.ids.d_date.text
-            time = self.ids.h_time.text + ":" + self.ids.m_time.text
+            time = self.ids.h_time.text + ":" + self.ids.m_time.text + ":00"
             self.hide()
             inPopup = False
             self.callback(date, time)
@@ -931,12 +931,15 @@ class Attendance(Screen):
         MDApp.get_running_app().root.ids.input_box.show()
     def handleMeetingDetails(self, data):
         global inPopup
+        
         try:
             if(data[0] == "" or data[1] == ""):
                 raise Exception()
             if(int(data[2]) < 1):
                 raise Exception()
             datetimeObject = datetime.strptime(str(self.date) + " " + str(self.time), '%Y-%m-%d %H:%M:%S')
+            
+            inPopup = False
             x = threading.Thread(target = self.createMeeting, args = (data[0], data[1], int(data[2]), datetimeObject), daemon=True)
             x.start()
         except:
