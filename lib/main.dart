@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparkclub/constants.dart';
+import 'package:sparkclub/homescreen.dart';
+import 'package:sparkclub/signin.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  // SharedPreferences.setMockInitialValues(<String, Object>{StorageConstants.usernameKey: 'Daviado'});
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final username = prefs.getString(StorageConstants.usernameKey);
+  runApp(MyApp(isLoggedIn: username != null));
+}
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
+  final bool isLoggedIn;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SparkClub',
+      debugShowCheckedModeBanner: false,
+      title: Constants.appTitle,
       theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0056d2)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Constants.seedColor),
       ),
-      home: const Home(),
-    );
-  }
-}
-
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SparkClub'),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.fromSeed(seedColor: Constants.darkSeedColor),
       ),
+      themeMode: ThemeMode.light,
+      home: isLoggedIn ? const MainWidget() : const SignIn(),
     );
   }
 }
