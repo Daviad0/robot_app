@@ -48,13 +48,13 @@
                 theme_text_color: "Custom"
                 text_color: root.getColor("secondary")
 
-    ScrollView:
+    StackLayout:
 
         DrawerList:
             id: md_list
     EmptySpace:
         size_hint_y: None
-        height: '10dp'
+        height: '20dp'
     ScrollView:
 
         DrawerList:
@@ -98,6 +98,8 @@ MainScreen:
                             id: meetingpage
                         Error:
                             id: errorpage
+                        Cable:
+                            id: cablepage
                     StackLayout:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
@@ -130,6 +132,7 @@ MainScreen:
             ContentNavigationDrawer:
                 id: content_drawer
         
+
 
 
 
@@ -358,6 +361,7 @@ MainScreen:
                             border: (2,2,2,2)
                             border_color: 0,0,0,1
                             on_text: root.dateChange("M")
+                            input_filter: "int"
                         MDTextField:
                             id: d_date
                             multiline: False
@@ -372,6 +376,7 @@ MainScreen:
                             border: (2,2,2,2)
                             border_color: 0,0,0,1
                             on_text: root.dateChange("D")
+                            input_filter: "int"
                         MDTextField:
                             id: y_date
                             multiline: False
@@ -386,6 +391,7 @@ MainScreen:
                             border: (2,2,2,2)
                             border_color: 0,0,0,1
                             on_text: root.dateChange("Y")
+                            input_filter: "int"
                 Label:
                     text: "Time of Event"
                     font_name: 'Roboto'
@@ -420,6 +426,7 @@ MainScreen:
                             border: (2,2,2,2)
                             border_color: 0,0,0,1
                             on_text: root.timeChange("H")
+                            input_filter: "int"
                         MDTextField:
                             id: m_time
                             multiline: False
@@ -434,6 +441,7 @@ MainScreen:
                             border: (2,2,2,2)
                             border_color: 0,0,0,1
                             on_text: root.timeChange("M")
+                            input_filter: "int"
                         
                 
                 FloatLayout:
@@ -623,6 +631,64 @@ MainScreen:
             color: root.getColor('secondary')
             bold: True
 
+<Cable>:
+    canvas:
+        Color:
+            rgba: root.getColor('white')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    name: "cable"
+    padding: '40dp'
+    StackLayout:
+        padding: ("0dp", "70dp", "0dp", "0dp")
+        FloatLayout:
+            size_hint_y: .1
+            padding: '20dp'
+            MDFillRoundFlatButton:
+                id: cable_channel
+                padding: '12dp'
+                font_size: '12sp'
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                md_bg_color: root.getColor('primary')
+                text: 'Announcements - Lightning Robotics'
+        ScrollView:
+            size_hint_y: .8
+            StackLayout:
+                size_hint_y: None
+                id: messages
+        FloatLayout:
+            size_hint_y: .1
+            padding: '20dp'
+            GridLayout:
+                rows: 1
+                size_hint_x: .8
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                spacing:"10dp"
+                FloatLayout:
+                    size_hint_y: None
+                    MDTextField:
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        line_color_focus: root.getColor('primary')
+                        line_color_normal: root.getColor('primary')
+                        color_mode: 'custom'
+                        active_line:True
+                        hint_text:"Your Message"
+                        font_size:"12sp"
+                        font_name: 'Roboto'
+                        border:(2,2,2,2)
+                        padding:"20dp"
+                        spacing: "20dp"
+                        border_color:(0,0,0,1)
+                MDFillRoundFlatButton:
+                    id: cable_channel
+                    padding: '12dp'
+                    font_size: '12sp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    md_bg_color: root.getColor('primary')
+                    text: 'Send'
+            
+        
 
 <Subgroup>:
     canvas:

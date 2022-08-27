@@ -62,6 +62,7 @@ icons_item = {
             "exit-to-app": ["Sign out", "login"],
             "view-list": ["Home", "landing"],
             "checkbox-marked-circle-outline": ["Meetings", "attendance"],
+            "forum": ["Communications", "cable"],
             "list-status": ["Settings", "actions"],
             "account-circle": ["My Account", "account"]
         }
@@ -149,7 +150,9 @@ def changePage(page):
     elif(page == "meeting"):
         MDApp.get_running_app().root.ids.nav_bar_title.title = "Specific Meeting"
         MDApp.get_running_app().root.ids.meetingpage.init()
-    
+    elif(page == "cable"):
+        MDApp.get_running_app().root.ids.nav_bar_title.title = "Communications"
+        MDApp.get_running_app().root.ids.cablepage.init()
     
         
 
@@ -1387,6 +1390,23 @@ class ClickableMDCard(MDCard):
     link = StringProperty()
     def getColor(self, name):
         return COLORS[name.lower()]
+    pass
+
+class Cable(Screen):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    def getItems(self):
+        Clock.schedule_once(lambda x: toggle_message_box(True), 0)
+        items = SCI.get_messages(self.chat == "ALL", None if self.chat == "ALL" else self.chat)
+        Clock.schedule_once(lambda x: toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x: self.showMessages(items), 0)
+    def init(self):
+        if(not "chat" in self.__dict__):
+            self.chat = "ALL"
+        x = threading.Thread(target=self.getItems, daemon=True)
+        x.start()
+    def showMessages(self, items):
+        print(items)
     pass
 
 class Subgroup(Screen):
