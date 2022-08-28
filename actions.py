@@ -262,6 +262,15 @@ class SparkClub():
         data = res["data"]
         if(res["status"] == 200 and data["successful"]):
             return data["messages"]
+    def send_message(self, group_wide, subgroup, message):
+        if not self.account["loggedIn"]:
+            return False
+        res = self._sendAPIRequest("POST", "/group/subgroup/message" if not group_wide else "/group/announcement", data={"message": message, "group": subgroup})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def reset_password(self, current, new):
         if not self.account["loggedIn"]:
             return False

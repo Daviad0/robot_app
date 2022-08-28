@@ -1,5 +1,5 @@
 
-from os import umask
+
 from kivy.lang import Builder
 from datetime import datetime
 from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty, BooleanProperty
@@ -683,6 +683,17 @@ class SubgroupItem(FloatLayout):
         subgroup = self.togoto
         changePage("subgroup")
     pass
+
+class Message(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
+class MyMessage(FloatLayout):
+    def getColor(self, name):
+        return COLORS[name.lower()]
+    pass
+
 
 class MemberStatus(FloatLayout):
     uid = StringProperty()
@@ -1398,16 +1409,82 @@ class Cable(Screen):
     def getItems(self):
         Clock.schedule_once(lambda x: toggle_message_box(True), 0)
         items = SCI.get_messages(self.chat == "ALL", None if self.chat == "ALL" else self.chat)
+        users = SCI.get_users()
+        subgroups = SCI.get_subgroups()
         Clock.schedule_once(lambda x: toggle_message_box(False), 0)
-        Clock.schedule_once(lambda x: self.showMessages(items), 0)
+        Clock.schedule_once(lambda x: self.showMessages(items, users, subgroups), 0)
     def init(self):
         if(not "chat" in self.__dict__):
             self.chat = "ALL"
+        
         x = threading.Thread(target=self.getItems, daemon=True)
         x.start()
-    def showMessages(self, items):
-        print(items)
-    pass
+    def selectChannel(self, channel):
+        try:
+            self.dropdown.dismiss()
+        except:
+            pass
+        self.chat = channel
+        self.ids.cable_channel.text = "Announcements - " + channel
+        if(channel == "ALL"):
+            self.ids.cable_channel.text = "Announcements - Lightning Robotics"
+        self.init()
+    def showMessages(self, items, users, sgs):
+        f = "%Y-%m-%dT%H:%M:%S.%fZ"
+        thisSg = None if self.chat == "ALL" else next(x for x in sgs if x["name"] == self.chat) 
+        if(not SCI.permissionCheck(["ADMIN_ANNOUNCEMENT"]) and not (thisSg != None and SCI.account["id"] in thisSg["managers"])):
+            self.ids.send_message.disabled = True
+            self.ids.create_message.disabled = True
+        
+        
+        ddItems = []
+        
+        sgs.append({
+            "name": "ALL"
+        })
+                
+        for s in sgs:
+            ddItems.append({
+                "text": s["name"],
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=s["name"]: self.selectChannel(x)
+            })
+        
+        self.dropdown = MDDropdownMenu(caller=self.ids.cable_channel, items=ddItems, width_mult=3,position="bottom")
+        
+        self.ids.messages.clear_widgets()
+        shown = 0
+        for mI in range(len(items)-1, -1, -1):
+            if(shown < 20):
+                m = items[mI]
+                dout = datetime.strptime(m["datetime"], f)
+                
+                sender = next(x for x in users if x["id"] == m["sender"])
+                nM = MyMessage() if sender["id"] == SCI.account['id'] else Message()
+                nM.ids.contents.text = "[b]" + sender["username"] + "[/b] says on [i]" + str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM") + "[/i]\n\n" + '"' + m["message"] + '"'
+                
+                self.ids.messages.add_widget(nM)
+                shown += 1
+            
+    def showDropdown(self):
+        try:
+            self.dropdown.open()
+        except:
+            pass
+    def waitSendMessage(self, msg):
+        Clock.schedule_once(lambda x: toggle_message_box(True), 0)
+        SCI.send_message(self.chat, self.chat, msg)
+        Clock.schedule_once(lambda x: toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x: self.init(), 0)
+    def sendMessage(self):
+        if(self.ids.create_message.text != ""):
+            
+            x = threading.Thread(target=self.waitSendMessage, args=(self.ids.create_message.text,), daemon=True)
+            self.ids.create_message.text = ""
+            x.start()
+            
+            
+        
 
 class Subgroup(Screen):
     def showNewItem(self):
@@ -1486,6 +1563,7 @@ class Subgroup(Screen):
         #print(items)
         for m in meetings:
             if(show > 0 and (sg["name"] in m["subgroups"] or self.admin)):
+
                 dout = datetime.strptime(m["datetime"], f)
                 if(dout > now):
                     mI = MeetingItem()
@@ -1494,7 +1572,7 @@ class Subgroup(Screen):
                     mI.ids.card.opacity = 1 if (sg["name"] in m["subgroups"]) else 0.5
                     mI.ids.card.bind(on_touch_down=self.triggerOverlay)
                     mI.ids.title.text = m["title"]
-                    
+
                     mI.ids.date.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
                     self.ids.meetings.add_widget(mI)
                     show -= 1
@@ -1739,10 +1817,10 @@ class Main(MDApp):
         COLORS = {
             "primary": rgba255to1((19, 3, 252,1)),
             "secondary": rgba255to1((7, 0, 105,1)),
-            "light": rgba255to1((130, 207, 255,1)),
+            "light": rgba255to1((110, 167, 230,1)),
             "white": rgba255to1((255, 255, 255,1)),
             "gray" : rgba255to1((100, 100, 100,1)),
-            "lightgray": rgba255to1((230, 230, 230,1)),
+            "lightgray": rgba255to1((220, 220, 220,1)),
             "black": rgba255to1((0, 0, 0,1)),
             "success": rgba255to1((0, 200, 0,1)),
             "red": rgba255to1((255, 0, 0,1)),

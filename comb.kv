@@ -631,6 +631,73 @@ MainScreen:
             color: root.getColor('secondary')
             bold: True
 
+
+<Message>:
+    padding: '40dp'
+    size_hint_y: None
+    height: card.height
+    MDCard:
+        radius: '20dp'
+        elevation: '0dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        orientation: 'vertical'
+        id: card
+        width: '160dp'
+        md_bg_color: root.getColor('gray')
+        height: card_content.height
+        StackLayout:
+            id: card_content
+            size_hint_y: None
+            padding: '20dp'
+            height: contents.height + 80
+            Label:
+                text: "[b]Daviado[/b] says...\n\nI am a message and you put documents in me!"
+                id: contents
+                font_name: 'Roboto'
+                font_size: '12sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('white')
+                text_size: self.width, None
+                height: self.texture_size[1]
+                markup: True
+                halign: 'center'
+
+<MyMessage>:
+    padding: '40dp'
+    size_hint_y: None
+    height: card.height
+    MDCard:
+        radius: '20dp'
+        elevation: '0dp'
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        size_hint_x: .8
+        size_hint_y: None
+        orientation: 'vertical'
+        id: card
+        width: '160dp'
+        md_bg_color: root.getColor('light')
+        height: card_content.height
+        StackLayout:
+            id: card_content
+            size_hint_y: None
+            padding: '20dp'
+            height: contents.height + 80
+            Label:
+                text: "[b]Daviado[/b] says...\n\nI am a message and you put documents in me!"
+                id: contents
+                font_name: 'Roboto'
+                font_size: '12sp'
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                color: root.getColor('white')
+                text_size: self.width, None
+                height: self.texture_size[1]
+                markup: True
+                halign: 'center'
+
 <Cable>:
     canvas:
         Color:
@@ -652,11 +719,19 @@ MainScreen:
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 md_bg_color: root.getColor('primary')
                 text: 'Announcements - Lightning Robotics'
+                on_release: root.showDropdown()
         ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
             size_hint_y: .8
+            pos_hint: {'center_x': .5, 'center_y': .5}
             StackLayout:
                 size_hint_y: None
+                spacing: '12dp'
                 id: messages
+                height: self.minimum_height
+                
+                
         FloatLayout:
             size_hint_y: .1
             padding: '20dp'
@@ -673,6 +748,7 @@ MainScreen:
                         line_color_normal: root.getColor('primary')
                         color_mode: 'custom'
                         active_line:True
+                        id: create_message
                         hint_text:"Your Message"
                         font_size:"12sp"
                         font_name: 'Roboto'
@@ -681,12 +757,13 @@ MainScreen:
                         spacing: "20dp"
                         border_color:(0,0,0,1)
                 MDFillRoundFlatButton:
-                    id: cable_channel
+                    id: send_message
                     padding: '12dp'
                     font_size: '12sp'
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     md_bg_color: root.getColor('primary')
                     text: 'Send'
+                    on_release: root.sendMessage()
             
         
 
