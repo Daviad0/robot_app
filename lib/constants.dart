@@ -8,8 +8,9 @@ abstract class Constants {
   static const String appTitle = 'SparkClub';
   static const Color seedColor = Color(0xFF323996);
   static const Color darkSeedColor = Color(0xFFb2c5ff);
+  static final Color textColor = Colors.indigo.shade900;
 
-  static List<PopupMenuEntry<int>> popupMenuItems = [
+  static final List<PopupMenuEntry<int>> popupMenuItems = [
     PopupMenuItem(
       value: 0,
       child: Row(
@@ -56,7 +57,7 @@ abstract class Constants {
 }
 
 abstract class FunctionConstants {
-  static List<Function> popupMenuFunctions = [
+  static final List<Function> popupMenuFunctions = [
     (context) => Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const MyAccount(),
@@ -109,6 +110,15 @@ abstract class FunctionConstants {
       );
     },
   ];
+  static void showUnfinishedSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('This feature has not been implemented!'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
 }
 
 abstract class StorageConstants {
