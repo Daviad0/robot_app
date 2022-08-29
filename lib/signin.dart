@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparkclub/alternatesignin.dart';
 import 'package:sparkclub/constants.dart';
 import 'package:sparkclub/homescreen.dart';
 
@@ -14,8 +15,11 @@ class _SignInState extends State<SignIn> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
 
+  // Used for detecting empty fields
   bool _validateUsername = false;
   bool _validatePassword = false;
+
+  bool _showingPassword = true;
 
   @override
   void initState() {
@@ -45,6 +49,7 @@ class _SignInState extends State<SignIn> {
               padding: const EdgeInsets.all(8),
               child: TextField(
                 decoration: InputDecoration(
+                  icon: const Icon(Icons.person),
                   border: const OutlineInputBorder(),
                   labelText: 'Username',
                   errorText: _validateUsername ? 'This field is required!' : null,
@@ -54,19 +59,34 @@ class _SignInState extends State<SignIn> {
                 controller: _usernameController,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  labelText: 'Password',
-                  errorText: _validatePassword ? 'This field is required!' : null,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        icon: const Icon(Icons.lock),
+                        border: const OutlineInputBorder(),
+                        labelText: 'Password',
+                        errorText: _validatePassword ? 'This field is required!' : null,
+                      ),
+                      onChanged: (value) => _validatePassword == true ? setState(() => _validatePassword = false) : null,
+                      // onEditingComplete: () => _passwordController.text.isEmpty ? setState(() => _validatePassword = true) : null, // DOES NOT WORK
+                      controller: _passwordController,
+                      obscureText: _showingPassword,
+                    ),
+                  ),
                 ),
-                onChanged: (value) => _validatePassword == true ? setState(() => _validatePassword = false) : null,
-                // onEditingComplete: () => _passwordController.text.isEmpty ? setState(() => _validatePassword = true) : null, // DOES NOT WORK
-                controller: _passwordController,
-                obscureText: true,
-              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+                  child: IconButton(
+                    icon: Icon(_showingPassword ? Icons.visibility_off : Icons.visibility), // I have no idea why these icons are switched
+                    onPressed: () => setState(() => _showingPassword = !_showingPassword),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Row(
@@ -84,6 +104,7 @@ class _SignInState extends State<SignIn> {
 
                     // TODO: fix textfields being laggy (due to setState() being called a lot)
                     // TODO: implement http request to signin, for now just send user to home screen
+                    // TODO: make sure to pause the app for a few seconds to prevent brute forcing and to prevent too many requests
                     () async {
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString(StorageConstants.usernameKey, _usernameController.text);
@@ -103,8 +124,17 @@ class _SignInState extends State<SignIn> {
                     primary: Theme.of(context).colorScheme.secondary,
                     onPrimary: Theme.of(context).colorScheme.onSecondary,
                   ),
-                  onPressed: () {},
-                  child: const Text('Forgot Password?'),
+                  onPressed: () {
+                    // TODO: fix animations
+                    Navigator.of(context).pushReplacement(
+                      PageRouteBuilder(
+                        pageBuilder: (ctx, animation1, animation2) => const AlternateSignIn(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero
+                      ),
+                    );
+                  },
+                  child: const Text('Alternate Signin'),
                 ),
               ],
             ),

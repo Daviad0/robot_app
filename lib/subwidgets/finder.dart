@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sparkclub/popupwidgets/myaccount.dart';
 import 'package:sparkclub/subwidgets/home.dart';
+import 'package:sparkclub/subwidgets/unfinished.dart';
 
 class Finder {
-  static Widget? find(int navIndex) {
-    switch (navIndex) {
-      case 0:
-      case 1:
-        return const Home();
-      default:
-        return null;
-    }
-  }
+  static Widget? find(int navIndex) => navIndex == 0 ? const HomePage() : const Unfinished();
 }

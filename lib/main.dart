@@ -5,7 +5,7 @@ import 'package:sparkclub/homescreen.dart';
 import 'package:sparkclub/signin.dart';
 
 Future<void> main() async {
-  // SharedPreferences.setMockInitialValues(<String, Object>{StorageConstants.usernameKey: 'Daviado'});
+  // SharedPreferences.setMockInitialValues(<String, Object>{StorageConstants.usernameKey: 'quackings'});
 
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();

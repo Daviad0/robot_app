@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sparkclub/popupwidgets/myaccount.dart';
-import 'package:sparkclub/popupwidgets/settings.dart';
+import 'package:sparkclub/dropdown/myaccount.dart';
+import 'package:sparkclub/dropdown/settings.dart';
 import 'package:sparkclub/signin.dart';
 
 abstract class Constants {
   static const String appTitle = 'SparkClub';
-  static const Color seedColor = Color(0xFF0056d2);
+  static const Color seedColor = Color(0xFF323996);
   static const Color darkSeedColor = Color(0xFFb2c5ff);
 
   static List<PopupMenuEntry<int>> popupMenuItems = [
@@ -20,6 +20,7 @@ abstract class Constants {
         ],
       ),
     ),
+    const PopupMenuDivider(),
     PopupMenuItem<int>(
       value: 1,
       child: Row(
@@ -67,10 +68,44 @@ abstract class FunctionConstants {
       ),
     ),
     (context) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove(StorageConstants.usernameKey);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (BuildContext ctx) => const SignIn())
+      // TODO: fix this, it looks ugly
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Are you sure you want to sign out?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const <Widget>[
+              Text('You will have to re-enter your information!'),
+            ],
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.error,
+                onPrimary: Theme.of(context).colorScheme.onError,
+              ),
+              onPressed: () {
+                () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.remove(StorageConstants.usernameKey);
+                }();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (BuildContext ctx) => const SignIn())
+                );
+              },
+              child: const Text('Sign Out'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.secondary,
+                onPrimary: Theme.of(context).colorScheme.onSecondary,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
       );
     },
   ];
