@@ -237,6 +237,16 @@ class SparkClub():
             return True
         else:
             return False
+    def try_external_login(self, externalId):
+        if not self.account["loggedIn"]:
+            return False
+        
+        res = self._sendAPIRequest('POST', '/group/today/anon', data={"externalId": externalId, "group": group})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def get_meeting_today(self):
         if not self.account["loggedIn"]:
             return {}

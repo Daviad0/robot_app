@@ -1407,7 +1407,7 @@ MainScreen:
                                 color: root.getColor('white')
                                 on_release: root.submitForm()
                             MDFillRoundFlatButton:
-                                text: "Forgot Something?"
+                                text: "External Sign In"
                                 md_bg_color: root.getColor('gray')
                                 on_release: root.goToTempLogin()
         GridLayout:
@@ -1429,91 +1429,60 @@ MainScreen:
             FloatLayout:
                 size_hint_y: None
                 padding: '20dp'
-                GridLayout:
-                    rows: 4
-                    cols: 1
-                    row_default_height: '32dp'
-                    row_force_default: True
+                height: temp_contents.height
+                StackLayout:
+                    id: temp_contents
+                    pos_hint: {'center_x': .5, 'center_y': 1}
                     size_hint_y: None
-                    size_hint_x: None
+                    size_hint_x: .8
                     height: self.minimum_height
-                    spacing: '20dp'
-                    width: 600
-                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    padding: '20dp'
                     Label:
-                        text: 'Temporary Login'
+                        text: 'Student ID Sign In'
                         font_name: 'Roboto'
-                        font_size: '24dp'
+                        font_size: '20sp'
+                        size_hint_y: None
+                        color: root.getColor('secondary')
+                        halign: 'center'
+                        bold: True
+                    Label:
+                        text: "If you do not want to login with your account to sign in, you may login with your Student ID instead, which has been attached to your account!"
+                        font_name: 'Roboto'
+                        font_size: '12sp'
                         pos_hint: {'center_x': 0.5}
                         size_hint_y: None
-                        color: root.getColor('primary')
-                        height: '60dp'
-                    GridLayout:
-                        rows: 1
-                        cols: 2
-                        row_default_height: '48dp'
-                        row_force_default: True
-                        size_hint_y: None
-                        size_hint_x: None
-                        width: 600
-                        height: self.minimum_height
-                        spacing: 60
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                        
-                        MDTextField:
-                            id: temp_email
-                            multiline: False
-                            
-                            line_color_focus: root.getColor('primary')
-                            active_line: True
-                            hint_text: 'Email'
-                            pos_hint: {'center_x': 0.5}
-                            font_name: 'Roboto'
-                            border: (2,2,2,2)
-                            border_color: 0,0,0,1
-                            spacing: (20,20,20,20)
-                            padding: (20,20,20,20)
-                            icon_right: 'email'
-                            icon_right_color: root.getColor('primary')
-                            on_text: root.emailChange()
-
-                        FloatLayout:
-                            size_hint_x: .25
-                            padding: '30dp'
-                            MDFillRoundFlatButton:
-                                id: temp_send_code
-                                text: "Send Code"
-                                disabled: True
-                                opacity: 0.3
-                                md_bg_color: root.getColor('primary')
-                                disabled_md_bg_color: root.getColor('primary')
-                                disabled_color: root.getColor('white')
-                                pos_hint: {'center_x': 0.5, 'center_y': .5}
-                                padding: (20,20,20,20)
-                                on_release: root.sendCode()
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        color: root.getColor('secondary')
+                        halign: 'center'
                     MDTextField:
-                        id: temp_code
+                        id: external_id
                         multiline: False
-                        disabled: True
-                        opacity: 0.3
-                        color_mode: 'custom'
+                        icon_right_color: root.getColor('primary')
                         line_color_focus: root.getColor('primary')
-                        line_color_normal: root.getColor('primary')
-                        line_color_disabled: root.getColor('primary')
                         active_line: True
-                        hint_text: 'Code'
+                        hint_text: 'Student ID'
                         pos_hint: {'center_x': 0.5}
                         font_name: 'Roboto'
                         border: (2,2,2,2)
                         border_color: 0,0,0,1
                         spacing: (20,20,20,20)
                         padding: (20,20,20,20)
-                    MDFillRoundFlatButton:
-                        text: "Back"
-                        id: back_button
-                        md_bg_color: root.getColor('gray')
-                        color: root.getColor('white')
-                        on_release: root.goToLogin()
+                        on_text: root.externalIDChange()
+                    FloatLayout:
+                        size_hint_y: None
+                        padding: '20dp'
+                        MDFillRoundFlatButton:
+                            text: "Try to Sign In"
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            id: external_submit
+                            md_bg_color: root.getColor('primary')
+                            disabled_md_bg_color: root.getColor('primary')
+                            disabled_color: root.getColor('white')
+                            color: root.getColor('white')
+                            disabled: True
+                            on_release: root.externalSubmit()
+
                         
 <Landing>:
     name: "landing"

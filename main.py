@@ -798,6 +798,21 @@ class Login(Screen):
             return
         self.ids.temp_code.disabled = False
         fadeto(self.ids.temp_code, 1, 0.25)
+    def externalIDChange(self):
+        if(self.ids.external_id.text == ""):
+            self.ids.external_submit.disabled = True
+        else:
+            self.ids.external_submit.disabled = False
+    def apiExternalSubmit(self, externalId):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.try_external_login(externalId)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : self.goToLogin(), 0)
+    def externalSubmit(self):
+        externalId = self.ids.external_id.text
+        x = threading.Thread(target = self.apiExternalSubmit, args = (externalId,), daemon=True)
+        x.start()
+        
         
 class Actions(Screen):
     def getColor(self, name):
