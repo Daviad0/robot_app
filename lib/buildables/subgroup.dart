@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparkclub/backend.dart';
 import 'package:sparkclub/constants.dart';
 
 class Subgroup extends StatefulWidget {
@@ -15,19 +16,7 @@ class Subgroup extends StatefulWidget {
 class _SubgroupState extends State<Subgroup> {
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> upcomingMeetings = [
-      {
-        'name': 'Rookie Informational Meeting',
-        'time': '9/7 at 2:30 PM',
-      }
-    ];
-    final List<String> members = [
-      'David',
-      'David',
-      'David',
-      'David',
-      'Kyle',
-    ];
+    final BaseSubgroup subgroup = TempBackend().getSubgroup(widget.name, widget.tag);
 
     return Scaffold(
       appBar: AppBar(
@@ -62,6 +51,47 @@ class _SubgroupState extends State<Subgroup> {
                     onPressed: () => FunctionConstants.showUnfinishedSnackbar(context),
                     child: const Text('Add Item'),
                   ),
+                  ListView.separated(
+                    itemCount: subgroup.items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Widget deleteButton = TextButton(
+                          style: TextButton.styleFrom(
+                            primary: Theme.of(context).colorScheme.error,
+                          ),
+                          onPressed: () => subgroup.items[index].openLink(context),
+                          child: const Text('Delete')
+                        );
+                      final Widget trailingWidget = subgroup.items[index].link == null ? deleteButton : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              primary: Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () => FunctionConstants.showUnfinishedSnackbar(context),
+                            child: const Text('Open Link'),
+                          ),
+                          const SizedBox(width: 4),
+                          deleteButton,
+                        ],
+                      );
+    
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Material(
+                          elevation: 4,
+                          shadowColor: Colors.blueGrey,
+                          child: ListTile(
+                            title: Text(subgroup.items[index].name),
+                            subtitle: subgroup.items[index].getContent != null ? Text(subgroup.items[index].getContent) : null,
+                            trailing: trailingWidget
+                          ),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (ctx, index) => const Divider(),
+                    shrinkWrap: true,
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
@@ -80,9 +110,9 @@ class _SubgroupState extends State<Subgroup> {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: <Widget>[
-                                Text(upcomingMeetings[index]['time'], style: const TextStyle(fontSize: 18)),
+                                Text(subgroup.meetings[index].time, style: const TextStyle(fontSize: 18)),
                                 const SizedBox(height: 16),
-                                Text(upcomingMeetings[index]['name'], style: const TextStyle(fontStyle: FontStyle.italic)),
+                                Text(subgroup.meetings[index].name, style: const TextStyle(fontStyle: FontStyle.italic)),
                               ],
                             ),
                           ),
@@ -90,7 +120,7 @@ class _SubgroupState extends State<Subgroup> {
                       );
                     },
                     separatorBuilder: (ctx, index) => const Divider(),
-                    itemCount: upcomingMeetings.length,
+                    itemCount: subgroup.meetings.length,
                     shrinkWrap: true,
                   ),
                 ],
@@ -115,7 +145,7 @@ class _SubgroupState extends State<Subgroup> {
                     mainAxisSpacing: 8,
                     childAspectRatio: 5,
                     shrinkWrap: true,
-                    children: List.generate(members.length, (index) {
+                    children: List.generate(subgroup.members.length, (index) {
                       return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8),
@@ -126,7 +156,7 @@ class _SubgroupState extends State<Subgroup> {
                               padding: const EdgeInsets.all(8),
                               height: double.infinity,
                               width: double.infinity,
-                              child: Center(child: Text(members[index], textAlign: TextAlign.center, style: const TextStyle(fontSize: 20))),
+                              child: Center(child: Text(subgroup.members[index], textAlign: TextAlign.center, style: const TextStyle(fontSize: 20))),
                             ),
                           ),
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparkclub/backend.dart';
 import 'package:sparkclub/buildables/subgroup.dart';
 import 'package:sparkclub/constants.dart';
 
@@ -12,32 +13,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    const List<Map<String, dynamic>> items = [
-      {
-        'name': 'Test Item',
-        'content': 'This is content',
-        'link': 'http://quackings.com',
-      },
-      {
-        'name': 'Test Item without link',
-        'content': 'This is content, this also doesnt have a link attached so the button will not show. This is also testing for overflow: WOW! This is a lot of overflow, I hope the ListTile object can handle it.',
-        'link': null,
-      },
-    ];
-    const List<Map<String, dynamic>> subgroups = [
-      {
-        'name': 'Subgroup 1',
-        'text': 'Subgroup Admin',
-        'rank': 'Admin',
-        'tag': 'SUB1',
-      },
-      {
-        'name': 'Subgroup 2',
-        'text': 'Not involved',
-        'rank': null,
-        'tag': 'SUB2',
-      },
-    ];
+    final List<BaseItem> items = TempBackend().getLandingItems();
+    final List<BaseSubgroup> subgroups = TempBackend().getSubgroups();
 
     return SingleChildScrollView(
       child: Center(
@@ -65,10 +42,10 @@ class HomePageState extends State<HomePage> {
                           style: TextButton.styleFrom(
                             primary: Theme.of(context).colorScheme.error,
                           ),
-                          onPressed: () => FunctionConstants.showUnfinishedSnackbar(context),
+                          onPressed: () => items[index].openLink(context),
                           child: const Text('Delete')
                         );
-                      final Widget trailingWidget = items[index]['link'] == null || items[index]['link'] == '' ? deleteButton : Row(
+                      final Widget trailingWidget = items[index].link == null ? deleteButton : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           TextButton(
@@ -87,8 +64,8 @@ class HomePageState extends State<HomePage> {
                         elevation: 4,
                         shadowColor: Colors.blueGrey,
                         child: ListTile(
-                          title: Text(items[index]['name']),
-                          subtitle: items[index]['content'] != null ? Text(items[index]['content']) : null,
+                          title: Text(items[index].name),
+                          subtitle: items[index].getContent != null ? Text(items[index].getContent) : null,
                           trailing: trailingWidget
                         ),
                       );
@@ -114,12 +91,12 @@ class HomePageState extends State<HomePage> {
                         elevation: 10.0,
                         shadowColor: Colors.blueGrey,
                         child: ListTile(
-                          title: Text(subgroups[index]['name']),
-                          subtitle: Text(subgroups[index]['text']),
+                          title: Text(subgroups[index].name),
+                          subtitle: Text(subgroups[index].getText),
                           leading: const Icon(Icons.group),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (ctx) => Subgroup(name: subgroups[index]['name'], tag: subgroups[index]['tag'], role: subgroups[index]['rank'])),
+                            MaterialPageRoute(builder: (ctx) => Subgroup(name: subgroups[index].name, tag: subgroups[index].tag, role: subgroups[index].role)),
                           ),
                         ),
                       );
