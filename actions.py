@@ -292,18 +292,19 @@ class SparkClub():
             return False
     
     def _sendAPIRequest(self, method, endpoint, data=None, headers=None):
-        cookies = {}
-        if(self.account["loggedIn"]):
-            cookies["session"] = self.account["token"]
-            print(self.account["token"])
-        res = requests.request(method, "https://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
-        
-        if(res.status_code != 200):
+        try:
+            cookies = {}
+            if(self.account["loggedIn"]):
+                cookies["session"] = self.account["token"]
+                print(self.account["token"])
+            res = requests.request(method, "https://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
+            
+            if(res.status_code != 200):
+                MDApp.get_running_app().root.show_error("Error Code: " + str(res.status_code))
+            data = res.json()
+            return {"status": res.status_code, "data": data}
+        except:
             MDApp.get_running_app().root.show_error("Error Code: " + str(res.status_code))
-        data = res.json()
-        
-        
-        
-        return {"status": res.status_code, "data": data}
+            return {}
         
     

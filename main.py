@@ -111,11 +111,18 @@ def toggle_message_box(show):
     MDApp.get_running_app().root.ids.message_box.pos_hint = {'center_x': 0.5, 'center_y': 0.5 if show else 10}
 
 
+
+
+
+    
+def changeTitleVisibility(show):
+    fadeto(MDApp.get_running_app().root.ids.title_card, 1 if show else 0, 0.1)
+
 def changePage(page):
     MDApp.get_running_app().root.ids.window_manager.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.ids.window_manager.current = page
     if(page == "landing"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Landing Page"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Landing Page"
         x = threading.Thread(target = MDApp.get_running_app().root.ids.landingpage.addItems, args = (), daemon=True)
         x.start()
         
@@ -125,36 +132,50 @@ def changePage(page):
         MDApp.get_running_app().root.ids.content_drawer.trigger_login()
         
     elif(page == "actions"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Actions"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Actions"
         Clock.schedule_once(MDApp.get_running_app().root.ids.actionspage.addItems, 0)
     elif(page == "subgroup"):
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 0.5}  
         
         x = threading.Thread(target = MDApp.get_running_app().root.ids.subgrouppage.subgroupInfo, args = (), daemon=True)
         x.start()
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Subgroup (" + subgroup + ")"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Subgroup (" + subgroup + ")"
         
     elif(page == "login"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "You Shouldn't See This..."
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "You Shouldn't See This..."
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 10}
         SCI.logout()
     elif(page == "error"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "You Shouldn't See This..."
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "You Shouldn't See This..."
         MDApp.get_running_app().root.ids.nav_bar.pos_hint = {'center_x': 0.5, 'center_y': 10}
     elif(page == "account"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "My Account"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "My Account"
         MDApp.get_running_app().root.ids.accountpage.setup()
     elif(page == "attendance"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Meeting Schedule"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Meeting Schedule"
         MDApp.get_running_app().root.ids.attendancepage.show()
     elif(page == "meeting"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Specific Meeting"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Specific Meeting"
         MDApp.get_running_app().root.ids.meetingpage.init()
     elif(page == "cable"):
-        MDApp.get_running_app().root.ids.nav_bar_title.title = "Communications"
+        MDApp.get_running_app().root.ids.nav_bar_title.text = "Communications"
         MDApp.get_running_app().root.ids.cablepage.init()
     
         
+pageScrollers = {}
+
+def checkScroll(b):
+    try:
+        
+        changeTitleVisibility(pageScrollers[MDApp.get_running_app().root.ids.window_manager.current].scroll_y > 0.90)
+    except:
+        if(MDApp.get_running_app().root.ids.window_manager.current == "cable"):
+            changeTitleVisibility(True)
+        else:
+            changeTitleVisibility(False)
+        pass
+
+Clock.schedule_interval(checkScroll, 0.1)
 
 def getLandingPageItems():
     Clock.schedule_once(lambda x : toggle_message_box(True), 0)
@@ -753,7 +774,7 @@ class Login(Screen):
         MDApp.get_running_app().root.ids.action_box.show()
         
         pass
-        
+    
     def getColor(self, name):
         return COLORS[name.lower()]
     def goToTempLogin(self):
@@ -868,7 +889,8 @@ class Attendance(Screen):
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
     
     def show(self):
-        
+        global pageScrollers
+        pageScrollers["attendance"] = self.ids.scroller
         x = threading.Thread(target = self.getItems, args = (), daemon=True)
         x.start()
     
@@ -1154,6 +1176,7 @@ class Error(Screen):
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
+    
     def removeAllElements(self):
         rows = [i for i in self.ids.all_items.children]
         for r in rows:
@@ -1181,6 +1204,9 @@ class Landing(Screen):
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
+        
+        
+        
         #print(data)
         x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
         x.start()
@@ -1190,10 +1216,12 @@ class Landing(Screen):
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("landing"), 0)
     def showItems(self, r):
+        global pageScrollers
+        pageScrollers["landing"] = self.ids.scroller
+        
         self.removeAllElements()
         #self.ids.all_items.rows = 9
-        self.ids.all_items.add_widget(EmptySpace())
-        self.ids.all_items.add_widget(EmptySpace())
+        
         
         
         admin = SCI.permissionCheck(["ADMIN_LANDING"])
@@ -1373,6 +1401,8 @@ class Account(Screen):
         self.ids.account_role.text = me['access']["role"].upper()
         
     def setup(self):
+        global pageScrollers
+        pageScrollers["account"] = self.ids.scroller
         x = threading.Thread(target=self.getMe, daemon=True)
         x.start()
     def showResetPassword(self,d):
@@ -1429,6 +1459,8 @@ class Cable(Screen):
         Clock.schedule_once(lambda x: toggle_message_box(False), 0)
         Clock.schedule_once(lambda x: self.showMessages(items, users, subgroups), 0)
     def init(self):
+        
+        
         if(not "chat" in self.__dict__):
             self.chat = "ALL"
         
@@ -1530,6 +1562,8 @@ class Subgroup(Screen):
         Clock.schedule_once(lambda x: self.setup(r, m, u, l), 0)
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
     def setup(self, sgD, meetings, users, items):
+        global pageScrollers
+        pageScrollers["subgroup"] = self.ids.scroller
         sg = sgD[0]
         
         self.ids.tag.text = ("• " if (sgD[1]) else "" ) + sg["tag"]

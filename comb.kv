@@ -100,18 +100,59 @@ MainScreen:
                             id: errorpage
                         Cable:
                             id: cablepage
-                    StackLayout:
+                    FloatLayout:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
-                        MDToolbar:
-                            title: "Landing Page"
-                            id: nav_bar_title
-                            elevation: '4dp'
-                            font_size: '16sp'
-                            left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
-                            #right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
-                            md_bg_color: root.getColor('primary')
-                            color: root.getColor('secondary')
+                        MDCard:
+                            md_bg_color: root.getColor("primary")
+                            radius: menu_button.height/2
+                            size_hint_y: None
+                            height: menu_button.height
+                            size_hint_x: None
+                            elevation: "2dp"
+                            width: "200dp"
+                            id: title_card
+                            padding: (menu_button.width, "0dp", "0dp", "0dp")
+                            pos_hint: {'x': .02, 'top': .98}
+                            FloatLayout:
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+
+                                Label:
+                                    text: "Landing Page"
+                                    id: nav_bar_title
+                                    font_name: 'Roboto'
+                                    font_size: '12sp'
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                    size_hint_y: None
+                                    color: root.getColor('white')
+                                    bold: True
+                                    halign: 'left'
+                                    valign: 'middle'
+                        MDIconButton:
+                            icon: 'menu'
+                            id: menu_button
+                            size_hint_x: None
+                            pos_hint: {'x': .02, 'top': .98}
+
+                            md_bg_color: root.getColor("primary")
+                            theme_text_color: "Custom"
+                            text_color: root.getColor('white')
+                            
+                            width: "20dp"
+                            height: "20dp"
+                            padding: "2dp"
+                            on_release: nav_drawer.set_state("open")
+
+                        
+                        # MDToolbar:
+                        #     title: "Landing Page"
+                        #     id: nav_bar_title
+                        #     elevation: '4dp'
+                        #     font_size: '16sp'
+                        #     left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
+                        #     #right_action_items: [['arrow-top-left-thin-circle-outline', lambda x: print("hello")]]
+                        #     md_bg_color: root.getColor('primary')
+                        #     color: root.getColor('secondary')
                     MessageBox:
                         id: message_box
                         pos_hint: {'center_x': .5, 'center_y': 10}
@@ -708,7 +749,7 @@ MainScreen:
     name: "cable"
     padding: '40dp'
     StackLayout:
-        padding: ("0dp", "70dp", "0dp", "0dp")
+        padding: ("0dp", "60dp", "0dp", "0dp")
         FloatLayout:
             size_hint_y: .1
             padding: '20dp'
@@ -780,6 +821,7 @@ MainScreen:
         do_scroll_x: False
         do_scroll_y: True
         pos_hint: {'center_x': .5, 'center_y': .5}
+        id: scroller
         StackLayout:
             padding: ("0dp", "80dp", "0dp", "0dp")
             size_hint_y: None
@@ -1135,7 +1177,7 @@ MainScreen:
         orientation: 'vertical'
         md_bg_color: root.getColor('white')
         id: card
-        width: '300dp'
+        width: '250dp'
         height: card_content.height
         StackLayout:
             id: card_content
@@ -1171,7 +1213,7 @@ MainScreen:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .8
+        size_hint_x: .9
         size_hint_y: None
         id: card
         md_bg_color: root.getColor('white')
@@ -1216,7 +1258,7 @@ MainScreen:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .8
+        size_hint_x: .9
         size_hint_y: None
         orientation: 'vertical'
         md_bg_color: root.getColor('white')
@@ -1432,7 +1474,7 @@ MainScreen:
                 height: temp_contents.height
                 StackLayout:
                     id: temp_contents
-                    pos_hint: {'center_x': .5, 'center_y': 1}
+                    pos_hint: {'center_x': .5, 'center_y': .9}
                     size_hint_y: None
                     size_hint_x: .8
                     height: self.minimum_height
@@ -1494,12 +1536,14 @@ MainScreen:
             size: self.size
     
     ScrollView:
+        id: scroller
         do_scroll_x: False
         do_scroll_y: True
         pos_hint: {'center_x': .5, 'center_y': .5}
         StackLayout:
             size_hint_y: None
             spacing: '12dp'
+            padding: ("0dp", "60dp", "0dp", "0dp")
             id: all_items
             height: self.minimum_height
                 
@@ -1510,41 +1554,56 @@ MainScreen:
         radius: '12dp'
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .8
+        size_hint_x: .9
         size_hint_y: None
         orientation: 'vertical'
         md_bg_color: root.getColor('white')
         id: card
-        height: contents.height
-        GridLayout:
-            rows: 1
+        height: contents.height+10
+        FloatLayout:
+            pos_hint: {'center_x': .5, 'center_y': .5}
             size_hint_y: None
-            id: contents
-            height: self.minimum_height
-            Label:
-                text: 'A Meeting'
-                id: meeting_title
-                font_name: 'Roboto'
-                font_size: '12sp'
+            GridLayout:
+                rows: 1
                 size_hint_y: None
-                color: root.getColor('secondary')
-                halign: 'left'
-                bold: True
-            Label:
-                text: '8/17 @ 8:30PM'
-                id: meeting_datetime
-                font_name: 'Roboto'
-                font_size: '12sp'
-                size_hint_y: None
-                color: root.getColor('secondary')
-                halign: 'left'
-            MDIconButton:
-                icon: 'magnify'
-                id: meeting_status
-                size_hint_x: None
-                theme_text_color: "Custom"
-                font_size: '16sp'
-                text_color: root.getColor('secondary')
+                size_hint_x: .95
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                id: contents
+                height: self.minimum_height
+                FloatLayout:
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    Label:
+                        text: 'A Meeting'
+                        id: meeting_title
+                        font_name: 'Roboto'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_size: '12sp'
+                        size_hint_y: None
+                        color: root.getColor('secondary')
+                        halign: 'left'
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        bold: True
+                FloatLayout:
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    Label:
+                        text: '8/17 @ 8:30PM'
+                        id: meeting_datetime
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_name: 'Roboto'
+                        font_size: '12sp'
+                        size_hint_y: None
+                        color: root.getColor('secondary')
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        halign: 'left'
+                MDIconButton:
+                    icon: 'magnify'
+                    id: meeting_status
+                    size_hint_x: None
+                    theme_text_color: "Custom"
+                    font_size: '16sp'
+                    text_color: root.getColor('secondary')
 
 
     
@@ -1561,8 +1620,9 @@ MainScreen:
         do_scroll_x: False
         do_scroll_y: True
         pos_hint: {'center_x': .5, 'center_y': .5}
+        id: scroller
         StackLayout:
-            padding: ('0dp', '80dp', '0dp', '0dp')
+            padding: ('0dp', '60dp', '0dp', '0dp')
             size_hint_y: None
             spacing: '12dp'
             id: all_items
@@ -1642,9 +1702,10 @@ MainScreen:
     ScrollView:
         do_scroll_x: False
         do_scroll_y: True
+        id: scroller
         pos_hint: {'center_x': .5, 'center_y': .5}
         StackLayout:
-            padding: ('0dp', '80dp', '0dp', '0dp')
+            padding: ('0dp', '60dp', '0dp', '0dp')
             size_hint_y: None
             spacing: '12dp'
             id: all_items
@@ -1802,7 +1863,7 @@ MainScreen:
     ScrollView:
         do_scroll_x: False
         do_scroll_y: True
-        
+        id: scroller
         pos_hint: {'center_x': .5, 'center_y': .5}
         StackLayout:
             size_hint_y: None
