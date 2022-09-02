@@ -63,7 +63,6 @@ icons_item = {
             "view-list": ["Home", "landing"],
             "checkbox-marked-circle-outline": ["Meetings", "attendance"],
             "forum": ["Communications", "cable"],
-            "list-status": ["Settings", "actions"],
             "account-circle": ["My Account", "account"]
         }
 class ItemDrawer(OneLineIconListItem):
@@ -121,6 +120,10 @@ def changeTitleVisibility(show):
 def changePage(page):
     MDApp.get_running_app().root.ids.window_manager.transition = t.RiseInTransition(duration=.3)
     MDApp.get_running_app().root.ids.window_manager.current = page
+    try:
+        pageScrollers[MDApp.get_running_app().root.ids.window_manager.current].scroll_y = 1
+    except:
+        pass
     if(page == "landing"):
         MDApp.get_running_app().root.ids.nav_bar_title.text = "Landing Page"
         x = threading.Thread(target = MDApp.get_running_app().root.ids.landingpage.addItems, args = (), daemon=True)
@@ -160,11 +163,14 @@ def changePage(page):
     elif(page == "cable"):
         MDApp.get_running_app().root.ids.nav_bar_title.text = "Communications"
         MDApp.get_running_app().root.ids.cablepage.init()
+
+        
     
         
 pageScrollers = {}
 
 def checkScroll(b):
+    
     try:
         
         changeTitleVisibility(pageScrollers[MDApp.get_running_app().root.ids.window_manager.current].scroll_y > 0.90)
@@ -590,7 +596,7 @@ class InputBox(FloatLayout):
                 multiline = b["multiline"]
                 protected = b["protected"]
                 id = "form" + str(n)
-                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_size="12sp", font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1))
+                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_size="12sp", font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1), max_height="100dp")
                 i.bind(text=self.changeText)
                 i.line_color_focus = self.getColor('primary')
                 self.items[str(n)] = i
@@ -599,7 +605,7 @@ class InputBox(FloatLayout):
                 hint = b["hint"]
                 color = b["color"]
                 options = b["options"]
-                
+                icons = b["icons"]
                 
                 items = []
                 
@@ -781,10 +787,15 @@ class Login(Screen):
         #print("Go to temp login")
         self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
         self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+    def goToCreate(self):
+        #print("Go to temp login")
+        self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
     def goToLogin(self):
         #print("Go to temp login")
         self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
         self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def usernameChange(self):
         self.ids.username.icon_right = ""
         if(self.ids.username.text == ""):
@@ -819,6 +830,11 @@ class Login(Screen):
             return
         self.ids.temp_code.disabled = False
         fadeto(self.ids.temp_code, 1, 0.25)
+    def createPageInputChange(self):
+        if(self.ids.create_username.text != "" and self.ids.create_fullname.text != "" and self.ids.create_email.text != "" and self.ids.create_external_id.text != "" and self.ids.create_password.text != "" and "@" in self.ids.create_email.text):
+            self.ids.create_submit.disabled = False
+        else:
+            self.ids.create_submit.disabled = True
     def externalIDChange(self):
         if(self.ids.external_id.text == ""):
             self.ids.external_submit.disabled = True
@@ -832,6 +848,31 @@ class Login(Screen):
     def externalSubmit(self):
         externalId = self.ids.external_id.text
         x = threading.Thread(target = self.apiExternalSubmit, args = (externalId,), daemon=True)
+        x.start()
+    def apiCreateAccount(self, u, fn, e, eid, pw):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        res = SCI.try_create_account(u, fn, e, eid, pw)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : self.handleCreateAccount(res), 0)
+    def handleCreateAccount(self, res):
+        if(res[0] == True):
+            Clock.schedule_once(lambda x: changePage(initialPage), 0)
+            MDApp.get_running_app().setUserId(SCI.account['id'], SCI.account['username'])
+        else:
+            try:
+                if(platform == "android" or platform == "ios"):
+                    vibrator.vibrate(0.2)
+            except:
+                pass
+            MDApp.get_running_app().root.ids.action_box.addData("Error Creating Account", res[1]["message"], [])
+            MDApp.get_running_app().root.ids.action_box.show()
+    def createSubmit(self):
+        username = self.ids.create_username.text
+        fullname = self.ids.create_fullname.text
+        email = self.ids.create_email.text
+        external_id = self.ids.create_external_id.text
+        password = self.ids.create_password.text
+        x = threading.Thread(target = self.apiCreateAccount, args = (username, fullname, email, external_id, password,), daemon=True)
         x.start()
         
         
@@ -1200,7 +1241,7 @@ class Landing(Screen):
             {"hint":"Title","multiline":False,"protected":False, "type":"input"},
             {"hint":"Contents","multiline":True,"protected":False, "type":"input"},
             {"hint":"Link To (optional)","multiline":False,"protected":False, "type":"input"},
-            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "alert-circle"], "type":"dropdown"}
+            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "bookmark", "basketball", "check", "fire", "information"], "icons":["star", "bookmark", "basketball", "check", "fire", "information"], "type":"dropdown"}
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
@@ -1539,7 +1580,7 @@ class Subgroup(Screen):
             {"hint":"Title","multiline":False,"protected":False, "type":"input"},
             {"hint":"Contents","multiline":True,"protected":False, "type":"input"},
             {"hint":"Link To (optional)","multiline":False,"protected":False, "type":"input"},
-            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "alert-circle"], "type":"dropdown"}
+            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "bookmark", "basketball", "check", "fire", "information"], "type":"dropdown"}
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
@@ -1900,4 +1941,5 @@ class Main(MDApp):
         x.start()
     
 Window.fullscreen = False
+Window.softinput_mode = "below_target"
 Main().run()

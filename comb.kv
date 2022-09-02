@@ -104,7 +104,7 @@ MainScreen:
                         id: nav_bar
                         pos_hint: {'center_x': 0.5, 'center_y': 10}
                         MDCard:
-                            md_bg_color: root.getColor("primary")
+                            md_bg_color: root.getColor("secondary")
                             radius: menu_button.height/2
                             size_hint_y: None
                             height: menu_button.height
@@ -134,7 +134,7 @@ MainScreen:
                             size_hint_x: None
                             pos_hint: {'x': .02, 'top': .98}
 
-                            md_bg_color: root.getColor("primary")
+                            md_bg_color: root.getColor("secondary")
                             theme_text_color: "Custom"
                             text_color: root.getColor('white')
                             
@@ -379,6 +379,7 @@ MainScreen:
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    height: buttons.height
                     GridLayout:
                         rows: 1
                         id: buttons
@@ -444,9 +445,10 @@ MainScreen:
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    height: buttons2.height
                     GridLayout:
                         rows: 1
-                        id: buttons
+                        id: buttons2
                         size_hint_y: None
                         size_hint_x: None
                         width: self.minimum_width
@@ -488,6 +490,7 @@ MainScreen:
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    height: defaultbuttons.height
                     GridLayout:
                         rows: 1
                         id: defaultbuttons
@@ -1429,9 +1432,9 @@ MainScreen:
                         
                     FloatLayout:
                         spacing: '20dp'
+                        size_hint_y: None
                         GridLayout:
                             rows: 1
-                            cols: 2
                             row_default_height: '48dp'
                             row_force_default: True
                             size_hint_y: None
@@ -1448,6 +1451,14 @@ MainScreen:
                                 disabled_color: root.getColor('white')
                                 color: root.getColor('white')
                                 on_release: root.submitForm()
+                            MDFillRoundFlatButton:
+                                text: "Create"
+                                id: login_button
+                                md_bg_color: root.getColor('secondary')
+                                disabled_md_bg_color: root.getColor('secondary')
+                                disabled_color: root.getColor('white')
+                                color: root.getColor('white')
+                                on_release: root.goToCreate()
                             MDFillRoundFlatButton:
                                 text: "External Sign In"
                                 md_bg_color: root.getColor('gray')
@@ -1514,16 +1525,157 @@ MainScreen:
                     FloatLayout:
                         size_hint_y: None
                         padding: '20dp'
-                        MDFillRoundFlatButton:
-                            text: "Try to Sign In"
+                        GridLayout:
+                            rows: 1
+                            row_default_height: '48dp'
+                            row_force_default: True
+                            size_hint_y: None
+                            size_hint_x: None
+                            width: self.minimum_width
+                            height: self.minimum_height
                             pos_hint: {'center_x': .5, 'center_y': .5}
-                            id: external_submit
-                            md_bg_color: root.getColor('primary')
-                            disabled_md_bg_color: root.getColor('primary')
-                            disabled_color: root.getColor('white')
-                            color: root.getColor('white')
-                            disabled: True
-                            on_release: root.externalSubmit()
+                            spacing: 20
+                            MDFillRoundFlatButton:
+                                text: "Try to Sign In"
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                id: external_submit
+                                md_bg_color: root.getColor('primary')
+                                disabled_md_bg_color: root.getColor('primary')
+                                disabled_color: root.getColor('white')
+                                color: root.getColor('white')
+                                disabled: True
+                                on_release: root.externalSubmit()
+                            MDFillRoundFlatButton:
+                                text: "Back"
+                                md_bg_color: root.getColor('gray')
+                                on_release: root.goToLogin()
+                        
+        GridLayout:
+            id: create_page
+            rows: 2
+            padding:'0dp'
+            cols: 1
+            #rows_minimum: '48dp'
+            size_hint_y: None
+            pos_hint: {'center_x': .5, 'center_y': 10}
+            width: '0dp'
+            spacing: 240
+            Image:
+                source: 'assets/lightning.png'
+                size: self.texture_size
+                size_hint_y: None
+                padding: '60dp'
+            
+            FloatLayout:
+                size_hint_y: None
+                padding: '20dp'
+                height: create_contents.height
+                StackLayout:
+                    id: create_contents
+                    pos_hint: {'center_x': .5, 'center_y': .9}
+                    size_hint_y: None
+                    size_hint_x: .8
+                    height: self.minimum_height
+                    padding: '20dp'
+                    MDTextField:
+                        id: create_username
+                        multiline: False
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Username'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.createPageInputChange()
+                    MDTextField:
+                        id: create_fullname
+                        multiline: False
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Full Name'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.createPageInputChange()
+                    MDTextField:
+                        id: create_email
+                        multiline: False
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Email'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.createPageInputChange()
+                    MDTextField:
+                        id: create_external_id
+                        multiline: False
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Student ID'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.createPageInputChange()
+                    MDTextField:
+                        id: create_password
+                        multiline: False
+                        password: True
+                        icon_right_color: root.getColor('primary')
+                        line_color_focus: root.getColor('primary')
+                        active_line: True
+                        hint_text: 'Password'
+                        pos_hint: {'center_x': 0.5}
+                        font_name: 'Roboto'
+                        border: (2,2,2,2)
+                        border_color: 0,0,0,1
+                        spacing: (20,20,20,20)
+                        padding: (20,20,20,20)
+                        on_text: root.createPageInputChange()
+                    FloatLayout:
+                        size_hint_y: None
+                        padding: '20dp'
+                        GridLayout:
+                            rows: 1
+                            row_default_height: '48dp'
+                            row_force_default: True
+                            size_hint_y: None
+                            size_hint_x: None
+                            width: self.minimum_width
+                            height: self.minimum_height
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            spacing: 20
+                            MDFillRoundFlatButton:
+                                text: "Create Account"
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                id: create_submit
+                                md_bg_color: root.getColor('primary')
+                                disabled_md_bg_color: root.getColor('primary')
+                                disabled_color: root.getColor('white')
+                                color: root.getColor('white')
+                                disabled: True
+                                on_release: root.createSubmit()
+                            MDFillRoundFlatButton:
+                                text: "Back"
+                                md_bg_color: root.getColor('gray')
+                                on_release: root.goToLogin()
+                        
 
                         
 <Landing>:
@@ -1543,7 +1695,7 @@ MainScreen:
         StackLayout:
             size_hint_y: None
             spacing: '12dp'
-            padding: ("0dp", "60dp", "0dp", "0dp")
+            padding: ("0dp", "80dp", "0dp", "0dp")
             id: all_items
             height: self.minimum_height
                 
@@ -1622,7 +1774,7 @@ MainScreen:
         pos_hint: {'center_x': .5, 'center_y': .5}
         id: scroller
         StackLayout:
-            padding: ('0dp', '60dp', '0dp', '0dp')
+            padding: ('0dp', '80dp', '0dp', '0dp')
             size_hint_y: None
             spacing: '12dp'
             id: all_items

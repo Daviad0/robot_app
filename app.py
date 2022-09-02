@@ -57,7 +57,7 @@ class widget_1(App):
         # closeButton.bind(on_press = popup.dismiss)   
         
         cookies = {'session': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhdmlhZG8iLCJncm91cCI6InRlc3RpbmctZW52IiwiaWQiOiI2MjdiMjM0NDg5ZTE3ODFhNGM1MjQxMzIiLCJpYXQiOjE2NTMwOTc3NjIsImV4cCI6MTY1MzE4NDE2Mn0.BuFPwXiij3E055fgmFCA3Da1-Gl8PDbukcymeJ9R9d0'}
-        headers = {'Content-Type': 'application/json', "group" : "testing-env"}
+        headers = {'Content-Type': 'application/json', "group" : "lightning-robotics"}
         UrlRequest("http://sparkclub.azurewebsites.net/group/items",req_headers=headers, debug=True, on_success = self.webReqSuccess, on_failure = self.webReqFail, on_error=self.webReqFail, timeout=2)
         
 

@@ -6,7 +6,7 @@ import requests
 import os
 
 path = ""
-group = "testing-env"
+group = "lightning-robotics"
 
 class SparkClub():
     def __init__(self):
@@ -237,8 +237,29 @@ class SparkClub():
             return True
         else:
             return False
+    def try_create_account(self, username, fullname, email, externalId, password):
+        if self.account["loggedIn"]:
+            return False
+        res = self._sendAPIRequest('POST', '/acc/create', data={"username": username, "fullname": fullname, "email": email, "externalId": externalId, "password": password, "group": group})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            
+            self.account["loggedIn"] = True
+            self.account["token"] = data["token"]
+            self.account["permissions"] = data["user"]["permissions"]
+            self.account["username"] = data["user"]["username"]
+            self.account["email"] = data["user"]["email"]
+            self.account["subgroups"] = data["user"]["access"]["groups"]
+            self.account["role"] = data["user"]["access"]["role"]
+            self.account["id"] = data["user"]["id"]
+            self.storage.put("prev", account=self.account)
+            
+            
+            return (True, data)
+        else:
+            return (False, data)
     def try_external_login(self, externalId):
-        if not self.account["loggedIn"]:
+        if self.account["loggedIn"]:
             return False
         
         res = self._sendAPIRequest('POST', '/group/today/anon', data={"externalId": externalId, "group": group})
