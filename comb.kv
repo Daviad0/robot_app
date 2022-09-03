@@ -110,7 +110,7 @@ MainScreen:
                             height: menu_button.height
                             size_hint_x: None
                             elevation: "2dp"
-                            width: "200dp"
+                            width: "220dp"
                             id: title_card
                             padding: (menu_button.width, "0dp", "0dp", "0dp")
                             pos_hint: {'x': .02, 'top': .98}
@@ -288,8 +288,9 @@ MainScreen:
                 FloatLayout:
                     size_hint_y: None
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    height: buttons.height
                     GridLayout:
-                        cols: 1
+                        cols: 2
                         id: buttons
                         size_hint_y: None
                         size_hint_x: None
@@ -532,7 +533,7 @@ MainScreen:
         radius: "10dp"
         elevation: '4dp'
         pos_hint: {'center_x': .5, 'center_y': .5}
-        size_hint_x: .8
+        size_hint_x: .9
         size_hint_y: None
         md_bg_color: root.getColor('white')
         height: action_box_layout.height
@@ -786,6 +787,7 @@ MainScreen:
                 spacing:"10dp"
                 FloatLayout:
                     size_hint_y: None
+                    height: create_message.height
                     MDTextField:
                         pos_hint: {'center_x': .5, 'center_y': .5}
                         line_color_focus: root.getColor('primary')
@@ -794,7 +796,7 @@ MainScreen:
                         active_line:True
                         id: create_message
                         hint_text:"Your Message"
-                        font_size:"12sp"
+                        
                         font_name: 'Roboto'
                         border:(2,2,2,2)
                         padding:"20dp"
@@ -1378,7 +1380,7 @@ MainScreen:
             #rows_minimum: '48dp'
             size_hint_y: None
             pos_hint: {'center_x': .5, 'center_y': .75}
-            spacing: 260
+            spacing: 280
             Image:
                 source: 'assets/lightning.png'
                 size: self.texture_size
@@ -1969,6 +1971,14 @@ MainScreen:
             Label:
                 text: 'Currently Excused'
                 id: status_current
+                font_name: 'Roboto'
+                font_size: '12sp'
+                size_hint_y: None
+                color: root.getColor('secondary')
+                halign: 'center'
+            Label:
+                text: 'No Request Change'
+                id: status_request
                 font_name: 'Roboto'
                 font_size: '12sp'
                 size_hint_y: None

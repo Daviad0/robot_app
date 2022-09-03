@@ -69,6 +69,8 @@ class ItemDrawer(OneLineIconListItem):
     icon = StringProperty()
     text_color = ListProperty((0, 0, 0, 1))
     def clickItem(self):
+        global inPopup
+        inPopup = False
         if(icons_item[self.icon][1] == "login"):
             MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "You will have to re-enter your username and password to access the app again!", [{"name": "Sign Out", "color": "red"}], self.signOut)
             MDApp.get_running_app().root.ids.action_box.show()
@@ -316,6 +318,9 @@ class Meeting(Screen):
         self.ids.meeting_description.text = tM['description']
         self.ids.meeting_attending.text = fs
         self.ids.statuses.clear_widgets()
+        f = "%Y-%m-%dT%H:%M:%S.%fZ"
+        now = datetime.now()
+        dout = datetime.strptime(tM["datetime"], f)
         for user in useUsers:
             
             attendanceItem = None
@@ -331,7 +336,24 @@ class Meeting(Screen):
             mS.uid = user["id"]
             
             if(not attendanceItem == None):
-                mS.init(attendanceItem["overriddenstatus"])
+                
+                request = None
+            
+                if("requests" in attendanceItem):
+                    for r in attendanceItem["requests"]:
+                        if(r["requester"] == user["id"]):
+                            request = r
+                            break
+                
+                
+                
+                mS.init(attendanceItem["overriddenstatus"], request["final"] if request != None else "", dout > now)
+                
+                if(request != None):
+                    mS.ids.status_request.text = "Requesting " + request["final"]
+                    mS.ids.status_request.color = self.getColor("red")
+                else:
+                    mS.ids.content.remove_widget(mS.ids.status_request)
                 
                 if(attendanceItem["status"] != ""):
                     mS.ids.status_current.text = "Currently " + attendanceItem["status"]
@@ -339,7 +361,7 @@ class Meeting(Screen):
                     mS.ids.status_current.text = "Currently *" + attendanceItem["overriddenstatus"]
             else:
                 mS.ids.status_current.text = "No Record..."
-                mS.init("")
+                mS.init("", "", dout > now)
             
             mS.ids.status_member.text = user['username']
             
@@ -596,7 +618,7 @@ class InputBox(FloatLayout):
                 multiline = b["multiline"]
                 protected = b["protected"]
                 id = "form" + str(n)
-                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_size="12sp", font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1), max_height="100dp")
+                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1), max_height="100dp")
                 i.bind(text=self.changeText)
                 i.line_color_focus = self.getColor('primary')
                 self.items[str(n)] = i
@@ -735,17 +757,20 @@ class MemberStatus(FloatLayout):
     def reAddButtons(self):
         self.ids.status_buttons.clear_widgets()
         
-        attend = MDIconButton(icon="account-check", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('success' if self.chosen.lower() == "attend" else "lightgray"), on_release=lambda x: self.selectStatus("attend"), font_size="12sp", padding="12dp")
-        excused = MDIconButton(icon="minus", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('gray' if self.chosen.lower() == "excused" else "lightgray"), on_release=lambda x: self.selectStatus("excused"), font_size="12sp", padding="12dp")
-        absent = MDIconButton(icon="alert-circle", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('red' if self.chosen.lower() == "absent" else "lightgray"), on_release=lambda x: self.selectStatus("absent"), font_size="12sp", padding="12dp")
+        attend = MDIconButton(icon="account-check", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('success' if self.chosen.lower() == "attend" else ("orange" if self.requested.lower() == "attend" else "lightgray")), on_release=lambda x: self.selectStatus("attend"), font_size="12sp", padding="12dp")
+        excused = MDIconButton(icon="minus", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('gray' if self.chosen.lower() == "excused" else ("orange" if self.requested.lower() == "excused" else "lightgray")), on_release=lambda x: self.selectStatus("excused"), font_size="12sp", padding="12dp")
+        absent = MDIconButton(icon="alert-circle", size_hint_x= None,theme_text_color= "Custom",text_color= self.getColor('white'), md_bg_color= self.getColor('red' if self.chosen.lower() == "absent" else "lightgray"), on_release=lambda x: self.selectStatus("absent"), font_size="12sp", padding="12dp", disabled= self.future)
         
         self.ids.status_buttons.add_widget(attend)
         self.ids.status_buttons.add_widget(excused)
         self.ids.status_buttons.add_widget(absent)
         
 
-    def init(self, initial):
+    def init(self, initial, requested, future):
         self.chosen = initial
+        self.future = future
+        
+        self.requested = requested
         self.reAddButtons()
 
     
@@ -973,14 +998,14 @@ class Attendance(Screen):
             fs += ("[b]"+attending[i]+"[/b]") if bold else attending[i]
             if(i != len(attending) - 1):
                 fs += ", "
-        fs += " are attending this meeting!"
+        fs += " are attending this meeting!" + (" You are expected to attend!" if sgAttending else "")
         
         if(len(attending) < 1):
             fs = "No one is attending this meeting yet!"
         
         buttons = [{"name" : "Show Meeting Page", "color": "primary"}]
         if(sgAttending):
-            buttons.append({"name": "Request 'EXCUSED' Status", "color": "primary"})
+            buttons.append({"name": "Request EXCUSED", "color": "primary"})
         
         MDApp.get_running_app().root.ids.action_box.addData(m['title'], m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, buttons, self.handleUpcomingOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
@@ -1071,8 +1096,8 @@ class Attendance(Screen):
 
         buttons = [{"name" : "Show Meeting Page", "color": "primary"}]
         if(not m['_id'] in self.userAttended and sgAttending):
-            buttons.append({"name": "Request 'ATTENDED' Status", "color": "success"})
-            buttons.append({"name": "Request 'EXCUSED' Status", "color": "primary"})
+            buttons.append({"name": "Request ATTENDED", "color": "success"})
+            buttons.append({"name": "Request EXCUSED", "color": "primary"})
         
         MDApp.get_running_app().root.ids.action_box.addData(m['title'] + " (Past)", m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, buttons, self.handlePastOverlay)
         MDApp.get_running_app().root.ids.action_box.show()
@@ -1124,32 +1149,11 @@ class Attendance(Screen):
         for a in me['attendance']:
             attended.append(a["event"])
         self.userAttended = attended
+        mtgs.sort(key=lambda x: datetime.strptime(x["datetime"], f), reverse=True)
         for m in mtgs:
             dout = datetime.strptime(m["datetime"], f)
             
-            if(dout > now):
-                inMeeting = False
-                for a in m["subgroups"]:
-                    if(a in me['access']['groups']):
-                        inMeeting = True
-                        break
-                
-                
-                sMI = SmallMeetingItem()
-                sMI.ids.card.identifier = m['_id']
-                sMI.ids.card.link = "upcoming"
-                sMI.ids.card.bind(on_touch_down = self.triggerOverlay)
-                sMI.ids.meeting_title.text = m['title']
-                sMI.ids.meeting_datetime.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
-                if(inMeeting):
-                    sMI.ids.meeting_status.icon = "calendar-check"
-                    sMI.ids.meeting_status.text_color = self.getColor('success')
-                else:
-                    sMI.ids.meeting_status.icon = "calendar-remove"
-                    sMI.ids.meeting_status.text_color = self.getColor('gray')
-                
-                self.ids.upcomingmeetings.add_widget(sMI)
-            else:
+            if(dout < now):
                 inMeeting = False
                 for a in m["subgroups"]:
                     if(a in me['access']['groups']):
@@ -1172,7 +1176,7 @@ class Attendance(Screen):
                 sMI.ids.card.identifier = m['_id']
                 sMI.ids.card.link = "past"
                 sMI.ids.card.bind(on_touch_down = self.triggerOverlay)
-                sMI.ids.meeting_title.text = m['title']
+                sMI.ids.meeting_title.text = m['title'] if m["title"] != "" else "A Meeting"
                 sMI.ids.meeting_datetime.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
                 
                 if(attendanceItem != None and attendanceItem['overriddenstatus'] != ""):
@@ -1203,8 +1207,38 @@ class Attendance(Screen):
                             sMI.ids.meeting_status.text_color = self.getColor('gray')
                 
                 self.ids.pastmeetings.add_widget(sMI)
+                
+        
+        mtgs.sort(key=lambda x: datetime.strptime(x["datetime"], f))
+        for m in mtgs:
+            dout = datetime.strptime(m["datetime"], f)
+            
+            if(dout > now):
+                inMeeting = False
+                for a in m["subgroups"]:
+                    if(a in me['access']['groups']):
+                        inMeeting = True
+                        break
+                
+                
+                sMI = SmallMeetingItem()
+                sMI.ids.card.identifier = m['_id']
+                sMI.ids.card.link = "upcoming"
+                sMI.ids.card.bind(on_touch_down = self.triggerOverlay)
+                sMI.ids.meeting_title.text = m['title'] if m["title"] != "" else "A Meeting"
+                sMI.ids.meeting_datetime.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
+                if(inMeeting):
+                    sMI.ids.meeting_status.icon = "calendar-check"
+                    sMI.ids.meeting_status.text_color = self.getColor('success')
+                else:
+                    sMI.ids.meeting_status.icon = "calendar-remove"
+                    sMI.ids.meeting_status.text_color = self.getColor('gray')
+                
+                self.ids.upcomingmeetings.add_widget(sMI)
+            
         
         
+        pass
         pass
 
 class Error(Screen):
