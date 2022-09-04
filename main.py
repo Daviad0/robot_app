@@ -1663,6 +1663,12 @@ class Subgroup(Screen):
             self.ids.action_button.md_bg_color = self.getColor("primary")
         pass
         
+        if(not self.admin):
+            self.ids.new_item.disabled = True
+            self.ids.new_member.disabled = True
+        else:
+            self.ids.new_item.disabled = False
+            self.ids.new_member.disabled = False
         show = 10 if not self.admin else 20
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         now = datetime.now()

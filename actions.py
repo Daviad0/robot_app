@@ -321,6 +321,7 @@ class SparkClub():
             res = requests.request(method, "https://lr.robosmrt.com" + endpoint, data=data, cookies=cookies, headers=headers)
             
             if(res.status_code != 200):
+                print("ERROR RECIEVED FOR " + endpoint + ": " + str(res.status_code))
                 MDApp.get_running_app().root.show_error("Error Code: " + str(res.status_code))
             data = res.json()
             return {"status": res.status_code, "data": data}
