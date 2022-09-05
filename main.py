@@ -1,7 +1,7 @@
 
 
 from kivy.lang import Builder
-from datetime import datetime
+from datetime import datetime, timedelta
 from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty, BooleanProperty
 # import kivy label
 from kivy.uix.label import Label
@@ -47,6 +47,8 @@ if(platform == "ios"):
     from pyobjus import autoclass, objc_dict
 
 window_size = [600,600]
+def getDSTOffset():
+    return -4
 
 class ContentNavigationDrawer(MDBoxLayout):
     def trigger_login(self):
@@ -281,6 +283,7 @@ class Meeting(Screen):
         
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         dout = datetime.strptime(tM["datetime"], f)
+        dout = dout + timedelta(hours=getDSTOffset())
         
         
         attending = []
@@ -321,6 +324,7 @@ class Meeting(Screen):
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
         now = datetime.now()
         dout = datetime.strptime(tM["datetime"], f)
+        dout = dout + timedelta(hours=getDSTOffset())
         for user in useUsers:
             
             attendanceItem = None
@@ -368,7 +372,7 @@ class Meeting(Screen):
                 mS.ids.status_current.text = "No Record..."
                 mS.init("", request["final"] if request != None else "", dout > now)
             
-            mS.ids.status_member.text = user['username']
+            mS.ids.status_member.text = user['username'] + " (" + user["fullname"] + ")"
             
             self.ids.statuses.add_widget(mS)
         
@@ -542,7 +546,7 @@ class DateTimeBox(FloatLayout):
         #print("Action Performed: " + str(buttonId))
         if(buttonId == 0):
             date = self.ids.y_date.text + "-" + self.ids.m_date.text + "-" + self.ids.d_date.text
-            time = self.ids.h_time.text + ":" + self.ids.m_time.text + ":00"
+            time = str(int(self.ids.h_time.text)-getDSTOffset()) + ":" + self.ids.m_time.text + ":00"
             self.hide()
             inPopup = False
             self.callback(date, time)
@@ -774,7 +778,7 @@ class MemberStatus(FloatLayout):
         
 
     def init(self, initial, requested, future):
-        self.chosen = initial
+        self.chosen = initial.lower()
         self.future = future
         
         self.requested = requested
@@ -784,10 +788,13 @@ class MemberStatus(FloatLayout):
 
 
     def selectStatus(self, type):
-        self.chosen = type
+        if(type == self.chosen):
+            self.chosen = ""
+        else:
+            self.chosen = type
         self.reAddButtons()
             
-        x = threading.Thread(target = self.sendToServer, args = (type,), daemon=True)
+        x = threading.Thread(target = self.sendToServer, args = (self.chosen,), daemon=True)
         x.start()
 
 
@@ -1162,6 +1169,7 @@ class Attendance(Screen):
         mtgs.sort(key=lambda x: datetime.strptime(x["datetime"], f), reverse=True)
         for m in mtgs:
             dout = datetime.strptime(m["datetime"], f)
+            dout = dout + timedelta(hours=getDSTOffset())
             
             if(dout < now):
                 inMeeting = False
@@ -1222,6 +1230,7 @@ class Attendance(Screen):
         mtgs.sort(key=lambda x: datetime.strptime(x["datetime"], f))
         for m in mtgs:
             dout = datetime.strptime(m["datetime"], f)
+            dout = dout + timedelta(hours=getDSTOffset())
             
             if(dout > now):
                 inMeeting = False
@@ -1632,7 +1641,8 @@ class Cable(Screen):
             if(shown < 20):
                 m = items[mI]
                 dout = datetime.strptime(m["datetime"], f)
-                
+                dout = dout + timedelta(hours=getDSTOffset())
+                print(dout.tzinfo)
                 sender = next(x for x in users if x["id"] == m["sender"])
                 nM = MyMessage() if sender["id"] == SCI.account['id'] else Message()
                 nM.ids.contents.text = "[b]" + sender["username"] + "[/b] says on [i]" + str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM") + "[/i]\n\n" + '"' + m["message"] + '"'
@@ -1750,6 +1760,7 @@ class Subgroup(Screen):
             if(show > 0 and (sg["name"] in m["subgroups"] or self.admin)):
 
                 dout = datetime.strptime(m["datetime"], f)
+                dout = dout + timedelta(hours=getDSTOffset())
                 if(dout > now):
                     mI = MeetingItem()
                     mI.ids.card.identifier = m["_id"]
@@ -1858,6 +1869,7 @@ class Subgroup(Screen):
         #print(self.meetings)
         m = next(x for x in self.meetings if x["_id"] == card.identifier)
         dout = datetime.strptime(m["datetime"], f)
+        dout = dout + timedelta(hours=getDSTOffset())
         self.selectedMeeting = m
         
         if(self.admin):
