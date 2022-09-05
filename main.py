@@ -335,15 +335,19 @@ class Meeting(Screen):
             mS = MemberStatus()
             mS.uid = user["id"]
             
-            if(not attendanceItem == None):
-                
-                request = None
+            request = None
             
-                if("requests" in attendanceItem):
-                    for r in attendanceItem["requests"]:
+            if("requests" in tM):
+                for r in tM["requests"]:
+                    try:
                         if(r["requester"] == user["id"]):
                             request = r
                             break
+                    except:
+                        pass
+            
+            if(not attendanceItem == None):
+                
                 
                 
                 
@@ -360,8 +364,9 @@ class Meeting(Screen):
                 else:
                     mS.ids.status_current.text = "Currently *" + attendanceItem["overriddenstatus"]
             else:
+                
                 mS.ids.status_current.text = "No Record..."
-                mS.init("", "", dout > now)
+                mS.init("", request["final"] if request != None else "", dout > now)
             
             mS.ids.status_member.text = user['username']
             
@@ -396,6 +401,7 @@ class ActionBox(FloatLayout):
     def actualHide(self):
         global inPopup
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        inPopup = False
         
     def hide(self):
         #print("HIDE")
@@ -426,7 +432,7 @@ class ActionBox(FloatLayout):
         else:
             self.callback(buttonId)
             self.hide()
-        inPopup = False
+        
         
     
     pass
@@ -591,6 +597,7 @@ class InputBox(FloatLayout):
     def actualHide(self):
         global inPopup
         self.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        inPopup = False
         
     def hide(self):
         #print("HIDE")
@@ -679,7 +686,7 @@ class InputBox(FloatLayout):
         else:
             self.callback(self.data)
             self.hide()
-        inPopup = False
+        
             
     
     pass
@@ -809,18 +816,21 @@ class Login(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
     def goToTempLogin(self):
-        #print("Go to temp login")
-        self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
-        self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+        if(not inPopup):
+            #print("Go to temp login")
+            self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+            self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
     def goToCreate(self):
-        #print("Go to temp login")
-        self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
-        self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+        if(not inPopup):
+            #print("Go to temp login")
+            self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+            self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
     def goToLogin(self):
-        #print("Go to temp login")
-        self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
-        self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
-        self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+        if(not inPopup):
+            #print("Go to temp login")
+            self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            self.ids.temp_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
+            self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
     def usernameChange(self):
         self.ids.username.icon_right = ""
         if(self.ids.username.text == ""):
@@ -1105,9 +1115,9 @@ class Attendance(Screen):
         
         pass
     
-    def sendRequest(self, finalRes):
+    def sendRequest(self, finalRes, useMeeting):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
-        SCI.send_attendance_request(finalRes)
+        SCI.send_attendance_request(finalRes, useMeeting)
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : changePage("attendance"), 0)
     def handleUpcomingOverlay(self, buttonId):
@@ -1117,7 +1127,7 @@ class Attendance(Screen):
             thisMeeting = self.use
             changePage("meeting")
         elif(buttonId == 1):
-            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",), daemon=True)
+            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",self.use), daemon=True)
             x.start()
     def handlePastOverlay(self, buttonId):
         global thisMeeting
@@ -1126,10 +1136,10 @@ class Attendance(Screen):
             thisMeeting = self.use
             changePage("meeting")
         elif(buttonId == 1):
-            x = threading.Thread(target = self.sendRequest, args = ("ATTEND",), daemon=True)
+            x = threading.Thread(target = self.sendRequest, args = ("ATTEND",self.use), daemon=True)
             x.start()
         elif(buttonId == 2):
-            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",), daemon=True)
+            x = threading.Thread(target = self.sendRequest, args = ("EXCUSED",self.use), daemon=True)
             x.start()
     def addItems(self, mtgs, sgs, me):
         f = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -1279,8 +1289,13 @@ class Landing(Screen):
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
     def handleNewItem(self, data):
+        global inPopup
         
-        
+        if(data[0] == "" or data[1] == ""):
+            inPopup = False
+            MDApp.get_running_app().root.ids.action_box.addData("Error", "Please fill out the Title and Contents field!", [], None)
+            MDApp.get_running_app().root.ids.action_box.show()
+            return
         
         #print(data)
         x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
@@ -1459,9 +1474,10 @@ class Account(Screen):
     def getMe(self):
         Clock.schedule_once(lambda x: toggle_message_box(True), 0)
         me = SCI.get_this_user()
+        roles = SCI.get_roles()
         Clock.schedule_once(lambda x: toggle_message_box(False), 0)
-        Clock.schedule_once(lambda x: self.showMe(me), 0)
-    def showMe(self, me):
+        Clock.schedule_once(lambda x: self.showMe(me, roles), 0)
+    def showMe(self, me, roles):
         self.ids.username.text = me["username"]
         self.ids.details_fullname.text = me["fullname"]
         self.ids.details_email.text = me["email"]
@@ -1473,7 +1489,40 @@ class Account(Screen):
         permString = permString[:-2]
         
         self.ids.details_permissions.text = permString
-        self.ids.account_role.text = me['access']["role"].upper()
+        self.ids.role_card_contents.clear_widgets()
+        roleName = me['access']["role"].upper()
+        
+        
+        '''
+        MDCard:
+                    id: role_card
+                    radius: '20dp'
+                    elevation: '2dp'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_y: None
+                    size_hint_x: None
+                    orientation: 'vertical'
+                    md_bg_color: root.getColor('gray')
+                    width: (len(account_role.text)*40) + 40
+                    height: '48dp'
+                    Label:
+                        id: account_role
+                        text: 'STUDENT'
+                        bold: True
+                        font_size: '20dp'
+        '''
+        color = ""
+        try:
+            myrole = next((x for x in roles if x["name"] == me['access']["role"]))
+            color = rgba255to1(hex_to_rgb(myrole["color"]))
+        except:
+            color = self.getColor("gray")
+            pass
+        
+        role_card = MDCard(radius = '20dp', elevation = '2dp', pos_hint = {'center_x': .5, 'center_y': .5}, size_hint_y = None, size_hint_x = None, orientation = 'vertical', md_bg_color = color, width = (len(roleName)*40) + 40, height = '48dp')
+        role_text = Label(text = roleName, bold = True, font_size = '20dp')
+        role_card.add_widget(role_text)
+        self.ids.role_card_contents.add_widget(role_card)
         
     def setup(self):
         global pageScrollers
@@ -1538,6 +1587,9 @@ class Cable(Screen):
         
         if(not "chat" in self.__dict__):
             self.chat = "ALL"
+        self.ids.cable_channel.text = "Announcements - " + self.chat
+        if(self.chat == "ALL"):
+            self.ids.cable_channel.text = "Announcements - Lightning Robotics"
         
         x = threading.Thread(target=self.getItems, daemon=True)
         x.start()
@@ -1595,7 +1647,7 @@ class Cable(Screen):
             pass
     def waitSendMessage(self, msg):
         Clock.schedule_once(lambda x: toggle_message_box(True), 0)
-        SCI.send_message(self.chat, self.chat, msg)
+        SCI.send_message(self.chat=="ALL", self.chat, msg)
         Clock.schedule_once(lambda x: toggle_message_box(False), 0)
         Clock.schedule_once(lambda x: self.init(), 0)
     def sendMessage(self):
@@ -1614,10 +1666,19 @@ class Subgroup(Screen):
             {"hint":"Title","multiline":False,"protected":False, "type":"input"},
             {"hint":"Contents","multiline":True,"protected":False, "type":"input"},
             {"hint":"Link To (optional)","multiline":False,"protected":False, "type":"input"},
-            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "bookmark", "basketball", "check", "fire", "information"], "type":"dropdown"}
+            {"hint":"Select Special Icon","color":self.getColor("primary"),"options":["star", "bookmark", "basketball", "check", "fire", "information"],"icons":[], "type":"dropdown"}
         ], self.handleNewItem)
         MDApp.get_running_app().root.ids.input_box.show()
+    def goToSubgroupChat(self):
+        MDApp.get_running_app().root.ids.cablepage.chat = self.subgroup["name"]
+        changePage("cable")
     def handleNewItem(self, data):
+        global inPopup
+        if(data[0] == "" or data[1] == ""):
+            inPopup = False
+            MDApp.get_running_app().root.ids.action_box.addData("Error", "Please fill out the Title and Contents field!", [], None)
+            MDApp.get_running_app().root.ids.action_box.show()
+            return
         #print(data)
         x = threading.Thread(target = self.createItem, args = (data,), daemon=True)
         x.start()
@@ -1652,15 +1713,9 @@ class Subgroup(Screen):
         inGroup = (sg["name"] in SCI.account["subgroups"])
         if(inGroup):
             self.ids.subgroup_membership.text = "You are a leader of this subgroup" if sgD[1] else "You are a member of this subgroup"
-            self.ids.action_button.text = "Leave Subgroup"
-            self.ids.action_button.md_bg_color = self.getColor("red")
-            self.ids.action_button.disabled = sgD[1]
-            self.ids.action_button.opacity = 0.3 if sgD[1] else 1
             
         else:
             self.ids.subgroup_membership.text = "You are not in this subgroup"
-            self.ids.action_button.text = "Join Subgroup"
-            self.ids.action_button.md_bg_color = self.getColor("primary")
         pass
         
         if(not self.admin):
@@ -1836,14 +1891,13 @@ class Subgroup(Screen):
         SCI.add_user_to_subgroup(uid, self.subgroup["name"])
         Clock.schedule_once(lambda dt: toggle_message_box(False), 0)
         Clock.schedule_once(lambda dt: changePage("subgroup"), 0)
-    def handleAddMember(self, buttonId):
+    def handleAddMember(self, data):
         global inPopup
-        if(buttonId == 0):
-            inPopup = False
-            self.showAddMember()
-            return
-        index = buttonId - 1
-        x = threading.Thread(target = self.addMemberAPI, args = (self.users[index]["id"],), daemon=True)
+        
+        username = data[0]
+        user = next(x for x in self.users if x["username"] == username)
+        
+        x = threading.Thread(target = self.addMemberAPI, args = (user["id"],), daemon=True)
         x.start()
     def showMembersToAdd(self,data):
         global inPopup
@@ -1853,23 +1907,36 @@ class Subgroup(Screen):
         
         listUsers = []
         for x in self.users:
-            if(username in x["username"] and username != ""):
-                listUsers.append(x)
-            elif(fullname in x["fullname"] and fullname != ""):
-                
-                listUsers.append(x)
-            elif(username == "" and fullname == ""):
-                listUsers.append(x)
+            if(not self.subgroup["name"] in x["access"]["groups"]):
+                if(username.lower() in x["username"].lower() and username != ""):
+                    listUsers.append(x)
+                elif(fullname.lower() in x["fullname"].lower() and fullname != ""):
+                    
+                    listUsers.append(x)
+                elif(username == "" and fullname == ""):
+                    listUsers.append(x)
         self.listUsers = listUsers
-        buttons = [{"name" : "Search Again", "color": "red"}]
-        for l in listUsers:
-            buttons.append({"name" : l["username"], "color": "primary"})
-        inPopup = False
-        MDApp.get_running_app().root.ids.action_box.addData("Find User", "Select one of these users from the buttons below, or refine your search!", buttons, self.handleAddMember)
-        MDApp.get_running_app().root.ids.action_box.show()
         
+        dropdownOptions = []
+        for l in listUsers:
+            dropdownOptions.append(l["username"] if username != "" else l["fullname"])
+        inPopup = False
+        print(dropdownOptions)
+        
+        Clock.schedule_once(lambda dt: self.showAgain(dropdownOptions), 0.5)
+    def showAgain(self, dropdownOptions):
+        if(len(dropdownOptions) == 0):
+            MDApp.get_running_app().root.ids.action_box.addData("No Users Found", "We could not find any users based on your search!", [])
+            MDApp.get_running_app().root.ids.action_box.show()
+        else:
+            MDApp.get_running_app().root.ids.input_box.addData("Find User", "Select one of these users from the dropdown below, or try again and edit your search!", [
+                {"hint":"Select Filtered Member","color":self.getColor("primary"),"options":dropdownOptions, "icons":[], "type":"dropdown"}
+                ], self.handleAddMember)
+            MDApp.get_running_app().root.ids.input_box.show()
          
     def showAddMember(self):
+        
+        
         MDApp.get_running_app().root.ids.input_box.addData("Search for Member", "Search for a member that you would like to add to the subgroup!", [
             {"hint":"Username (contains)","multiline":False,"protected":False, "type":"input"},
             {"hint":"Full Name (contains)","multiline":False,"protected":False, "type":"input"}
@@ -1955,7 +2022,8 @@ class Main(MDApp):
             "success": rgba255to1((0, 200, 0,1)),
             "red": rgba255to1((255, 0, 0,1)),
             "green": rgba255to1((0, 255, 0,1)),
-            "blue": rgba255to1((0, 0, 255,1))
+            "blue": rgba255to1((0, 0, 255,1)),
+            "orange": rgba255to1((255, 165, 0,1))
         }
         self.icon = "AppIcons/playstore.png"
         
@@ -1981,5 +2049,4 @@ class Main(MDApp):
         x.start()
     
 Window.fullscreen = False
-Window.softinput_mode = "below_target"
 Main().run()

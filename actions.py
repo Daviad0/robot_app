@@ -111,10 +111,19 @@ class SparkClub():
             return res["data"]["user"]
         else:
             return None
-    def send_attendance_request(self, finalResult):
+    def get_roles(self):
         if not self.account["loggedIn"]:
             return None
-        res = self._sendAPIRequest("POST", "/group/attendance/request", data={"final": finalResult})
+        res = self._sendAPIRequest("GET", "/group/roles")
+        data = res["data"]
+        if(res["status"] == 200):
+            return data["items"]
+        else:
+            return None
+    def send_attendance_request(self, finalResult, useMeeting):
+        if not self.account["loggedIn"]:
+            return None
+        res = self._sendAPIRequest("POST", "/group/attendance/request", data={"final": finalResult, "meetingId" : useMeeting, "uid": self.account["id"]})
         if(res["status"] == 200):
             return res["data"]
         else:

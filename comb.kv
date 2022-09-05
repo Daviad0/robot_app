@@ -875,9 +875,9 @@ MainScreen:
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     spacing: 20
                     MDFillRoundFlatButton:
-                        text: "Join"
-                        id: action_button
-                        on_release: root.showLeaveOverlay()
+                        text: "See Subgroup Chat"
+                        id: chat_button
+                        on_release: root.goToSubgroupChat()
                         md_bg_color: root.getColor('primary')
                         color: root.getColor('white')
 
@@ -1372,31 +1372,33 @@ MainScreen:
     FloatLayout:
         spacing: '10dp'
         padding: '0dp'
-        GridLayout:
+        StackLayout:
             id: login_page
-            rows: 2
             padding:'0dp'
-            cols: 1
             #rows_minimum: '48dp'
             size_hint_y: None
-            pos_hint: {'center_x': .5, 'center_y': .75}
-            spacing: 280
+            height: self.minimum_height
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: "20dp"
             Image:
                 source: 'assets/lightning.png'
-                size: self.texture_size
+                
                 size_hint_y: None
+                size: self.texture_size
+                height: self.texture_size[1]
                 padding: '60dp'
             FloatLayout:
                 size_hint_y: None
                 padding: '60dp'
+                height: form_contents.height
                 GridLayout:
                     rows: 3
+                    id: form_contents
                     cols: 1
                     row_default_height: '36dp'
                     row_force_default: True
                     size_hint_y: None
-                    size_hint_x: None
-                    width: 600
+                    size_hint_x: .8
                     height: self.minimum_height
                     spacing: 40
                     pos_hint: {'center_x': .5, 'center_y': .5}
@@ -1465,20 +1467,21 @@ MainScreen:
                                 text: "External Sign In"
                                 md_bg_color: root.getColor('gray')
                                 on_release: root.goToTempLogin()
-        GridLayout:
+        StackLayout:
             id: temp_page
-            rows: 2
             padding:'0dp'
-            cols: 1
             #rows_minimum: '48dp'
             size_hint_y: None
+            height: self.minimum_height
             pos_hint: {'center_x': .5, 'center_y': 10}
             width: '0dp'
-            spacing: 240
+            spacing: '20dp'
             Image:
                 source: 'assets/lightning.png'
-                size: self.texture_size
+                
                 size_hint_y: None
+                size: self.texture_size
+                height: self.texture_size[1]
                 padding: '60dp'
             
             FloatLayout:
@@ -1487,7 +1490,7 @@ MainScreen:
                 height: temp_contents.height
                 StackLayout:
                     id: temp_contents
-                    pos_hint: {'center_x': .5, 'center_y': .9}
+                    pos_hint: {'center_x': .5, 'center_y': .5}
                     size_hint_y: None
                     size_hint_x: .8
                     height: self.minimum_height
@@ -1552,20 +1555,23 @@ MainScreen:
                                 md_bg_color: root.getColor('gray')
                                 on_release: root.goToLogin()
                         
-        GridLayout:
+        StackLayout:
             id: create_page
             rows: 2
             padding:'0dp'
             cols: 1
             #rows_minimum: '48dp'
             size_hint_y: None
+            height: self.minimum_height
             pos_hint: {'center_x': .5, 'center_y': 10}
             width: '0dp'
-            spacing: 240
+            spacing: '20dp'
             Image:
                 source: 'assets/lightning.png'
-                size: self.texture_size
+                
                 size_hint_y: None
+                size: self.texture_size
+                height: self.texture_size[1]
                 padding: '60dp'
             
             FloatLayout:
@@ -1574,7 +1580,7 @@ MainScreen:
                 height: create_contents.height
                 StackLayout:
                     id: create_contents
-                    pos_hint: {'center_x': .5, 'center_y': .9}
+                    pos_hint: {'center_x': .5, 'center_y': .5}
                     size_hint_y: None
                     size_hint_x: .8
                     height: self.minimum_height
@@ -2051,23 +2057,9 @@ MainScreen:
                 font_size: '36sp'
             FloatLayout:
                 size_hint_y: None
-                height: role_card.height + 60
-                MDCard:
-                    id: role_card
-                    radius: '20dp'
-                    elevation: '2dp'
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-                    size_hint_y: None
-                    size_hint_x: None
-                    orientation: 'vertical'
-                    md_bg_color: root.getColor('gray')
-                    width: (len(account_role.text)*40) + 40
-                    height: '48dp'
-                    Label:
-                        id: account_role
-                        text: 'STUDENT'
-                        bold: True
-                        font_size: '20dp'
+                height: "108dp"
+                id: role_card_contents
+                
 
             
             FloatLayout:
