@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sparkclub/alternatesignin.dart';
+import 'package:sparkclub/idsignin.dart';
 import 'package:sparkclub/constants.dart';
 import 'package:sparkclub/homescreen.dart';
+import 'package:sparkclub/signup.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -121,6 +122,23 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).colorScheme.tertiary,
+                    onPrimary: Theme.of(context).colorScheme.onTertiary,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      PageRouteBuilder(
+                        pageBuilder: (ctx, animation1, animation2) => const Signup(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero
+                      ),
+                    );
+                  },
+                  child: const Text('Create Account'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).colorScheme.secondary,
                     onPrimary: Theme.of(context).colorScheme.onSecondary,
                   ),
@@ -128,7 +146,7 @@ class _SignInState extends State<SignIn> {
                     // TODO: fix animations
                     Navigator.of(context).pushReplacement(
                       PageRouteBuilder(
-                        pageBuilder: (ctx, animation1, animation2) => const AlternateSignIn(),
+                        pageBuilder: (ctx, animation1, animation2) => const IDSignIn(),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero
                       ),
