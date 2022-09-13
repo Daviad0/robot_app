@@ -123,4 +123,6 @@ abstract class FunctionConstants {
 
 abstract class StorageConstants {
   static const String usernameKey = 'username';
+  static const String nameKey = 'fullname';
+  static const String emailKey = 'email';
 }

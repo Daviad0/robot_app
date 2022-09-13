@@ -166,6 +166,8 @@ class _SignupState extends State<Signup> {
                       () async {
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.setString(StorageConstants.usernameKey, _usernameController.text);
+                        prefs.setString(StorageConstants.emailKey, _emailController.text);
+                        prefs.setString(StorageConstants.nameKey, _nameController.text);
                       }();
       
                       Navigator.of(context).pushReplacement(
@@ -196,6 +198,7 @@ class _SignupState extends State<Signup> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
