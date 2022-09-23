@@ -295,6 +295,7 @@ MainScreen:
                         size_hint_y: None
                         size_hint_x: None
                         width: self.minimum_width
+                        height: self.minimum_height
                         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                         spacing: "5dp"
                         padding: "5dp"
@@ -1289,6 +1290,7 @@ MainScreen:
                     theme_text_color: "Custom"
                     font_size: '16sp'
                     text_color: root.getColor('secondary')
+                    on_release: root.showInfo()
                 Label:
                     text: 'Item'
                     id: title
@@ -1332,14 +1334,7 @@ MainScreen:
                         md_bg_color: root.getColor('primary')
                         text: 'Open Link'
                         on_press: root.openLink()
-                    MDFillRoundFlatButton:
-                        id: deletebutton
-                        padding: '12dp'
-                        font_size: '12sp'
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                        md_bg_color: root.getColor('red')
-                        text: 'Delete Item'
-                        on_press: root.deleteItem()
+                    
 
 <Actions>:
     name: "actions"

@@ -707,6 +707,7 @@ class MemberItem(FloatLayout):
 
 class LandingItem(FloatLayout):
     weblink = StringProperty("")
+    admin = NumericProperty(0)
     moduleitemid = StringProperty("")
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -720,6 +721,18 @@ class LandingItem(FloatLayout):
         if(buttonId == 0):
             x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
             x.start()
+    def handleInfo(self, buttonId):
+        pass
+    def showInfo(self):
+        thisLandingItem = next(x for x in allLandingItems if x["_id"] == self.moduleitemid)
+        buttons = []
+        if(self.admin == 1):
+            buttons.append({"name":"Delete", "color":"red"})
+            buttons.append({"name":"Edit", "color":"primary"})
+            
+        
+        MDApp.get_running_app().root.ids.action_box.addData(thisLandingItem['title'], thisLandingItem['contents'], buttons, self.handleInfo)
+        MDApp.get_running_app().root.ids.action_box.show()
     def deleteItem(self):
         self.context = MDApp.get_running_app().root.ids.window_manager.current
         print(self.context)
@@ -1266,7 +1279,7 @@ class Error(Screen):
     def back(self):
         changePage("landing")
         
-    
+allLandingItems = []
 class Landing(Screen):
     def getColor(self, name):
         return COLORS[name.lower()]
@@ -1385,6 +1398,8 @@ class Landing(Screen):
             b = IDButton(text="Add New Item", md_bg_color=self.getColor("primary"), color=self.getColor('white'), font_size="12sp", padding="12dp", pos_hint={"center_x":.5, "center_y":.5}, on_release=self.showNewItem)
             fL.add_widget(b)
             self.ids.all_items.add_widget(fL)
+        global allLandingItems
+        allLandingItems = r[0]
         for lpi in r[0]:
             #self.ids.all_items.rows += 4
             
@@ -1405,12 +1420,13 @@ class Landing(Screen):
                 nW.weblink = lpi["result"]["data"]
             
             if(not admin):
-                nW.ids.buttonspan.remove_widget(nW.ids.deletebutton)
-                buttonsGone += 1
+                nW.admin = 0
+                
             else:
+                nW.admin = 1
                 nW.moduleitemid = lpi["_id"]
                 
-            if(buttonsGone == 2):
+            if(buttonsGone == 1):
                 nW.ids.landingitem_content.remove_widget(nW.ids.buttonct)
             if("color" in lpi):
                 try:
@@ -1797,9 +1813,11 @@ class Subgroup(Screen):
                 lI.weblink = i["result"]["data"]
             
             if(not self.admin or not SCI.permissionCheck(["ADMIN_LANDING"])):
-                lI.ids.buttonspan.remove_widget(lI.ids.deletebutton)
-                buttonsGone += 1
+
+                lI.admin = 0
+
             else:
+                lI.admin = 1
                 lI.moduleitemid = i["_id"]
                 
             if(buttonsGone == 2):
