@@ -629,7 +629,8 @@ class InputBox(FloatLayout):
                 multiline = b["multiline"]
                 protected = b["protected"]
                 id = "form" + str(n)
-                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1), max_height="100dp")
+                text = "" if not "value" in b else b["value"]
+                i = IDInput(inputid=n,multiline=multiline, password=protected, line_color_focus= self.getColor('primary'),line_color_normal= self.getColor('primary'), color_mode= 'custom', active_line=True, hint_text=hint, font_name= 'Roboto', border=(2,2,2,2), spacing=(20,20,20,20), padding=(20,20,20,20),border_color= (0,0,0,1), max_height="100dp", text=text)
                 i.bind(text=self.changeText)
                 i.line_color_focus = self.getColor('primary')
                 self.items[str(n)] = i
@@ -669,7 +670,8 @@ class InputBox(FloatLayout):
                 
                 self.ids.inputs.add_widget(fL)
             n+=1
-            self.data.append("")
+            text = "" if not "value" in b else b["value"]
+            self.data.append(text)
     def openDropdown(self, key):
 
         self.dropdowns[str(key.buttonid)].open()
@@ -718,9 +720,29 @@ class LandingItem(FloatLayout):
         #print("A")
         
     def handleConfirmation(self, buttonId):
+        global inPopup
         if(buttonId == 0):
             x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
             x.start()
+        elif(buttonId == 1):
+            thisLandingItem = next(x for x in allLandingItems if x["_id"] == self.moduleitemid)
+            inPopup = False
+            MDApp.get_running_app().root.ids.input_box.addData("Edit Landing Item", "Please input the edited values that you want for this landing item!", [
+                {"hint":"Title","multiline":False,"protected":False, "type":"input", "value": thisLandingItem["title"]},
+                {"hint":"Contents","multiline":True,"protected":False, "type":"input", "value": thisLandingItem["contents"]},
+                {"hint":"Link","multiline":False,"protected":False, "type":"input", "value": thisLandingItem["result"]["data"]}
+            ], self.handleEdit)
+            MDApp.get_running_app().root.ids.input_box.show()
+    def handleEdit(self, data):
+        #print(data)
+        self.context = MDApp.get_running_app().root.ids.window_manager.current
+        x = threading.Thread(target = self.bgHandleEdit, args = (data[0], data[1], data[2]), daemon=True)
+        x.start()
+    def bgHandleEdit(self, title, contents, linkto):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        SCI.edit_item(self.moduleitemid, title, contents, linkto)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        Clock.schedule_once(lambda x : changePage(self.context), 0)
     def handleInfo(self, buttonId):
         pass
     def showInfo(self):
@@ -731,11 +753,10 @@ class LandingItem(FloatLayout):
             buttons.append({"name":"Edit", "color":"primary"})
             
         
-        MDApp.get_running_app().root.ids.action_box.addData(thisLandingItem['title'], thisLandingItem['contents'], buttons, self.handleInfo)
+        MDApp.get_running_app().root.ids.action_box.addData(thisLandingItem['title'], thisLandingItem['contents'], buttons, self.handleConfirmation)
         MDApp.get_running_app().root.ids.action_box.show()
     def deleteItem(self):
         self.context = MDApp.get_running_app().root.ids.window_manager.current
-        print(self.context)
         MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "This will delete the Landing Item for EVERYONE, not just you seeing it!", [{"name" : "Delete", "color": "red"}], self.handleConfirmation)
         MDApp.get_running_app().root.ids.action_box.show()
     def bgDeleteItem(self, id):
