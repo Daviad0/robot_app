@@ -1,6 +1,6 @@
 # sparkclub
 
-[!sparkclub](https://raw.githubusercontent.com/frc-862/robot_app/main/assets/sparkclub.png)
+![sparkclub](/assets/sparkclub.png)
 
 #### Mobile application for managaging attendance and meetings, team-wide communications, as well announcements and informatino for individual subgroups.
 
