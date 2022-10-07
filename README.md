@@ -7,7 +7,7 @@
 ## Installing
 
 ### IOS
-For IOS, you need to install TestFlight since it has not been deployed on the App Store. To gain access to the app, you need to contact David.
+First, install TestFlight, then [use this link](https://testflight.apple.com/join/1GOd3RKw) while on your phone to join the app.
 
 ### Android
 The app has not been deployed to the play store, so you need to [download the raw APK](https://lr.robosmrt.com/ql/android).
