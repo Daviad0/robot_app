@@ -766,18 +766,6 @@ MainScreen:
                 md_bg_color: root.getColor('primary')
                 text: 'Announcements - Lightning Robotics'
                 on_release: root.showDropdown()
-        ScrollView:
-            do_scroll_x: False
-            do_scroll_y: True
-            size_hint_y: .8
-            pos_hint: {'center_x': .5, 'center_y': .5}
-            StackLayout:
-                size_hint_y: None
-                spacing: '12dp'
-                id: messages
-                height: self.minimum_height
-                
-                
         FloatLayout:
             size_hint_y: .1
             padding: '20dp'
@@ -811,6 +799,19 @@ MainScreen:
                     md_bg_color: root.getColor('primary')
                     text: 'Send'
                     on_release: root.sendMessage()
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            size_hint_y: .8
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            StackLayout:
+                size_hint_y: None
+                spacing: '12dp'
+                id: messages
+                height: self.minimum_height
+                
+                
+        
             
         
 
