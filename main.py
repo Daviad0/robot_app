@@ -313,10 +313,10 @@ class Meeting(Screen):
                 if(subgroup["name"] in user['access']['groups']):
                     doesManage = True
                     break
-            if(doesManage):
+            if(doesManage or SCI.permissionCheck(["ADMIN_SCHEDULE_ATTENDENCE_CONFIRM"]) or SCI.permissionCheck(["ADMIN_SCHEDULE_ATTENDENCE"])):
                 useUsers.append(user)
         
-        
+        useUsers.sort(key=lambda x: x["name"])
         self.ids.meeting_title_datetime.text = tM['title'] + " on " + str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
         self.ids.meeting_description.text = tM['description']
         self.ids.meeting_attending.text = fs
@@ -670,7 +670,11 @@ class InputBox(FloatLayout):
                 
                 self.ids.inputs.add_widget(fL)
             n+=1
-            text = "" if not "value" in b else b["value"]
+            text = ""
+            try:
+                text = "" if not "value" in b else b["value"]
+            except:
+                pass
             self.data.append(text)
     def openDropdown(self, key):
 
@@ -722,8 +726,7 @@ class LandingItem(FloatLayout):
     def handleConfirmation(self, buttonId):
         global inPopup
         if(buttonId == 0):
-            x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
-            x.start()
+            self.deleteItem()
         elif(buttonId == 1):
             thisLandingItem = next(x for x in allLandingItems if x["_id"] == self.moduleitemid)
             inPopup = False
@@ -733,6 +736,7 @@ class LandingItem(FloatLayout):
                 {"hint":"Link","multiline":False,"protected":False, "type":"input", "value": thisLandingItem["result"]["data"]}
             ], self.handleEdit)
             MDApp.get_running_app().root.ids.input_box.show()
+    
     def handleEdit(self, data):
         #print(data)
         self.context = MDApp.get_running_app().root.ids.window_manager.current
@@ -757,8 +761,11 @@ class LandingItem(FloatLayout):
         MDApp.get_running_app().root.ids.action_box.show()
     def deleteItem(self):
         self.context = MDApp.get_running_app().root.ids.window_manager.current
-        MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "This will delete the Landing Item for EVERYONE, not just you seeing it!", [{"name" : "Delete", "color": "red"}], self.handleConfirmation)
+        MDApp.get_running_app().root.ids.action_box.addData("Are You Sure?", "This will delete the Landing Item for EVERYONE, not just you seeing it!", [{"name" : "Delete", "color": "red"}], self.handleConfirmDelete)
         MDApp.get_running_app().root.ids.action_box.show()
+    def handleConfirmDelete(self):
+        x = threading.Thread(target = self.bgDeleteItem, args = (self.moduleitemid,), daemon=True)
+        x.start()
     def bgDeleteItem(self, id):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
         SCI.remove_item(id)
@@ -1421,8 +1428,26 @@ class Landing(Screen):
             self.ids.all_items.add_widget(fL)
         global allLandingItems
         allLandingItems = r[0]
+        f = "%Y-%m-%dT%H:%M:%S.%fZ"
         for lpi in r[0]:
             #self.ids.all_items.rows += 4
+            
+            if("details" in lpi):
+                
+                startRes = lpi["details"]["start"] if "start" in lpi["details"] else None
+                endRes = lpi["details"]["end"] if "end" in lpi["details"] else None
+                now = datetime.now()
+                if(startRes != None):
+                    start = datetime.strptime(startRes, f)
+                    start = start + timedelta(hours=getDSTOffset())
+                    if(start > now):
+                        continue
+                if(endRes != None):
+                    end = datetime.strptime(endRes, f)
+                    end = end + timedelta(hours=getDSTOffset())
+                    if(end < now):
+                        continue
+                
             
             
             nW = LandingItem()
@@ -1809,6 +1834,8 @@ class Subgroup(Screen):
                     mI.ids.date.text = str(dout.month) + "/" + str(dout.day) + " @ " + str(dout.hour - 12 if dout.hour > 12 else dout.hour) + ":" + str(dout.minute).zfill(2) + ("PM" if dout.hour >= 12 else "AM")
                     self.ids.meetings.add_widget(mI)
                     show -= 1
+        global allLandingItems
+        allLandingItems = items
         for i in items:
             lI = LandingItem()
             lI.ids.title.text = i["title"]
