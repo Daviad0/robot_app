@@ -1388,7 +1388,7 @@ MainScreen:
                 padding: '60dp'
                 height: form_contents.height
                 GridLayout:
-                    rows: 3
+                    rows: 4
                     id: form_contents
                     cols: 1
                     row_default_height: '36dp'
@@ -1463,6 +1463,8 @@ MainScreen:
                                 text: "External Sign In"
                                 md_bg_color: root.getColor('gray')
                                 on_release: root.goToTempLogin()
+                    
+                            
         StackLayout:
             id: temp_page
             padding:'0dp'

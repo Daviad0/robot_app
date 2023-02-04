@@ -154,7 +154,24 @@ class SparkClub():
             return data["items"]
         else:
             return []
+    def reset_code_request(self, email, studentId):
+        if self.account["loggedIn"]:
+            return None
+        res = self._sendAPIRequest("POST", "/acc/requestcode", data={"email": email, "studentid": studentId})
+        if(res["status"] == 200):
+            return res["data"]
+        else:
+            return None
+    def reset_password_code(self, code, password, userId):
+        if self.account["loggedIn"]:
+            return None
         
+        res = self._sendAPIRequest("POST", "/acc/reset", data={"code": code, "newPw": password, "uid": userId})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def get_protons(self):
         if not self.account["loggedIn"]:
             return None
@@ -162,6 +179,16 @@ class SparkClub():
         res = self._sendAPIRequest("GET", "/group/protons")
         if(res["status"] == 200):
             return res["data"]
+        else:
+            return None
+    def get_my_attendance(self):
+        if not self.account["loggedIn"]:
+            return None
+        
+        res = self._sendAPIRequest("GET", "/group/report/attendance/you")
+        data = res["data"]
+        if(res["status"] == 200):
+            return data
         else:
             return None
     def get_subgroups(self):
@@ -206,6 +233,18 @@ class SparkClub():
             return res["data"]
         else:
             return None
+    def edit_item(self, id, title, contents, linkto):
+        if not self.account["loggedIn"]:
+            return False
+        
+        action = "link" if linkto else "static"
+        
+        res = self._sendAPIRequest("POST", "/group/item", data={"_id": id, "action": "edit", "title": title, "contents": contents, "resultdata": [action, linkto]})
+        data = res["data"]
+        if(res["status"] == 200 and data["successful"]):
+            return True
+        else:
+            return False
     def create_new_item(self, title, contents, linkto, subgroup=None, icon="star"):
         if not self.account["loggedIn"]:
             return False

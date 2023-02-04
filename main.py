@@ -726,6 +726,7 @@ class LandingItem(FloatLayout):
     def handleConfirmation(self, buttonId):
         global inPopup
         if(buttonId == 0):
+            inPopup = False
             self.deleteItem()
         elif(buttonId == 1):
             thisLandingItem = next(x for x in allLandingItems if x["_id"] == self.moduleitemid)
@@ -839,7 +840,7 @@ class MemberStatus(FloatLayout):
         x.start()
 
 
-
+resetUID = ""
 
 
 class Login(Screen):
@@ -873,6 +874,47 @@ class Login(Screen):
             #print("Go to temp login")
             self.ids.login_page.pos_hint = {'center_x': 0.5, 'center_y': 10}
             self.ids.create_page.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+    def forgetDialogue(self):
+        if(not inPopup):
+           MDApp.get_running_app().root.ids.input_box.addData("Prove You're You", "To be able to reset your password, you have to first provide your email and Student ID that you created your account with", [
+                {"hint":"Email","multiline":False,"protected":False, "type":"input", "value": ""},
+                {"hint":"Student ID","multiline":False,"protected":False, "type":"input", "value": ""}
+            ], self.handleForget)
+           MDApp.get_running_app().root.ids.input_box.show()
+    def api_getCode(self, email, sid):
+        global resetUID
+        res = SCI.get_reset_code(email, sid)
+        resetUID = res["userId"]
+   
+    def handleForget(self, data):
+        global inPopup
+        x = threading.Thread(target = self.api_getCode, args = (data[0],data[1],), daemon=True)
+        x.start()
+        inPopup = False
+        MDApp.get_running_app().root.ids.input_box.addData("Reset Password", "You should've gotten a code to your email if the information was correct. Please enter it in here, along with your new password...", [
+                {"hint":"Code","multiline":False,"protected":False, "type":"input", "value": ""},
+                {"hint":"New Password","multiline":False,"protected":True, "type":"input", "value": ""},
+                {"hint":"Confirm Password","multiline":False,"protected":True, "type":"input", "value": ""},
+            ], self.handleReset)
+        MDApp.get_running_app().root.ids.input_box.show()
+        
+        pass
+    def handleReset(self, data):
+        if(data[0] == ""):
+            return
+        if(data[1] == data[2]):
+            global inPopup
+            x = threading.Thread(target = self.api_resetPassword, args = (data[0],data[1],), daemon=True)
+            x.start()
+            inPopup = False
+        pass
+    def api_resetPassword(self, code, password):
+        Clock.schedule_once(lambda x : toggle_message_box(True), 0)
+        success = SCI.reset_password_code(code, password, resetUID)
+        Clock.schedule_once(lambda x : toggle_message_box(False), 0)
+        
+        
+        pass
     def goToLogin(self):
         if(not inPopup):
             #print("Go to temp login")
@@ -926,6 +968,14 @@ class Login(Screen):
     def apiExternalSubmit(self, externalId):
         Clock.schedule_once(lambda x : toggle_message_box(True), 0)
         SCI.try_external_login(externalId)
+        '''
+        buttons = [{"name" : "Show Meeting Page", "color": "primary"}]
+        if(sgAttending):
+            buttons.append({"name": "Request EXCUSED", "color": "primary"})
+        
+        MDApp.get_running_app().root.ids.action_box.addData(m['title'], m['description'] + "\n\n" + str(m['length']) + " hours\n\n" + fs, buttons, self.handleUpcomingOverlay)
+        MDApp.get_running_app().root.ids.action_box.show()
+        '''
         Clock.schedule_once(lambda x : toggle_message_box(False), 0)
         Clock.schedule_once(lambda x : self.goToLogin(), 0)
     def externalSubmit(self):
@@ -1362,7 +1412,10 @@ class Landing(Screen):
         self.removeAllElements()
         #self.ids.all_items.rows = 9
         
-        
+        memberAttendance = SCI.get_my_attendance()
+        if(not memberAttendance == None):
+            attendanceSummary = Label(text = "Total Hours: " + str(memberAttendance["hours"]), font_size = "24dp", font_name =  'Roboto', color = self.getColor("secondary"),size_hint_y= None, bold=True)
+            self.ids.all_items.add_widget(attendanceSummary)
         
         admin = SCI.permissionCheck(["ADMIN_LANDING"])
         canCreate = SCI.permissionCheck(["ADMIN_LANDING_CREATE", "ADMIN_LANDING"])
